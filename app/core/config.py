@@ -27,13 +27,13 @@ class Settings(BaseSettings):
     VERSION: str = "2.0.0"
 
     # Supabase Configuration
-    SUPABASE_URL: str
-    SUPABASE_ANON_KEY: str
+    SUPABASE_URL: str = "https://placeholder.supabase.co"
+    SUPABASE_ANON_KEY: str = "placeholder-key"
     SUPABASE_SERVICE_ROLE_KEY: Optional[str] = None
 
     # AI Service Configuration (OpenRouter + DeepSeek)
     MODEL_NAME: str = "deepseek/deepseek-chat"
-    API_KEY: str
+    API_KEY: str = "placeholder-api-key"
     API_BASE: str = "https://openrouter.ai/api/v1"
     
     # Scaling & Performance
