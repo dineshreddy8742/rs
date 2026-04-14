@@ -86,11 +86,20 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             status_code=exc.status_code, content={"detail": str(exc.detail)}
         )
 
-    # For other errors on web routes, show a simple error page
+    # For other errors on web routes, show an error page with details
+    error_title = "Page Not Found" if exc.status_code == 404 else "Error Occurred"
+    if exc.status_code == 403: error_title = "Access Denied"
+    if exc.status_code == 401: error_title = "Authentication Required"
+    
     return templates.TemplateResponse(
         request,
         "404.html",
-        {"request": request, "status_code": exc.status_code, "detail": str(exc.detail)},
+        {
+            "request": request, 
+            "status_code": exc.status_code, 
+            "error_title": error_title,
+            "detail": str(exc.detail)
+        },
         status_code=exc.status_code,
     )
 
@@ -118,7 +127,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         {
             "request": request,
             "status_code": 422,
-            "detail": "Validation Error: Please check your input data.",
+            "error_title": "Validation Error",
+            "detail": "Please check your input data. Some required fields might be missing or in the wrong format.",
         },
         status_code=422,
     )
