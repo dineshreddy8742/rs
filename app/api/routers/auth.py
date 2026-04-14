@@ -175,17 +175,22 @@ async def login(req: LoginRequest, response: Response):
     try:
         # Try to find user by email or roll_number
         user = None
-        if req.email:
-            user = await repo.get_user_by_email(req.email.lower())
-            email = req.email.lower()
+        email = None
+        
+        # Check if input looks like an email (contains @)
+        if '@' in identifier:
+            user = await repo.get_user_by_email(identifier.lower())
+            email = identifier.lower()
+            print(f"DEBUG: Looking up by EMAIL: {identifier}")
         else:
-            # Login with roll_number
+            # Try roll_number lookup
             user = await repo.get_user_by_roll_number(identifier.lower())
             email = user.get("email") if user else None
+            print(f"DEBUG: Looking up by ROLL_NUMBER: {identifier}")
         
         print(f"DEBUG LOGIN ATTEMPT: identifier={identifier}, user_found={user is not None}")
         if user:
-            print(f"DEBUG USER: id={user.get('id')}, has_password={bool(user.get('password_hash'))}")
+            print(f"DEBUG USER: id={user.get('id')}, roll={user.get('roll_number')}, has_password={bool(user.get('password_hash'))}, is_active={user.get('is_active')}")
         
         if not user:
             raise HTTPException(status_code=401, detail="User not found. Contact admin to create account.")
