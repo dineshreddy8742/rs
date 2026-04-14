@@ -44,6 +44,31 @@
                     <p class="text-4xl font-black text-white mt-2" x-text="users.filter(u => u.status === 'blocked').length"></p>
                 </div>
             </div>
+
+            <!-- Recent Activity Feed -->
+            <div class="bg-white/10 border border-white/20 rounded-3xl backdrop-blur-xl overflow-hidden">
+                <div class="px-6 py-5 border-b border-white/10 flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-white">🔥 Recent Activity</h3>
+                    <span class="text-xs text-blue-300">Latest 10 student registrations</span>
+                </div>
+                <div class="divide-y divide-white/5">
+                    <template x-for="act in recentActivity" :key="act.id">
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-xl">👤</div>
+                                <div>
+                                    <p class="text-sm font-bold text-white"><span x-text="act.name"></span> joined from <span class="text-cyan-400" x-text="act.college"></span></p>
+                                    <p class="text-[10px] text-blue-300 uppercase tracking-tighter" x-text="new Date(act.created_at).toLocaleString()"></p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] bg-green-500/20 text-green-300 px-2 py-0.5 rounded border border-green-500/30 font-bold uppercase">New Student</span>
+                        </div>
+                    </template>
+                    <template x-if="recentActivity.length === 0">
+                        <div class="px-6 py-10 text-center text-blue-300">No recent activity found.</div>
+                    </template>
+                </div>
+            </div>
         </div>
 
         <!-- Tab 2: Organizations (Colleges) -->
@@ -276,6 +301,7 @@ function adminDashboard() {
         colleges: [],
         searchQuery: '',
         statusFilter: 'all',
+        recentActivity: [],
         showAddModal: false,
         newCollege: { name: '', email: '' },
         showEditModal: false,
@@ -294,14 +320,16 @@ function adminDashboard() {
 
         async refreshData() {
             try {
-                const [statsRes, usersRes, collegesRes] = await Promise.all([
+                const [statsRes, usersRes, collegesRes, activityRes] = await Promise.all([
                     fetch('/api/auth/admin/stats'),
                     fetch('/api/auth/admin/users'),
-                    fetch('/api/auth/admin/colleges')
+                    fetch('/api/auth/admin/colleges'),
+                    fetch('/api/auth/admin/activity')
                 ]);
                 this.stats = await statsRes.json();
                 this.users = await usersRes.json();
                 this.colleges = await collegesRes.json();
+                this.recentActivity = await activityRes.json();
             } catch (e) { console.error("Admin init failed", e); }
         },
 
@@ -324,13 +352,15 @@ function adminDashboard() {
         async addCollege() {
             this.loading = true;
             try {
-                const res = await fetch(`/api/auth/admin/colleges?name=${encodeURIComponent(this.newCollege.name)}&email=${encodeURIComponent(this.newCollege.email)}`, {
-                    method: 'POST'
+                const res = await fetch('/api/auth/admin/colleges', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(this.newCollege)
                 });
                 if (res.ok) {
                     this.newCollege = { name: '', email: '' };
                     await this.refreshData();
-                    alert("College registered successfully!");
+                    alert("College registered successfully! 🎉");
                 } else {
                     const errorData = await res.json();
                     alert("Error: " + (errorData.detail || "Registration failed"));
@@ -383,13 +413,13 @@ function adminDashboard() {
         },
 
         deleteCollege(collegeId, collegeName) {
-            if (confirm(`Are you sure you want to delete "${collegeName}"? This action cannot be undone.`)) {
+            if (confirm(`Are you sure you want to delete "${collegeName}"?\n\nThis will remove the organization BUT will not delete students already enrolled under this name.`)) {
                 this.loading = true;
                 fetch(`/api/auth/admin/colleges/${collegeId}`, {
                     method: 'DELETE'
                 })
-                .then(res => res.json())
-                .then(data => {
+                .then(async res => {
+                    const data = await res.json();
                     if (res.ok) {
                         alert(data.message || "College deleted successfully!");
                         this.refreshData();
@@ -399,11 +429,12 @@ function adminDashboard() {
                 })
                 .catch(e => {
                     console.error(e);
-                    alert("Delete failed: " + e.message);
+                    alert("Network error: " + e.message);
                 })
                 .finally(() => { this.loading = false; });
             }
         },
+
 
         async addUser() {
             try {

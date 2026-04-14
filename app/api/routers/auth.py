@@ -382,6 +382,15 @@ async def admin_bulk_import(users: List[RegisterRequest], user_id: str = Depends
     return {"success": True, "count": len(result.data) if result.data else 0}
 
 
+# ===== College Management Models =====
+class CollegeCreate(BaseModel):
+    name: str
+    email: str
+
+class CollegeUpdate(BaseModel):
+    name: str
+    email: str
+
 # ===== College Management =====
 
 @auth_router.get("/admin/colleges")
@@ -395,25 +404,25 @@ async def get_colleges(user_id: str = Depends(get_current_user)):
     return result.data
 
 @auth_router.post("/admin/colleges")
-async def add_college(name: str, email: str, user_id: str = Depends(get_current_user)):
+async def add_college(req: CollegeCreate, user_id: str = Depends(get_current_user)):
     repo = UserRepository()
     admin = await repo.get_user_by_id(user_id)
     if not admin or (not admin.get("is_admin", False) and admin.get("role") != "admin"):
         raise HTTPException(status_code=403, detail="Admin access required")
 
-    result = repo._get_supabase_client().table("colleges").insert({"name": name, "email": email}).execute()
+    result = repo._get_supabase_client().table("colleges").insert({"name": req.name, "email": req.email}).execute()
     if result.data:
         return result.data[0]
-    return {"name": name, "email": email, "success": True}
+    return {"name": req.name, "email": req.email, "success": True}
 
 @auth_router.put("/admin/colleges/{college_id}")
-async def update_college(college_id: str, name: str, email: str, user_id: str = Depends(get_current_user)):
+async def update_college(college_id: str, req: CollegeUpdate, user_id: str = Depends(get_current_user)):
     repo = UserRepository()
     admin = await repo.get_user_by_id(user_id)
     if not admin or (not admin.get("is_admin", False) and admin.get("role") != "admin"):
         raise HTTPException(status_code=403, detail="Admin access required")
 
-    result = repo._get_supabase_client().table("colleges").update({"name": name, "email": email}).eq("id", college_id).execute()
+    result = repo._get_supabase_client().table("colleges").update({"name": req.name, "email": req.email}).eq("id", college_id).execute()
     if result.data:
         return result.data[0]
     raise HTTPException(status_code=404, detail="College not found")
@@ -421,25 +430,26 @@ async def update_college(college_id: str, name: str, email: str, user_id: str = 
 @auth_router.delete("/admin/colleges/{college_id}")
 async def delete_college(college_id: str, user_id: str = Depends(get_current_user)):
     repo = UserRepository()
-    admin = await repo.get_user_by_id(user_id)
-    if not admin or (not admin.get("is_admin", False) and admin.get("role") != "admin"):
-        raise HTTPException(status_code=403, detail="Admin access required")
+    # Check if college info exists to get the name
+    college_res = repo._get_supabase_client().table("colleges").select("name").eq("id", college_id).execute()
+    if not college_res.data:
+        raise HTTPException(status_code=404, detail="College not found")
+    
+    college_name = college_res.data[0].get("name")
 
-    # Check if college has students
-    students = repo._get_supabase_client().table("users").select("id").eq("college", college_id).execute()
+    # Check if college has students (by name)
+    students = repo._get_supabase_client().table("users").select("id").eq("college", college_name).execute()
     if students.data and len(students.data) > 0:
         raise HTTPException(status_code=400, detail=f"Cannot delete college with {len(students.data)} enrolled students. Remove students first.")
 
     result = repo._get_supabase_client().table("colleges").delete().eq("id", college_id).execute()
-    if result.data:
-        return {"success": True, "message": "College deleted successfully"}
-    raise HTTPException(status_code=404, detail="College not found")
+    return {"success": True, "message": "College deleted successfully"}
 
 @auth_router.get("/admin/colleges/{college_id}/details")
 async def get_college_details(college_id: str, user_id: str = Depends(get_current_user)):
     repo = UserRepository()
     admin = await repo.get_user_by_id(user_id)
-    if not admin or not admin.get("is_admin", False):
+    if not admin or (not admin.get("is_admin", False) and admin.get("role") != "admin"):
         raise HTTPException(status_code=403, detail="Admin access required")
 
     # Get college info
@@ -465,7 +475,7 @@ async def update_user_status(target_id: str, status: str, user_id: str = Depends
     """Set user status to 'approved', 'pending', or 'blocked'."""
     repo = UserRepository()
     admin = await repo.get_user_by_id(user_id)
-    if not admin or not admin.get("is_admin", False):
+    if not admin or (not admin.get("is_admin", False) and admin.get("role") != "admin"):
         raise HTTPException(status_code=403, detail="Admin access required")
 
     # If blocking, also set is_active to false
@@ -478,7 +488,7 @@ async def update_user_status(target_id: str, status: str, user_id: str = Depends
 async def delete_user(target_id: str, user_id: str = Depends(get_current_user)):
     repo = UserRepository()
     admin = await repo.get_user_by_id(user_id)
-    if not admin or not admin.get("is_admin", False):
+    if not admin or (not admin.get("is_admin", False) and admin.get("role") != "admin"):
         raise HTTPException(status_code=403, detail="Admin access required")
 
     success = await repo.delete_user(target_id)
@@ -537,3 +547,14 @@ async def admin_update_user(req: AdminUserUpdate, user_id: str = Depends(get_cur
         raise HTTPException(status_code=500, detail="Failed to update user")
     
     return {"success": True, "message": "User updated successfully"}
+
+@auth_router.get("/admin/activity")
+async def get_recent_activity(user_id: str = Depends(get_current_user)):
+    """Get 10 most recent user registrations."""
+    repo = UserRepository()
+    admin = await repo.get_user_by_id(user_id)
+    if not admin or (not admin.get("is_admin", False) and admin.get("role") != "admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = repo._get_supabase_client().table("users").select("id, name, email, college, created_at").order("created_at", desc=True).limit(10).execute()
+    return result.data or []
