@@ -42,7 +42,7 @@ from app.services.ai.resume_enrichment import ResumeEnrichmentWizard
 from app.services.ai.phrase_blacklist import detect_ai_phrases, replace_ai_phrases, get_blacklist_stats
 from app.services.resume.latex_generator import LaTeXGenerator
 from app.services.resume.pdf_generator import generate_resume_pdf
-from app.core.security import get_current_user_optional
+from app.core.security import get_current_user, get_current_user_optional
 from app.database.repositories.user_repository import UserRepository
 from app.utils.file_handling import create_temporary_pdf, extract_text_from_pdf
 from app.utils.scalability import get_ai_semaphore, get_job_status, set_job_status
@@ -515,10 +515,9 @@ async def track_download(
         await user_repo.increment_download_count(resume.get("user_id"))
     return {"success": True}
 
-@resume_router.post("/save-manual")
 async def save_manual_resume(
     request: ManualSaveRequest,
-    user_id: str = Depends(get_current_user_id),
+    user_id: str = Depends(get_current_user),
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
     """Save a manually built resume to the database."""
