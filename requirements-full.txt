@@ -1,0 +1,43 @@
+# Core Web Framework
+fastapi[standard]
+uvicorn[standard]
+pydantic-settings
+pydantic>=2.0.0
+python-multipart
+jinja2
+
+# Database & Storage
+supabase>=2.0.0
+python-dotenv
+httpx
+
+# AI & Processing
+openai
+langchain-openai
+langchain
+langchain-community
+tiktoken
+pypdf
+PyPDF2
+scikit-learn
+sentence-transformers
+
+# Utilities & Security
+python-jose[cryptography]
+passlib[bcrypt]
+authlib
+itsdangerous
+slowapi
+psutil
+ruff
+markdown
+fpdf2
+
+# Documentation
+mkdocs
+mkdocs-material
+
+# Optional/Service Specific
+pytesseract
+pdf2image
+opencv-python

@@ -11,33 +11,13 @@ supabase>=2.0.0
 python-dotenv
 httpx
 
-# AI & Processing
+# AI
 openai
-langchain-openai
-langchain
-langchain-community
-tiktoken
-pypdf
-PyPDF2
-scikit-learn
-sentence-transformers
 
-# Utilities & Security
+# Security
 python-jose[cryptography]
 passlib[bcrypt]
-authlib
-itsdangerous
-slowapi
-psutil
-ruff
+
+# Utilities
 markdown
 fpdf2
-
-# Documentation
-mkdocs
-mkdocs-material
-
-# Optional/Service Specific
-pytesseract
-pdf2image
-opencv-python
