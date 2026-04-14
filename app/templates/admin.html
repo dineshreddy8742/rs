@@ -83,11 +83,32 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-sm font-bold text-white" x-text="users.filter(u => u.college === college.name).length + ' Students'"></p>
-                                <button class="text-xs text-pink-400 hover:text-pink-300 mt-1 font-bold">Edit Details</button>
+                                <button @click="editCollegeModal(college)" class="text-xs text-pink-400 hover:text-pink-300 mt-1 font-bold">Edit Details</button>
                             </div>
                         </div>
                     </template>
                 </div>
+            </div>
+        </div>
+
+        <!-- Edit College Modal -->
+        <div x-show="showEditModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" @click.self="closeEditModal()">
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-white/20 rounded-3xl p-8 w-full max-w-md mx-4 shadow-2xl">
+                <h3 class="text-2xl font-black text-white mb-6">✏️ Edit College</h3>
+                <form @submit.prevent="saveCollegeEdit" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-blue-300 mb-1 uppercase">College Name</label>
+                        <input x-model="editingCollege.name" type="text" required class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-blue-300 mb-1 uppercase">College Email</label>
+                        <input x-model="editingCollege.email" type="email" required class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-400">
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" @click="closeEditModal()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl text-white font-bold transition-all">Cancel</button>
+                        <button type="submit" :disabled="loading" class="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 py-3 rounded-xl text-white font-black hover:scale-[1.02] transition-all">Save Changes</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -254,6 +275,8 @@ function adminDashboard() {
         statusFilter: 'all',
         showAddModal: false,
         newCollege: { name: '', email: '' },
+        showEditModal: false,
+        editingCollege: { id: '', name: '', email: '' },
         newUser: { name: '', email: '', roll_number: '', role: 'student', college: 'SVCET', password: '' },
         dragOver: false,
         csvPreview: [],
@@ -305,6 +328,42 @@ function adminDashboard() {
                 } else {
                     const errorData = await res.json();
                     alert("Error: " + (errorData.detail || "Registration failed"));
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Action failed: " + e.message);
+            }
+            finally { this.loading = false; }
+        },
+
+        editCollegeModal(college) {
+            this.editingCollege = { ...college };
+            this.showEditModal = true;
+        },
+
+        closeEditModal() {
+            this.showEditModal = false;
+            this.editingCollege = { id: '', name: '', email: '' };
+        },
+
+        async saveCollegeEdit() {
+            this.loading = true;
+            try {
+                const res = await fetch(`/api/auth/admin/colleges/${this.editingCollege.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: this.editingCollege.name,
+                        email: this.editingCollege.email
+                    })
+                });
+                if (res.ok) {
+                    this.closeEditModal();
+                    await this.refreshData();
+                    alert("College updated successfully!");
+                } else {
+                    const errorData = await res.json();
+                    alert("Error: " + (errorData.detail || "Update failed"));
                 }
             } catch (e) {
                 console.error(e);

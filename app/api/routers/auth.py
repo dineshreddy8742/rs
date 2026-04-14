@@ -381,6 +381,18 @@ async def add_college(name: str, email: str, user_id: str = Depends(get_current_
         return result.data[0]
     return {"name": name, "email": email, "success": True}
 
+@auth_router.put("/admin/colleges/{college_id}")
+async def update_college(college_id: str, name: str, email: str, user_id: str = Depends(get_current_user)):
+    repo = UserRepository()
+    admin = await repo.get_user_by_id(user_id)
+    if not admin or not admin.get("is_admin", False):
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    result = repo._get_supabase_client().table("colleges").update({"name": name, "email": email}).eq("id", college_id).execute()
+    if result.data:
+        return result.data[0]
+    raise HTTPException(status_code=404, detail="College not found")
+
 # ===== User Status Control =====
 
 @auth_router.post("/admin/users/{target_id}/status")
