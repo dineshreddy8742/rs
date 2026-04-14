@@ -187,11 +187,10 @@ async def login(req: LoginRequest, response: Response):
             raise HTTPException(status_code=401, detail="User not found. Please register first.")
         
         # Check password hash
-        from passlib.context import CryptContext
-        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        from app.core.security import verify_password
         
         stored_hash = user.get("password_hash")
-        if not stored_hash or not pwd_context.verify(req.password, stored_hash):
+        if not stored_hash or not verify_password(req.password, stored_hash):
             raise HTTPException(status_code=401, detail="Invalid password.")
         
         # Check user status
