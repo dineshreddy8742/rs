@@ -116,12 +116,20 @@ function loginForm() {
                 
                 // Save user info to local storage for quick access if needed
                 localStorage.setItem('user', JSON.stringify(data));
-                
-                if (data.is_admin || this.role === 'admin') {
-                    window.location.href = '/admin';
-                } else {
-                    window.location.href = '/dashboard';
-                }
+
+                console.log('Login response:', data);
+                console.log('is_admin:', data.is_admin, 'role:', this.role);
+
+                // Brief pause then redirect
+                setTimeout(() => {
+                    if (data.is_admin || this.role === 'admin') {
+                        alert('Login successful! Redirecting to admin panel...');
+                        window.location.href = '/admin';
+                    } else {
+                        alert('Login successful! Redirecting to dashboard...');
+                        window.location.href = '/dashboard';
+                    }
+                }, 500);
             } catch(e) {
                 this.error = e.message;
             } finally {
