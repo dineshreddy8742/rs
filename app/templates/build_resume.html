@@ -852,7 +852,17 @@ function resumeBuilder() {
 
         downloadPDF() {
             this.showDownloadModal = false;
-            window.print();
+            const element = document.getElementById('resume-content');
+            const opt = {
+                margin: 0,
+                filename: (this.data.name || 'Resume') + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            
+            // New Promise-based usage:
+            html2pdf().set(opt).from(element).save();
         },
         printResume() { this.showDownloadModal = false; window.print(); },
         
