@@ -370,16 +370,16 @@ async def get_colleges(user_id: str = Depends(get_current_user)):
     return result.data
 
 @auth_router.post("/admin/colleges")
-async def add_college(name: str, location: str = "", user_id: str = Depends(get_current_user)):
+async def add_college(name: str, user_id: str = Depends(get_current_user)):
     repo = UserRepository()
     admin = await repo.get_user_by_id(user_id)
     if not admin or not admin.get("is_admin", False):
         raise HTTPException(status_code=403, detail="Admin access required")
 
-    result = repo._get_supabase_client().table("colleges").insert({"name": name, "location": location}).execute()
+    result = repo._get_supabase_client().table("colleges").insert({"name": name}).execute()
     if result.data:
         return result.data[0]
-    return {"name": name, "location": location, "success": True}
+    return {"name": name, "success": True}
 
 # ===== User Status Control =====
 
