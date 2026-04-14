@@ -270,27 +270,37 @@ class AdminStats(BaseModel):
     users_by_college: dict
     recent_logins: list
 
-@auth_router.get("/admin/stats", response_model=AdminStats)
+@auth_router.get("/admin/stats")
 async def get_admin_stats(user_id: str = Depends(get_current_user)):
-    """Get admin dashboard statistics."""
+    """Get statistics for admin dashboard (admin only)."""
     repo = UserRepository()
     user = await repo.get_user_by_id(user_id)
     if not user or not user.get("is_admin", False):
         raise HTTPException(status_code=403, detail="Admin access required")
-    
-    stats = await repo.get_admin_stats()
-    
-    # Get total resumes from resume repo
-    resume_repo = ResumeRepository()
-    all_resumes = []
-    for u in stats.get("recent_logins", []):
-        uid = u.get("id")
-        if uid:
-            user_resumes = await resume_repo.get_resumes_by_user_id(uid)
-            all_resumes.extend(user_resumes)
-    
-    stats["total_resumes"] = sum(u.get("resume_count", 0) for u in await repo.get_all_users())
-    return stats
+
+    try:
+        stats = await repo.get_admin_stats()
+
+        # Ensure colleges list is fetched correctly
+        colleges_result = repo._get_supabase_client().table("colleges").select("name").execute()
+        stats["colleges"] = [c["name"] for c in colleges_result.data] if colleges_result.data else []
+
+        # Calculate total resumes safely
+        users = await repo.get_all_users()
+        stats["total_users"] = len(users)
+        stats["total_resumes"] = sum(u.get("resume_count", 0) for u in users)
+
+        return stats
+    except Exception as e:
+        print(f"Error fetching admin stats: {e}")
+        return {
+            "total_users": 0,
+            "total_resumes": 0,
+            "colleges": [],
+            "users_by_college": {},
+            "recent_logins": []
+        }
+
 
 
 @auth_router.get("/admin/users")
@@ -392,6 +402,46 @@ async def update_college(college_id: str, name: str, email: str, user_id: str = 
     if result.data:
         return result.data[0]
     raise HTTPException(status_code=404, detail="College not found")
+
+@auth_router.delete("/admin/colleges/{college_id}")
+async def delete_college(college_id: str, user_id: str = Depends(get_current_user)):
+    repo = UserRepository()
+    admin = await repo.get_user_by_id(user_id)
+    if not admin or not admin.get("is_admin", False):
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    # Check if college has students
+    students = repo._get_supabase_client().table("users").select("id").eq("college", college_id).execute()
+    if students.data and len(students.data) > 0:
+        raise HTTPException(status_code=400, detail=f"Cannot delete college with {len(students.data)} enrolled students. Remove students first.")
+
+    result = repo._get_supabase_client().table("colleges").delete().eq("id", college_id).execute()
+    if result.data:
+        return {"success": True, "message": "College deleted successfully"}
+    raise HTTPException(status_code=404, detail="College not found")
+
+@auth_router.get("/admin/colleges/{college_id}/details")
+async def get_college_details(college_id: str, user_id: str = Depends(get_current_user)):
+    repo = UserRepository()
+    admin = await repo.get_user_by_id(user_id)
+    if not admin or not admin.get("is_admin", False):
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    # Get college info
+    college_result = repo._get_supabase_client().table("colleges").select("*").eq("id", college_id).execute()
+    if not college_result.data:
+        raise HTTPException(status_code=404, detail="College not found")
+    
+    college = college_result.data[0]
+    
+    # Get students from this college
+    students = repo._get_supabase_client().table("users").select("id, name, email, roll_number, is_active, resume_count, created_at").eq("college", college.get("name", "")).execute()
+    
+    college["students"] = students.data or []
+    college["total_students"] = len(college["students"])
+    college["total_resumes"] = sum(s.get("resume_count", 0) for s in college["students"])
+    
+    return college
 
 # ===== User Status Control =====
 

@@ -73,7 +73,7 @@
                 </div>
                 <div class="divide-y divide-white/5">
                     <template x-for="college in colleges" :key="college.id">
-                        <div class="px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer" @click="viewCollegeDetails(college.id)">
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-2xl">🏫</div>
                                 <div>
@@ -83,7 +83,10 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-sm font-bold text-white" x-text="users.filter(u => u.college === college.name).length + ' Students'"></p>
-                                <button @click="editCollegeModal(college)" class="text-xs text-pink-400 hover:text-pink-300 mt-1 font-bold">Edit Details</button>
+                                <div class="flex gap-2 mt-1">
+                                    <button @click.stop="editCollegeModal(college)" class="text-xs text-cyan-400 hover:text-cyan-300 font-bold">Edit</button>
+                                    <button @click.stop="deleteCollege(college.id, college.name)" class="text-xs text-pink-400 hover:text-pink-300 font-bold">Delete</button>
+                                </div>
                             </div>
                         </div>
                     </template>
@@ -277,6 +280,9 @@ function adminDashboard() {
         newCollege: { name: '', email: '' },
         showEditModal: false,
         editingCollege: { id: '', name: '', email: '' },
+        showDeleteConfirm: false,
+        deletingCollegeId: '',
+        deletingCollegeName: '',
         newUser: { name: '', email: '', roll_number: '', role: 'student', college: 'SVCET', password: '' },
         dragOver: false,
         csvPreview: [],
@@ -370,6 +376,33 @@ function adminDashboard() {
                 alert("Action failed: " + e.message);
             }
             finally { this.loading = false; }
+        },
+
+        viewCollegeDetails(collegeId) {
+            window.location.href = `/admin/colleges/${collegeId}`;
+        },
+
+        deleteCollege(collegeId, collegeName) {
+            if (confirm(`Are you sure you want to delete "${collegeName}"? This action cannot be undone.`)) {
+                this.loading = true;
+                fetch(`/api/auth/admin/colleges/${collegeId}`, {
+                    method: 'DELETE'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (res.ok) {
+                        alert(data.message || "College deleted successfully!");
+                        this.refreshData();
+                    } else {
+                        alert("Error: " + (data.detail || "Delete failed"));
+                    }
+                })
+                .catch(e => {
+                    console.error(e);
+                    alert("Delete failed: " + e.message);
+                })
+                .finally(() => { this.loading = false; });
+            }
         },
 
         async addUser() {

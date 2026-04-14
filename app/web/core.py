@@ -153,6 +153,23 @@ async def admin_page(
     )
 
 @core_web_router.get(
+    "/admin/colleges/{college_id}",
+    summary="College Detail View",
+    response_description="College details with enrolled students",
+    response_class=HTMLResponse,
+)
+async def college_detail(
+    request: Request,
+    college_id: str,
+    _ = Depends(require_admin)
+):
+    """Render college detail page showing enrolled students."""
+    return templates.TemplateResponse(
+        name="college_detail.html",
+        context={"request": request, "college_id": college_id},
+    )
+
+@core_web_router.get(
     "/profile",
     summary="User Profile",
     response_description="Profile page",
