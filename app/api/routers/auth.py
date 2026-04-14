@@ -183,16 +183,24 @@ async def login(req: LoginRequest, response: Response):
             user = await repo.get_user_by_roll_number(identifier.lower())
             email = user.get("email") if user else None
         
+        print(f"DEBUG LOGIN ATTEMPT: identifier={identifier}, user_found={user is not None}")
+        if user:
+            print(f"DEBUG USER: id={user.get('id')}, has_password={bool(user.get('password_hash'))}")
+        
         if not user:
-            raise HTTPException(status_code=401, detail="User not found. Please register first.")
+            raise HTTPException(status_code=401, detail="User not found. Contact admin to create account.")
         
         # Check password hash
         from app.core.security import verify_password
         
         stored_hash = user.get("password_hash")
+        password_valid = stored_hash and verify_password(req.password, stored_hash)
+        print(f"DEBUG PASSWORD: stored={bool(stored_hash)}, valid={password_valid}")
+        
         if not stored_hash or not verify_password(req.password, stored_hash):
             raise HTTPException(status_code=401, detail="Invalid password.")
         
+        print(f"DEBUG STATUS: is_active={user.get('is_active')}")
         # Check user status
         if not user.get("is_active", False):
             raise HTTPException(status_code=403, detail="Account pending approval. Contact admin.")
