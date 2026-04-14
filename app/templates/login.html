@@ -104,7 +104,14 @@ function loginForm() {
                 });
                 const data = await res.json();
                 if (!res.ok) {
-                    throw new Error(data.detail || 'Login failed');
+                    // Handle both string and array error details
+                    let errorMsg = data.detail || 'Login failed';
+                    if (Array.isArray(errorMsg)) {
+                        errorMsg = errorMsg.map(e => e.msg || e.message).join(', ');
+                    } else if (typeof errorMsg === 'object') {
+                        errorMsg = JSON.stringify(errorMsg);
+                    }
+                    throw new Error(errorMsg);
                 }
                 
                 // Save user info to local storage for quick access if needed

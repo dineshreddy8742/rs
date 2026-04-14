@@ -148,9 +148,10 @@ async def register(req: RegisterRequest, response: Response):
 
 # ===== Login =====
 class LoginRequest(BaseModel):
-    email: str
+    email: Optional[str] = None
+    roll_number: Optional[str] = None
     password: str
-    role: str
+    role: str = "student"
 
 class LoginResponse(BaseModel):
     success: bool
@@ -163,41 +164,39 @@ class LoginResponse(BaseModel):
 @auth_router.post("/login", response_model=LoginResponse)
 async def login(req: LoginRequest, response: Response):
     """Login using Supabase Auth."""
-    # 1. Domain Validation
-    if not req.email.lower().endswith("@svcet.edu.in"):
-        raise HTTPException(status_code=400, detail="Only @svcet.edu.in emails allowed.")
+    # Accept either email or roll_number
+    identifier = req.email or req.roll_number
+    if not identifier:
+        raise HTTPException(status_code=400, detail="Email or roll number required.")
 
     repo = UserRepository()
     client = repo.connection_manager.get_client()
 
     try:
-        # 2. Attempt Supabase Auth Sign In
-        auth_response = client.auth.sign_in_with_password({
-            "email": req.email.lower(),
-            "password": req.password
-        })
-        
-        if not auth_response.user:
-            raise HTTPException(status_code=401, detail="Invalid credentials.")
-
-        supabase_uid = auth_response.user.id
-        
-        # 3. Get User Profile from our public.users table
-        user = await repo.get_user_by_email(req.email.lower())
+        # Try to find user by email or roll_number
+        user = None
+        if req.email:
+            user = await repo.get_user_by_email(req.email.lower())
+            email = req.email.lower()
+        else:
+            # Login with roll_number
+            user = await repo.get_user_by_roll_number(identifier.lower())
+            email = user.get("email") if user else None
         
         if not user:
-            # If user exists in Auth but not in our Profile table, create a profile
-            user_data = {
-                "id": supabase_uid,
-                "email": req.email.lower(),
-                "roll_number": req.email.split('@')[0],
-                "name": req.email.split('@')[0],
-                "college": "SVCET",
-                "role": req.role, # Use requested role or default
-                "status": "approved"
-            }
-            await repo.create_user(user_data)
-            user = user_data
+            raise HTTPException(status_code=401, detail="User not found. Please register first.")
+        
+        # Check password hash
+        from passlib.context import CryptContext
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        
+        stored_hash = user.get("password_hash")
+        if not stored_hash or not pwd_context.verify(req.password, stored_hash):
+            raise HTTPException(status_code=401, detail="Invalid password.")
+        
+        # Check user status
+        if not user.get("is_active", False):
+            raise HTTPException(status_code=403, detail="Account pending approval. Contact admin.")
 
         # 4. Strict Role Verification
         if user.get("role") != req.role:
@@ -206,10 +205,10 @@ async def login(req: LoginRequest, response: Response):
         if user.get("status") == "blocked":
             raise HTTPException(status_code=403, detail="Your account has been blocked.")
 
-        # 5. Set Cookies
+        # 5. Set Session Cookie
         response.set_cookie(
-            key="auth_token",
-            value=auth_response.session.access_token,
+            key="user_id",
+            value=str(user.get("id", "")),
             httponly=True,
             samesite="lax",
             max_age=ACCESS_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
@@ -224,11 +223,13 @@ async def login(req: LoginRequest, response: Response):
             is_admin=user.get("is_admin", False) or user.get("role") == "admin"
         )
 
+    except HTTPException:
+        raise
     except Exception as e:
         error_msg = str(e)
         if "Invalid login credentials" in error_msg:
             raise HTTPException(status_code=401, detail="Invalid email or password.")
-        raise HTTPException(status_code=400, detail=error_msg)
+        raise HTTPException(status_code=400, detail=f"Login failed: {error_msg}")
 
 
 # ===== Logout =====
