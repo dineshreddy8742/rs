@@ -1,7 +1,3 @@
-# Python config
-pyproject.toml
-pyproject.toml.bak
-
 # Development and IDE files
 .vscode/
 .cline/
