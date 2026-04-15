@@ -99,9 +99,15 @@ function coverLetterApp() {
         coverLetter: '', wordCount: 0, loading: false, error: '',
         async init() {
             try {
-                const res = await fetch('/api/resume/user/temp-user-id');
+                // First get the actual user ID from auth
+                const authRes = await fetch('/api/auth/me');
+                if (!authRes.ok) return;
+                const user = await authRes.json();
+                
+                // Then fetch their resumes
+                const res = await fetch(`/api/resume/user/${user.id}`);
                 if (res.ok) this.resumes = await res.json();
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error('Failed to load resumes:', e); }
         },
         canGenerate() { return this.resumeId && this.jobTitle && this.jobDescription.trim().length > 10; },
         async generate() {
