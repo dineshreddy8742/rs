@@ -150,29 +150,42 @@
     <div class="absolute top-40 right-10 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
     
     <div class="relative z-10 max-w-full mx-auto py-6 px-4" x-data="resumeBuilder()" x-init="init()">
-        <!-- Floating Navbar -->
-        <div id="resume-nav" class="sticky top-2 z-40 bg-gradient-to-r from-purple-900/90 via-blue-900/90 to-indigo-900/90 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-2.5 mb-4 flex items-center justify-between shadow-2xl">
-            <div class="flex items-center gap-3">
-                <span class="text-xl">📝</span>
-                <span class="text-white font-bold text-sm hidden sm:inline">Resume Builder</span>
+        <div id="resume-nav" class="sticky top-0 sm:top-2 z-40 bg-gradient-to-r from-purple-900/90 via-blue-900/90 to-indigo-900/90 backdrop-blur-xl sm:border border-white/20 sm:rounded-2xl px-2 sm:px-4 py-2 sm:py-2.5 mb-4 flex flex-col sm:flex-row items-center justify-between shadow-2xl gap-2 sm:gap-0">
+            <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">📝</span>
+                    <span class="text-white font-bold text-sm hidden sm:inline">Resume Builder</span>
+                </div>
+                <button @click="showFormattingPanel = !showFormattingPanel" :class="showFormattingPanel ? 'bg-yellow-500 text-white' : 'bg-white/10 text-white'" class="sm:hidden px-3 py-1.5 rounded-lg text-xs font-bold transition-all">🎨 Customize</button>
             </div>
-            <div class="flex items-center gap-2">
-                <button @click="startTour()" class="nav-btn bg-white/10 text-white px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-white/20 transition-all">🎓 Tour</button>
-                <button @click="saveToServer()" :disabled="isSaving" class="nav-btn bg-green-500/30 text-green-300 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-green-500/50 transition-all">
+            <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+                <button @click="startTour()" class="nav-btn bg-white/10 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold hover:bg-white/20 transition-all flex-1 sm:flex-none">🎓 Tour</button>
+                <button @click="saveToServer()" :disabled="isSaving" class="nav-btn bg-green-500/30 text-green-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold hover:bg-green-500/50 transition-all flex-1 sm:flex-none">
                     <span x-show="!isSaving">💾 Save</span>
-                    <span x-show="isSaving">⌛ Saving...</span>
+                    <span x-show="isSaving">⌛ Saving</span>
                 </button>
-                <button @click="resetResume()" class="nav-btn bg-red-500/30 text-red-300 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-red-500/50 transition-all">🗑️ Clear</button>
-                <button @click="showDownloadModal = true" class="nav-btn bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:scale-105 transition-all shadow-lg">📥 Download</button>
-                <button @click="showFormattingPanel = !showFormattingPanel" :class="showFormattingPanel ? 'bg-yellow-500 text-white' : 'bg-white/10 text-white'" class="nav-btn px-3 py-1.5 rounded-lg text-sm font-bold hover:scale-105 transition-all">🎨 Customize</button>
+                <button @click="resetResume()" class="nav-btn bg-red-500/30 text-red-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold hover:bg-red-500/50 transition-all flex-1 sm:flex-none">🗑️ Clear</button>
+                <button @click="showDownloadModal = true" class="nav-btn bg-gradient-to-r from-pink-500 to-purple-500 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold hover:scale-105 transition-all shadow-lg flex-1 sm:flex-none">📥 Download</button>
+                <button @click="showFormattingPanel = !showFormattingPanel" :class="showFormattingPanel ? 'bg-yellow-500 text-white' : 'bg-white/10 text-white'" class="hidden sm:block nav-btn px-3 py-1.5 rounded-lg text-sm font-bold hover:scale-105 transition-all">🎨 Customize</button>
             </div>
         </div>
 
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-            <div>
-                <h1 class="text-4xl font-black bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">Build Resume from Scratch</h1>
-                <p class="text-blue-200 mt-1">Start from scratch OR import existing resume • <span class="text-green-300 font-bold">✅ ATS-Friendly Mode ON</span> • Clean, simple, professional formatting</p>
+        <!-- Builder Header Era -->
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-8 gap-8">
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="px-3 py-1 bg-pink-500/20 border border-pink-500/30 rounded-full text-[10px] font-black text-pink-400 uppercase tracking-widest animate-pulse">Architect Era ✨</span>
+                </div>
+                <h1 class="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
+                    Resume Builder
+                </h1>
+                <p class="text-sm font-bold text-blue-300/60 uppercase tracking-[0.4em] mt-4">Crafting professional rizz from the ground up.</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-xl">
+                    <span class="animate-pulse">●</span>
+                    <span class="text-[10px] font-black text-green-400 uppercase tracking-widest">ATS Matcher: Active</span>
+                </div>
             </div>
         </div>
 
@@ -208,7 +221,7 @@
                 <!-- Template Selection -->
                 <div>
                     <label class="block text-sm font-bold text-blue-200 mb-2">📄 Template (10 Options)</label>
-                    <div class="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-56 sm:max-h-64 overflow-y-auto pr-1 custom-scrollbar">
                         <template x-for="tpl in templates" :key="tpl.id">
                             <button @click="formatting.template = tpl.id" :class="formatting.template === tpl.id ? 'bg-purple-500 border-purple-400 ring-2 ring-purple-400' : 'bg-white/5 border-white/20 hover:bg-white/10'" class="border-2 rounded-lg p-2 text-left transition-all">
                                 <div class="flex items-center gap-2">
@@ -225,9 +238,9 @@
                 <!-- Accent Color -->
                 <div>
                     <label class="block text-sm font-bold text-blue-200 mb-2">🎨 Accent Color</label>
-                    <div class="grid grid-cols-4 gap-2">
+                    <div class="flex flex-wrap gap-3 mt-4">
                         <template x-for="color in accentColors" :key="color.id">
-                            <button @click="formatting.accentColor = color.id; updatePreview()" :class="formatting.accentColor === color.id ? 'ring-2 ring-white scale-110 shadow-[0_0_10px_rgba(255,255,255,0.5)]' : ''" class="w-8 h-8 rounded-full mx-auto transition-all hover:scale-110" :style="'background-color: ' + color.hex" :title="color.name"></button>
+                            <button @click="formatting.accentColor = color.id; updatePreview()" :class="formatting.accentColor === color.id ? 'ring-2 ring-white scale-125 shadow-[0_0_10px_rgba(255,255,255,0.5)]' : ''" class="w-8 h-8 rounded-full transition-all hover:scale-110" :style="'background-color: ' + color.hex" :title="color.name"></button>
                         </template>
                     </div>
                 </div>
@@ -276,6 +289,21 @@
                 <span>📏 <strong x-text="formatting.sectionGap"></strong>/<strong x-text="formatting.itemGap"></strong></span>
                 <span x-show="formatting.compactMode">📦 Compact</span>
                 <span x-show="formatting.atsMode" class="text-green-300 font-bold">✅ ATS Mode</span>
+            </div>
+
+            <!-- Section Layout Order -->
+            <div class="mt-4 border-t border-white/20 pt-4">
+                <label class="block text-sm font-bold text-blue-200 mb-2">🔄 Profile Layout Tracker (Use ◀/▶ to shuffle)</label>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="(sec, index) in sectionOrder" :key="sec.id">
+                        <div class="flex items-center bg-white/5 border border-white/20 rounded-md hover:bg-white/10 p-1">
+                            <button @click="moveSection(index, -1)" :disabled="index === 0" class="text-xs px-1 text-white/50 hover:text-white disabled:opacity-20 cursor-pointer">◀</button>
+                            <span class="text-xs px-2 text-white font-semibold tracking-wide" x-text="sec.label"></span>
+                            <button @click="moveSection(index, 1)" :disabled="index === sectionOrder.length - 1" class="text-xs px-1 text-white/50 hover:text-white disabled:opacity-20 cursor-pointer">▶</button>
+                        </div>
+                    </template>
+                </div>
+                <p class="text-[10px] text-white/40 mt-2">* Note: In side-by-side templates (Modern/Creative/Startup), sections shuffle vertically within their assigned columns.</p>
             </div>
         </div>
 
@@ -641,13 +669,13 @@
                             </div>
 
                             <!-- Profile -->
-                            <div class="profile-section mb-3" x-show="data.profile" :style="sectionStyle">
+                            <div class="profile-section mb-3 flex flex-col" x-show="data.profile" :style="sectionStyle + ' order: ' + getOrder('profile') + ';'">
                                 <h3 class="text-xs font-bold mb-2 uppercase" :class="formatting.atsMode ? 'text-gray-900 border-b border-gray-300 pb-1' : 'border-bottom: 1px solid ' + accentLight + '; padding-bottom: 2px; color: ' + accentColor + ';'">Summary</h3>
                                 <p class="text-gray-700 text-xs cursor-text hover:bg-gray-50 rounded px-1 -mx-1" x-text="data.profile" @click="$event.target.contentEditable=true; $event.target.focus()" @blur="data.profile = $event.target.textContent.trim(); $event.target.contentEditable=false; updatePreview()"></p>
                             </div>
 
                             <!-- Experience -->
-                            <div class="experience-section mb-3" x-show="data.experience.length > 0" :style="sectionStyle">
+                            <div class="experience-section mb-3 flex flex-col" x-show="data.experience.length > 0" :style="sectionStyle + ' order: ' + getOrder('experience') + ';'">
                                 <h3 class="text-xs font-bold mb-2 uppercase" :class="formatting.atsMode ? 'text-gray-900 border-b border-gray-300 pb-1' : 'border-bottom: 1px solid ' + accentLight + '; padding-bottom: 2px; color: ' + accentColor + ';'">Experience</h3>
                                 <template x-for="(exp, i) in data.experience" :key="i">
                                     <div class="mb-2" :style="itemStyle">
@@ -668,7 +696,7 @@
                             </div>
 
                             <!-- Education -->
-                            <div class="education-section mb-3" x-show="data.education.length > 0" :style="sectionStyle">
+                            <div class="education-section mb-3 flex flex-col" x-show="data.education.length > 0" :style="sectionStyle + ' order: ' + getOrder('education') + ';'">
                                 <h3 class="text-xs font-bold mb-2 uppercase" :class="formatting.atsMode ? 'text-gray-900 border-b border-gray-300 pb-1' : 'border-bottom: 1px solid ' + accentLight + '; padding-bottom: 2px; color: ' + accentColor + ';'">Education</h3>
                                 <template x-for="(edu, i) in data.education" :key="i">
                                     <div class="mb-2" :style="itemStyle">
@@ -682,7 +710,7 @@
                             </div>
 
                             <!-- Skills (ATS-friendly) -->
-                            <div class="skills-section mb-3" x-show="hasAnySkills()" :style="sectionStyle">
+                            <div class="skills-section mb-3 flex flex-col" x-show="hasAnySkills()" :style="sectionStyle + ' order: ' + getOrder('skills') + ';'">
                                 <h3 class="text-xs font-bold mb-2 uppercase" :class="formatting.atsMode ? 'text-gray-900 border-b border-gray-300 pb-1' : 'border-bottom: 1px solid ' + accentLight + '; padding-bottom: 2px; color: ' + accentColor + ';'">Skills</h3>
                                 
                                 <template x-if="data.skills.programming && data.skills.programming.some(s => s.text)">
@@ -741,7 +769,7 @@
                             </div>
 
                             <!-- Projects -->
-                            <div class="projects-section mb-3" x-show="data.projects.length > 0" :style="sectionStyle">
+                            <div class="projects-section mb-3 flex flex-col" x-show="data.projects.length > 0" :style="sectionStyle + ' order: ' + getOrder('projects') + ';'">
                                 <h3 class="text-xs font-bold mb-2 uppercase" :class="formatting.atsMode ? 'text-gray-900 border-b border-gray-300 pb-1' : 'border-bottom: 1px solid ' + accentLight + '; padding-bottom: 2px; color: ' + accentColor + ';'">Projects</h3>
                                 <template x-for="(proj, i) in data.projects" :key="i">
                                     <div class="mb-2" :style="itemStyle">
@@ -759,7 +787,7 @@
                             </div>
 
                             <!-- Certifications -->
-                            <div class="certifications-section mb-3" x-show="data.certifications.length > 0" :style="sectionStyle">
+                            <div class="certifications-section mb-3 flex flex-col" x-show="data.certifications.length > 0" :style="sectionStyle + ' order: ' + getOrder('certifications') + ';'">
                                 <h3 class="text-xs font-bold mb-2 uppercase" :class="formatting.atsMode ? 'text-gray-900 border-b border-gray-300 pb-1' : 'border-bottom: 1px solid ' + accentLight + '; padding-bottom: 2px; color: ' + accentColor + ';'">Certifications</h3>
                                 <template x-for="(cert, i) in data.certifications" :key="i">
                                     <div class="mb-1.5" :style="itemStyle">
@@ -773,7 +801,7 @@
                             </div>
 
                             <!-- Languages -->
-                            <div class="languages-section mb-3" x-show="data.languages.length > 0" :style="sectionStyle">
+                            <div class="languages-section mb-3 flex flex-col" x-show="data.languages.length > 0" :style="sectionStyle + ' order: ' + getOrder('languages') + ';'">
                                 <h3 class="text-xs font-bold mb-2 uppercase" :class="formatting.atsMode ? 'text-gray-900 border-b border-gray-300 pb-1' : 'border-bottom: 1px solid ' + accentLight + '; padding-bottom: 2px; color: ' + accentColor + ';'">Languages</h3>
                                 <div class="space-y-0.5">
                                     <template x-for="(lang, i) in data.languages.filter(l => l.name)" :key="i">
@@ -783,7 +811,7 @@
                             </div>
 
                             <!-- Achievements -->
-                            <div class="achievements-section mb-3" x-show="data.achievements.length > 0" :style="sectionStyle">
+                            <div class="achievements-section mb-3 flex flex-col" x-show="data.achievements.length > 0" :style="sectionStyle + ' order: ' + getOrder('achievements') + ';'">
                                 <h3 class="text-xs font-bold mb-2 uppercase" :class="formatting.atsMode ? 'text-gray-900 border-b border-gray-300 pb-1' : 'border-bottom: 1px solid ' + accentLight + '; padding-bottom: 2px; color: ' + accentColor + ';'">Achievements</h3>
                                 <div class="space-y-0.5">
                                     <template x-for="(ach, i) in data.achievements.filter(a => a.text)" :key="i">
@@ -793,7 +821,7 @@
                             </div>
 
                             <!-- Interests -->
-                            <div class="interests-section mb-3" x-show="data.interests.length > 0" :style="sectionStyle">
+                            <div class="interests-section mb-3 flex flex-col" x-show="data.interests.length > 0" :style="sectionStyle + ' order: ' + getOrder('interests') + ';'">
                                 <h3 class="text-xs font-bold mb-2 uppercase" :class="formatting.atsMode ? 'text-gray-900 border-b border-gray-300 pb-1' : 'border-bottom: 1px solid ' + accentLight + '; padding-bottom: 2px; color: ' + accentColor + ';'">Interests</h3>
                                 <div class="space-y-0.5">
                                     <template x-for="(interest, i) in data.interests.filter(int => int.text)" :key="i">
@@ -804,7 +832,7 @@
 
                             <!-- Custom Sections -->
                             <template x-for="(sec, i) in data.customSections.filter(s => s.title)" :key="i">
-                                <div class="custom-section mb-3" :style="sectionStyle">
+                                <div class="custom-section mb-3 flex flex-col" :style="sectionStyle + ' order: ' + getOrder('custom') + ';'">
                                     <h3 class="text-xs font-bold mb-2 uppercase" :class="formatting.atsMode ? 'text-gray-900 border-b border-gray-300 pb-1' : 'border-bottom: 1px solid ' + accentLight + '; padding-bottom: 2px; color: ' + accentColor + ';" x-text="sec.title"></h3>
                                     <p class="text-gray-700 text-xs whitespace-pre-line" x-text="sec.description"></p>
                                 </div>
@@ -1335,16 +1363,43 @@ function resumeBuilder() {
             return all.slice(0, 4).join(', ') || 'relevant technical areas';
         },
 
-        startTour() {
-            const tour = new Shepherd.Tour({ defaultStepOptions: { cancelIcon: { enabled: true }, scrollTo: { behavior: 'smooth', block: 'center' } } });
-            tour.addStep({ title: 'Welcome! 🎉', text: 'Build a professional, ATS-friendly resume with 10 templates, categorized skills, and cover letter generation!', buttons: [{ action() { return this.next(); }, text: 'Next →' }] });
-            tour.addStep({ title: '📂 Import Resume', text: 'Import an existing resume - skills are auto-categorized into 6 groups!', attachTo: { element: '#import-section', on: 'bottom' }, buttons: [{ action() { return this.back(); }, text: 'Back', classes: 'shepherd-button-secondary' }, { action() { return this.next(); }, text: 'Next →' }] });
-            tour.addStep({ title: '📝 Fill Details', text: 'Add Experience, Education, Skills (6 categories!), Projects, Certifications, and more.', attachTo: { element: '#form-section', on: 'right' }, buttons: [{ action() { return this.back(); }, text: 'Back', classes: 'shepherd-button-secondary' }, { action() { return this.next(); }, text: 'Next →' }] });
-            tour.addStep({ title: '🎨 10 Templates + ATS Mode', text: 'Choose from 10 templates! ✅ ATS Mode is ON by default for clean, simple, professional formatting that ATS systems love.', attachTo: { element: '#customize-panel', on: 'bottom' }, buttons: [{ action() { return this.back(); }, text: 'Back', classes: 'shepherd-button-secondary' }, { action() { return this.next(); }, text: 'Next →' }] });
-            tour.addStep({ title: '👁️ Live Preview', text: 'Clean, simple preview. Click name, title, or profile to edit inline! Skills organized by category.', attachTo: { element: '#resume-preview-container', on: 'left' }, buttons: [{ action() { return this.back(); }, text: 'Back', classes: 'shepherd-button-secondary' }, { action() { return this.next(); }, text: 'Next →' }] });
-            tour.addStep({ title: '📥 Download Options', text: 'Export Resume PDF, Cover Letter PDF, or Print. ATS-friendly formatting guaranteed!', attachTo: { element: '#resume-nav', on: 'bottom' }, buttons: [{ action() { return this.back(); }, text: 'Back', classes: 'shepherd-button-secondary' }, { action() { return this.complete(); }, text: "Let's Go! 🚀" }] });
-            tour.start();
-        }
+            sectionOrder: [
+                { id: 'profile', label: 'Summary' },
+                { id: 'experience', label: 'Experience' },
+                { id: 'education', label: 'Education' },
+                { id: 'skills', label: 'Skills' },
+                { id: 'projects', label: 'Projects' },
+                { id: 'certifications', label: 'Certifications' },
+                { id: 'languages', label: 'Languages' },
+                { id: 'achievements', label: 'Achievements' },
+                { id: 'interests', label: 'Interests' },
+                { id: 'custom', label: 'Custom' }
+            ],
+            moveSection(index, dir) {
+                if (dir === -1 && index > 0) {
+                    const temp = this.sectionOrder[index];
+                    this.sectionOrder[index] = this.sectionOrder[index - 1];
+                    this.sectionOrder[index - 1] = temp;
+                } else if (dir === 1 && index < this.sectionOrder.length - 1) {
+                    const temp = this.sectionOrder[index];
+                    this.sectionOrder[index] = this.sectionOrder[index + 1];
+                    this.sectionOrder[index + 1] = temp;
+                }
+                this.updatePreview();
+            },
+            getOrder(id) {
+                return this.sectionOrder.findIndex(s => s.id === id);
+            },
+            startTour() {
+                const tour = new Shepherd.Tour({ defaultStepOptions: { cancelIcon: { enabled: true }, scrollTo: { behavior: 'smooth', block: 'center' } } });
+                tour.addStep({ title: 'Welcome! 🎉', text: 'Build a professional, ATS-friendly resume with 10 templates, categorized skills, and cover letter generation!', buttons: [{ action() { return this.next(); }, text: 'Next →' }] });
+                tour.addStep({ title: '📂 Import Resume', text: 'Import an existing resume - skills are auto-categorized into 6 groups!', attachTo: { element: '#import-section', on: 'bottom' }, buttons: [{ action() { return this.back(); }, text: 'Back', classes: 'shepherd-button-secondary' }, { action() { return this.next(); }, text: 'Next →' }] });
+                tour.addStep({ title: '📝 Fill Details', text: 'Add Experience, Education, Skills (6 categories!), Projects, Certifications, and more.', attachTo: { element: '#form-section', on: 'right' }, buttons: [{ action() { return this.back(); }, text: 'Back', classes: 'shepherd-button-secondary' }, { action() { return this.next(); }, text: 'Next →' }] });
+                tour.addStep({ title: '🎨 10 Templates + ATS Mode', text: 'Choose from 10 templates! ✅ ATS Mode is ON by default for clean, simple, professional formatting that ATS systems love.', attachTo: { element: '#customize-panel', on: 'bottom' }, buttons: [{ action() { return this.back(); }, text: 'Back', classes: 'shepherd-button-secondary' }, { action() { return this.next(); }, text: 'Next →' }] });
+                tour.addStep({ title: '👁️ Live Preview', text: 'Clean, simple preview. Click name, title, or profile to edit inline! Skills organized by category.', attachTo: { element: '#resume-preview-container', on: 'left' }, buttons: [{ action() { return this.back(); }, text: 'Back', classes: 'shepherd-button-secondary' }, { action() { return this.next(); }, text: 'Next →' }] });
+                tour.addStep({ title: '📥 Download Options', text: 'Export Resume PDF, Cover Letter PDF, or Print. ATS-friendly formatting guaranteed!', attachTo: { element: '#resume-nav', on: 'bottom' }, buttons: [{ action() { return this.back(); }, text: 'Back', classes: 'shepherd-button-secondary' }, { action() { return this.complete(); }, text: "Let's Go! 🚀" }] });
+                tour.start();
+            }
     };
 }
 </script>

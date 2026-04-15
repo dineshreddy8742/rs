@@ -123,7 +123,7 @@ class AtsResumeOptimizer:
         You are an expert ATS (Applicant Tracking System) Resume Optimizer with specialized knowledge in resume writing, keyword optimization, and applicant tracking systems. Your task is to transform the candidate's existing resume into a highly optimized version tailored specifically to the provided job description, maximizing the candidate's chances of passing through ATS filters while maintaining honesty and accuracy.
         
         ## INPUT DATA:
-
+        
         ### JOB DESCRIPTION:
         {{job_description}}
 
@@ -181,13 +181,20 @@ class AtsResumeOptimizer:
             - Use synonyms and related terms for key skills to maximize keyword matching
             - Make connections between past experience and job requirements clear and explicit
 
+        5. **ATS SCORING LOGIC (For `ats_metrics`)**:
+            - **Strictness**: Be objective. Don't just give 100%.
+            - **90-100**: Well-tailored, strong keyword alignment, all core requirements met.
+            - **80-89**: Solid match, maybe missing 1-2 minor secondary skills.
+            - **70-79**: Good attempt but clear gaps in experience or specific tools.
+            - **Below 70**: Mismatch in seniority or core technical stack.
+            - **Generosity**: For students/interns, reward relevant projects and courses at 85+ if they show potential.
+
         ## QUALITY & ALIGNMENT CONSTRAINTS:
         - **Impact Verbs**: Use strong action verbs (e.g., 'Engineered', 'Orchestrated', 'Optimized', 'Spearheaded') at the start of every bullet point.
         - **JD Alignment**: For every single bullet point, ask yourself: 'How does this directly address a requirement in the Job Description?'
         - **Neat & Professional**: Write descriptions that are concise but descriptive. Avoid vague phrases like 'responsible for'. Focus on what you DID and the RESULT you achieved.
         - **Fill the Space**: Expand on the most relevant experiences to ensure the resume looks full, professional, and dense.
         - **No Hallucination**: Do not invent new jobs, but feel free to rephrase existing tasks to be 100% aligned with the JD keywords.
-
 
         ## OUTPUT FORMAT:
 
@@ -253,7 +260,13 @@ class AtsResumeOptimizer:
                     "start_date": "",
                     "end_date": ""
                 }}}}
-            ]
+            ],
+            "ats_metrics": {{{{
+                "optimized_score": 0,
+                "matching_skills": [],
+                "missing_skills": [],
+                "recommendation": ""
+            }}}}
         }}}}
 
         IMPORTANT REQUIREMENTS:
@@ -308,20 +321,25 @@ class AtsResumeOptimizer:
                 {"job_description": job_description, "resume": self.resume}
             )
 
-            # Step 3: Parse JSON (logic similar to sync version)
+            # Step 3: Parse JSON
             content = result.content if hasattr(result, "content") else result
             try:
                 # Direct JSON parsing or extraction
                 json_match = re.search(r"(\{[\s\S]*\})", content)
                 if json_match:
                     json_result = json.loads(json_match.group(1))
+                    
+                    # Merge initial score if we computed it
                     if score_results:
-                        json_result["ats_metrics"] = {
-                            "initial_score": score_results.get("final_score", 0),
-                            "matching_skills": score_results.get("matching_skills", []),
-                            "missing_skills": score_results.get("missing_skills", []),
-                            "recommendation": score_results.get("recommendation", "")
-                        }
+                        if "ats_metrics" not in json_result:
+                            json_result["ats_metrics"] = {}
+                        json_result["ats_metrics"]["initial_score"] = score_results.get("final_score", 0)
+                        # Only fill if LLM didn't fill its own metrics
+                        if not json_result["ats_metrics"].get("matching_skills"):
+                             json_result["ats_metrics"]["matching_skills"] = score_results.get("matching_skills", [])
+                        if not json_result["ats_metrics"].get("missing_skills"):
+                             json_result["ats_metrics"]["missing_skills"] = score_results.get("missing_skills", [])
+                    
                     return json_result
             except Exception as e:
                 return {"error": f"JSON parse error: {e}", "raw": content[:500]}
@@ -354,13 +372,13 @@ class AtsResumeOptimizer:
             json_match = re.search(r"(\{[\s\S]*\})", content)
             if json_match:
                 json_result = json.loads(json_match.group(1))
+                
+                # Merge initial score
                 if score_results:
-                    json_result["ats_metrics"] = {
-                        "initial_score": score_results.get("final_score", 0),
-                        "matching_skills": score_results.get("matching_skills", []),
-                        "missing_skills": score_results.get("missing_skills", []),
-                        "recommendation": score_results.get("recommendation", "")
-                    }
+                    if "ats_metrics" not in json_result:
+                        json_result["ats_metrics"] = {}
+                    json_result["ats_metrics"]["initial_score"] = score_results.get("final_score", 0)
+                
                 return json_result
             return {"error": "JSON not found"}
         except Exception as e:
@@ -368,23 +386,4 @@ class AtsResumeOptimizer:
 
 
 if __name__ == "__main__":
-    with open("../../../data/sample_resumes/resume.txt", "r") as f:
-        resume = f.read()
-
-    with open("../../../data/sample_descriptions/job_description_1.txt", "r") as f:
-        job_description = f.read()
-
-    API_KEY = "sk-********************"
-    API_BASE = "https://api.deepseek.com/v1"
-    MODEL_NAME = "deepseek-chat"
-
-    model = AtsResumeOptimizer(
-        model_name=MODEL_NAME,
-        resume=resume,
-        api_key=API_KEY,
-        api_base=API_BASE,
-    )
-
-    result = model.generate_ats_optimized_resume_json(job_description)
-
-    print(json.dumps(result, indent=2))
+    pass

@@ -329,49 +329,54 @@ async def run_optimization_task(
                     f"| semaphore: {semaphore._value} slots free"
                 )
 
-                # ── Step 1: Score original (sync → thread pool) ──
-                def _score_original():
-                    scorer = ATSScorerLLM(
-                        model_name=_model, api_key=_api_key, api_base=_api_base
-                    )
+                # ── Parallel Execution: Score Original & Generate Optimized ──
+                # We run these in parallel to cut the wait time in half (Max Speed)
+                def _score():
+                    scorer = ATSScorerLLM(model_name=_model, api_key=_api_key, api_base=_api_base)
                     return scorer.compute_match_score(resume_content, job_description)
 
-                # ── Step 2: Generate optimized resume (sync → thread pool) ──
-                # Fast path: skip the optimizer's internal pre-score because we already
-                # compute missing skills here. This removes one full LLM round trip.
-                def _optimize(missing_skills: List[str]):
-                    optimizer = AtsResumeOptimizer(
-                        model_name=_model,
-                        resume=resume_content,
-                        api_key=_api_key,
-                        api_base=_api_base,
-                    )
-                    return optimizer.generate_ats_optimized_resume_json(
-                        job_description, missing_skills=missing_skills
-                    )
+                def _generate():
+                    optimizer = AtsResumeOptimizer(model_name=_model, resume=resume_content, api_key=_api_key, api_base=_api_base)
+                    return optimizer.generate_ats_optimized_resume_json(job_description)
 
-                original_score_result = await loop.run_in_executor(None, _score_original)
-                original_ats_score = int(original_score_result.get("final_score", 0))
-                logger.info(f"[{resume_id}] Original ATS score: {original_ats_score}")
-
-                missing_skills = original_score_result.get("missing_skills", []) or []
-                result = await loop.run_in_executor(None, _optimize, missing_skills)
+                logger.info(f"[{resume_id}] Starting parallel AI processing...")
+                
+                # Execute both tasks concurrently
+                original_score_task = loop.run_in_executor(None, _score)
+                optimization_task = loop.run_in_executor(None, _generate)
+                
+                original_score_result, result = await asyncio.gather(original_score_task, optimization_task)
 
                 if "error" in result:
                     raise RuntimeError(f"AI error: {result['error']}")
 
+                original_ats_score = int(original_score_result.get("final_score", 0))
+                logger.info(f"[{resume_id}] Parallel processing complete. Original: {original_ats_score}")
+
                 # ── Step 3: Validate result ──
                 optimized_data_model = ResumeData.parse_obj(result)
+                # ── Step 4: Extract or Calculate Score ──
+                # If the generator already returned metrics, use them to save a full LLM round trip (~60s saved)
+                if "ats_metrics" in result and result["ats_metrics"].get("optimized_score"):
+                    logger.info(f"[{resume_id}] Using embedded AI metrics (fast path)")
+                    metrics = result["ats_metrics"]
+                    optimized_ats_score = int(metrics.get("optimized_score", 0))
+                    optimized_score_result = {
+                        "matching_skills": metrics.get("matching_skills", []),
+                        "missing_skills": metrics.get("missing_skills", []),
+                        "recommendation": metrics.get("recommendation", "Perfect match! Keep it up.")
+                    }
+                else:
+                    # Slow path fallback (Legacy)
+                    def _score_optimized():
+                        scorer = ATSScorerLLM(
+                            model_name=_model, api_key=_api_key, api_base=_api_base
+                        )
+                        return scorer.compute_match_score(json.dumps(result), job_description)
 
-                # ── Step 4: Score optimized (sync → thread pool) ──
-                def _score_optimized():
-                    scorer = ATSScorerLLM(
-                        model_name=_model, api_key=_api_key, api_base=_api_base
-                    )
-                    return scorer.compute_match_score(json.dumps(result), job_description)
+                    optimized_score_result = await loop.run_in_executor(None, _score_optimized)
+                    optimized_ats_score = int(optimized_score_result.get("final_score", 0))
 
-                optimized_score_result = await loop.run_in_executor(None, _score_optimized)
-                optimized_ats_score = int(optimized_score_result.get("final_score", 0))
                 score_improvement = optimized_ats_score - original_ats_score
                 logger.info(
                     f"[{resume_id}] Optimized ATS: {optimized_ats_score} "

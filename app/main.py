@@ -17,6 +17,7 @@ from app.database.connector import SupabaseConnectionManager
 from app.api.routers.resume import resume_router
 from app.api.routers.token_usage import router as token_usage_router
 from app.api.routers.auth import auth_router
+from app.api.routers.feedback import router as feedback_router
 from app.web.core import core_web_router
 from app.web.base_router import WebRouter
 from app.web.dashboard import web_router as dashboard_web_router
@@ -217,6 +218,7 @@ async def health_check():
 app.include_router(resume_router)
 app.include_router(token_usage_router)
 app.include_router(auth_router)
+app.include_router(feedback_router, prefix="/api")
 app.include_router(core_web_router)
 app.include_router(dashboard_web_router)
 app.include_router(web_router)

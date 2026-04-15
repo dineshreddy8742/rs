@@ -3,123 +3,129 @@
 {% block title %}My Profile - AuraRise{% endblock %}
 
 {% block content %}
-<div class="relative min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+<div class="relative min-h-screen bg-indigo-950/40">
     <div class="absolute top-20 left-10 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
     <div class="absolute top-40 right-10 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
     
-    <div class="relative z-10 max-w-4xl mx-auto py-8 px-4" x-data="profilePage()" x-init="init()">
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-            <div>
-                <h1 class="text-4xl font-black bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">👤 My Profile</h1>
-                <p class="text-blue-200 mt-1">Manage your account settings and password</p>
+    <div class="relative z-10 max-w-4xl mx-auto py-12 px-4 overflow-hidden" x-data="profilePage()" x-init="init()" x-cloak>
+        <!-- Profile Header Era -->
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-8">
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="px-3 py-1 bg-pink-500/20 border border-pink-500/30 rounded-full text-[10px] font-black text-pink-400 uppercase tracking-widest animate-pulse">Identity Era ✨</span>
+                </div>
+                <h1 class="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
+                    My Profile
+                </h1>
+                <p class="text-sm font-bold text-blue-300/60 uppercase tracking-[0.4em] mt-4">Manage your digital rizz and credentials.</p>
             </div>
-            <div class="flex gap-3 mt-4 md:mt-0">
-                <a href="/dashboard" class="px-4 py-2 bg-white/10 border border-white/30 text-white rounded-xl font-bold hover:bg-white/20 transition-all">📊 Dashboard</a>
-                <a x-show="isAdmin" href="/admin" class="px-4 py-2 bg-yellow-500/30 text-yellow-300 rounded-xl font-bold hover:bg-yellow-500/50 transition-all">🛡️ Admin</a>
+            <div class="flex gap-4">
+                <a href="/dashboard" class="px-6 py-3 bg-white/5 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-white/10 transition-all">← Back</a>
             </div>
         </div>
 
-        <!-- Loading -->
-        <div x-show="loading" class="text-center py-16">
-            <div class="animate-spin inline-block h-16 w-16 border-4 border-purple-500 border-t-transparent rounded-full mb-4"></div>
-            <p class="text-lg text-blue-200">Loading profile...</p>
+        <!-- Loading Protocol -->
+        <div x-show="loading" class="flex flex-col items-center justify-center py-20">
+            <div class="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+            <p class="mt-6 text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Fetching Identity...</p>
         </div>
 
-        <!-- Profile Content -->
-        <div x-show="!loading" class="space-y-6">
-            <!-- Profile Card -->
-            <div class="bg-white/10 backdrop-blur-xl border-2 border-pink-400/30 rounded-2xl p-6">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center text-3xl font-black text-white shadow-lg">
-                        <span x-text="user.name ? user.name.charAt(0).toUpperCase() : 'U'"></span>
+        <!-- Profile Inventory -->
+        <div x-show="!loading" class="space-y-8">
+            <!-- Hero Card -->
+            <div class="group relative bg-white/5 backdrop-blur-3xl rounded-[2.5rem] border border-white/10 p-10 hover:bg-white/10 transition-all overflow-hidden">
+                <div class="absolute -right-8 -top-8 text-8xl text-white/5 font-black uppercase italic pointer-events-none">HERO</div>
+                <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                    <div class="relative">
+                        <div class="w-32 h-32 rounded-[2rem] bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center text-5xl font-black text-white shadow-[0_0_40px_rgba(236,72,153,0.3)] border-4 border-white/10">
+                            <span x-text="user.name ? user.name.charAt(0).toUpperCase() : '?'"></span>
+                        </div>
+                        <div class="absolute -bottom-2 -right-2 px-4 py-1.5 bg-white text-black font-black text-[10px] uppercase tracking-tighter rounded-full shadow-xl">LVL 99</div>
                     </div>
-                    <div>
-                        <h2 class="text-2xl font-black text-white" x-text="user.name"></h2>
-                        <p class="text-blue-300" x-text="'Roll: ' + user.roll_number + ' | ' + user.college"></p>
-                        <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-bold" :class="user.is_admin ? 'bg-yellow-500/30 text-yellow-300' : 'bg-blue-500/30 text-blue-300'" x-text="user.is_admin ? '🛡️ Administrator' : '🎓 Student'"></span>
+                    <div class="text-center md:text-left">
+                        <h2 class="text-4xl font-black text-white italic truncate uppercase tracking-tighter" x-text="user.name"></h2>
+                        <div class="flex flex-wrap justify-center md:justify-start gap-3 mt-3">
+                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-black text-blue-300 uppercase tracking-widest" x-text="user.roll_number"></span>
+                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-black text-purple-300 uppercase tracking-widest" x-text="user.college"></span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Stats -->
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="bg-white/5 border border-white/20 rounded-xl p-3 text-center">
-                        <div class="text-2xl font-black text-pink-400" x-text="user.resume_count || 0"></div>
-                        <div class="text-xs text-blue-300">Resumes Created</div>
+                <!-- Stats Protocol -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12">
+                    <div class="bg-white/5 rounded-2xl p-6 border border-white/10 text-center">
+                        <p class="text-3xl font-black text-pink-400 italic" x-text="user.resume_count || 0">0</p>
+                        <p class="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mt-2">Logs Cooked</p>
                     </div>
-                    <div class="bg-white/5 border border-white/20 rounded-xl p-3 text-center">
-                        <div class="text-2xl font-black text-purple-400" x-text="formatDate(user.created_at)"></div>
-                        <div class="text-xs text-blue-300">Member Since</div>
+                    <div class="bg-white/5 rounded-2xl p-6 border border-white/10 text-center">
+                        <p class="text-xl font-black text-purple-400 italic uppercase" x-text="formatDate(user.created_at)">N/A</p>
+                        <p class="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mt-2">Era Joined</p>
                     </div>
-                    <div class="bg-white/5 border border-white/20 rounded-xl p-3 text-center">
-                        <div class="text-2xl font-black text-cyan-400" x-text="formatDate(user.last_login)"></div>
-                        <div class="text-xs text-blue-300">Last Login</div>
+                    <div class="bg-white/5 rounded-2xl p-6 border border-white/10 text-center">
+                        <p class="text-xl font-black text-cyan-400 italic uppercase" x-text="formatDate(user.last_login)">N/A</p>
+                        <p class="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mt-2">Last Active</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Edit Profile Form -->
-            <div class="bg-white/10 backdrop-blur-xl border-2 border-purple-400/30 rounded-2xl p-6">
-                <h3 class="text-lg font-bold text-white mb-4 flex items-center">✏️ Edit Profile</h3>
-                <form @submit.prevent="updateProfile()">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Configuration Era -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Profile Settings -->
+                <div class="bg-white/5 backdrop-blur-3xl rounded-[2.5rem] border border-white/10 p-8">
+                    <h3 class="text-lg font-black text-white tracking-tighter uppercase italic mb-8">Personal Config</h3>
+                    <form @submit.prevent="updateProfile()" class="space-y-6">
                         <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-1">📝 Roll Number</label>
-                            <input type="text" :value="user.roll_number" disabled class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white/50 cursor-not-allowed">
-                            <p class="text-xs text-blue-400 mt-1">Roll number cannot be changed</p>
+                            <label class="block text-[10px] font-black text-blue-300/40 uppercase tracking-[0.4em] mb-2">Full Name</label>
+                            <input x-model="editForm.name" type="text" 
+                                   class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold placeholder-white/20 focus:outline-none focus:border-pink-500/50 focus:bg-white/10 transition-all">
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-1">👤 Full Name</label>
-                            <input x-model="editForm.name" type="text" required class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400">
+                            <label class="block text-[10px] font-black text-blue-300/40 uppercase tracking-[0.4em] mb-2">College Arena</label>
+                            <input x-model="editForm.college" type="text" 
+                                   class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold placeholder-white/20 focus:outline-none focus:border-purple-500/50 focus:bg-white/10 transition-all">
                         </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-bold text-blue-200 mb-1">🏫 College/Institution</label>
-                            <input x-model="editForm.college" type="text" required class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400">
+                        <div x-show="message" class="p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center"
+                             :class="messageType === 'error' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'" x-text="message"></div>
+                        <button type="submit" :disabled="updating" class="w-full py-5 bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl text-white font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-xl shadow-pink-500/10">
+                            <span x-show="!updating">Sync Changes 🚀</span>
+                            <span x-show="updating">Syncing...</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Security Era -->
+                <div class="bg-white/5 backdrop-blur-3xl rounded-[2.5rem] border border-white/10 p-8">
+                    <h3 class="text-lg font-black text-white tracking-tighter uppercase italic mb-8">Security Protocol</h3>
+                    <form @submit.prevent="changePassword()" class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-blue-300/40 uppercase tracking-[0.4em] mb-2">Old Passphrase</label>
+                            <input x-model="passwordForm.current" type="password" 
+                                   class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:border-cyan-500/50 transition-all">
                         </div>
-                    </div>
-                    <div x-show="message" class="mt-4 p-3 rounded-xl text-sm" :class="messageType === 'error' ? 'bg-red-500/20 text-red-200 border border-red-400/40' : 'bg-green-500/20 text-green-200 border border-green-400/40'" x-text="message"></div>
-                    <button type="submit" :disabled="updating" class="mt-4 w-full md:w-auto bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-8 rounded-xl hover:scale-105 transition-all disabled:opacity-50">
-                        <span x-show="!updating">💾 Save Changes</span>
-                        <span x-show="updating">Saving...</span>
-                    </button>
-                </form>
+                        <div>
+                            <label class="block text-[10px] font-black text-blue-300/40 uppercase tracking-[0.4em] mb-2">New Passphrase</label>
+                            <input x-model="passwordForm.new" type="password" 
+                                   class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+                        </div>
+                        <div x-show="pwdMessage" class="p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center"
+                             :class="pwdMessageType === 'error' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'" x-text="pwdMessage"></div>
+                        <button type="submit" :disabled="changingPwd" class="w-full py-5 bg-white/10 border border-white/20 rounded-2xl text-white font-black uppercase tracking-widest text-xs hover:bg-white/20 hover:scale-105 transition-all">
+                            <span x-show="!changingPwd">Update Key 🔑</span>
+                            <span x-show="changingPwd">Updating...</span>
+                        </button>
+                    </form>
+                </div>
             </div>
 
-            <!-- Change Password -->
-            <div class="bg-white/10 backdrop-blur-xl border-2 border-cyan-400/30 rounded-2xl p-6">
-                <h3 class="text-lg font-bold text-white mb-4 flex items-center">🔒 Change Password</h3>
-                <form @submit.prevent="changePassword()">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-1">Current Password</label>
-                            <input x-model="passwordForm.current" type="password" required class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-400">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-1">New Password</label>
-                            <input x-model="passwordForm.new" type="password" required minlength="6" class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-400">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-1">Confirm New Password</label>
-                            <input x-model="passwordForm.confirm" type="password" required minlength="6" class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-400">
-                        </div>
-                    </div>
-                    <div x-show="pwdMessage" class="mt-4 p-3 rounded-xl text-sm" :class="pwdMessageType === 'error' ? 'bg-red-500/20 text-red-200 border border-red-400/40' : 'bg-green-500/20 text-green-200 border border-green-400/40'" x-text="pwdMessage"></div>
-                    <button type="submit" :disabled="changingPwd" class="mt-4 w-full md:w-auto bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-3 px-8 rounded-xl hover:scale-105 transition-all disabled:opacity-50">
-                        <span x-show="!changingPwd">🔑 Change Password</span>
-                        <span x-show="changingPwd">Changing...</span>
-                    </button>
-                </form>
-            </div>
-
-            <!-- Danger Zone -->
-            <div class="bg-white/10 backdrop-blur-xl border-2 border-red-400/30 rounded-2xl p-6">
-                <h3 class="text-lg font-bold text-red-300 mb-4 flex items-center">⚠️ Danger Zone</h3>
-                <p class="text-sm text-blue-200 mb-4">Once you delete your account, all your resumes and data will be permanently removed. This cannot be undone.</p>
-                <button @click="confirmDeleteAccount()" :disabled="deleting" class="bg-red-500/30 text-red-300 font-bold py-2 px-6 rounded-xl hover:bg-red-500/50 transition-all disabled:opacity-50">
-                    <span x-show="!deleting">🗑️ Delete My Account</span>
-                    <span x-show="deleting">Deleting...</span>
+            <!-- Termination Protocol -->
+            <div class="bg-red-500/5 border border-red-500/20 rounded-[2.5rem] p-10 text-center relative overflow-hidden">
+                <div class="absolute -right-8 -bottom-8 text-8xl text-red-500/5 font-black uppercase italic pointer-events-none">EXIT</div>
+                <h3 class="text-xl font-black text-red-400 tracking-tighter uppercase italic mb-4">Termination Era</h3>
+                <p class="text-xs font-bold text-red-300/60 uppercase tracking-widest mb-8 max-w-xl mx-auto">Permanently wipe all logs and credentials. This action is irreversible fr.</p>
+                <button @click="confirmDeleteAccount()" :disabled="deleting" class="px-10 py-4 bg-red-500/20 border border-red-500/30 text-red-400 font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-red-500 text-white transition-all">
+                    <span x-show="!deleting">Wipe Everything 💀</span>
+                    <span x-show="deleting">Wiping...</span>
                 </button>
-            </div>
         </div>
     </div>
 </div>

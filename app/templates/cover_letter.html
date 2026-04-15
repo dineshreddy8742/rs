@@ -1,116 +1,138 @@
 {% extends "base.html" %}
 
-{% block title %}Cover Letter - AuraRise{% endblock %}
+{% block title %}Cover Letter Architect - AuraRise{% endblock %}
 
 {% block content %}
-<div class="relative min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-    <div class="absolute top-20 left-10 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-    <div class="absolute top-40 right-10 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+<div class="relative min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-t border-white/5 overflow-hidden">
+    <!-- Star Glows -->
+    <div class="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-pink-500/10 rounded-full blur-[120px] animate-blob"></div>
+    <div class="absolute bottom-1/4 -right-20 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px] animate-blob animation-delay-2000"></div>
     
-    <div class="relative z-10 max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8" x-data="coverLetterApp()" x-init="init()">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-5xl font-black bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-3">📝 Cover Letter Generator</h1>
-            <p class="text-lg text-blue-200">Generate tailored cover letters that get you interviews</p>
+    <div class="relative z-10 max-w-[90rem] mx-auto py-12 px-6 lg:px-12" x-data="coverLetterApp()" x-init="init()">
+        <!-- Header Protocol -->
+        <div class="text-center mb-20">
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <span class="px-5 py-2 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest italic animate-pulse shadow-2xl">Signal Manifestation Protocol ✨</span>
+            </div>
+            <h1 class="text-4xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-white italic tracking-tighter leading-none mb-6 uppercase">
+                Cover Letter <span class="bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">Architect</span>
+            </h1>
+            <p class="text-[12px] font-bold text-white/40 uppercase tracking-[0.4em] max-w-3xl mx-auto italic">
+                Slaying the application era with high-performance professional rizz.
+            </p>
         </div>
 
-        <div class="grid lg:grid-cols-2 gap-8">
-            <!-- Form -->
-            <div class="bg-white/10 backdrop-blur-xl border-2 border-pink-400/30 rounded-2xl p-6">
-                <h2 class="text-xl font-bold text-white mb-4 flex items-center">✏️ Generate Cover Letter</h2>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-bold text-blue-200 mb-1">Select Resume *</label>
-                        <select x-model="resumeId" class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-400">
-                            <option value="">-- Select a resume --</option>
-                            <template x-for="r in resumes" :key="r.id">
-                                <option :value="r.id" class="bg-purple-900" x-text="r.title"></option>
-                            </template>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-bold text-blue-200 mb-1">Job Title *</label>
-                        <input x-model="jobTitle" type="text" class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-pink-400" placeholder="e.g. Software Engineer">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-bold text-blue-200 mb-1">Job Description *</label>
-                        <textarea x-model="jobDescription" rows="6" class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-pink-400 resize-none" placeholder="Paste the job description here..."></textarea>
-                    </div>
+        <div class="grid lg:grid-cols-12 gap-6 sm:gap-12 items-start relative">
+            <!-- Parameter Node (L) -->
+            <div class="lg:col-span-12 xl:col-span-5 space-y-8">
+                <div class="bg-white/10 backdrop-blur-3xl border border-white/20 rounded-3xl sm:rounded-[4rem] p-0.5 sm:p-1 shadow-2xl overflow-hidden group">
+                    <div class="bg-indigo-950/20 rounded-[1.7rem] sm:rounded-[3.9rem] p-6 sm:p-10 md:p-14 space-y-8 sm:space-y-12 relative overflow-hidden">
+                        <div class="absolute -right-12 -top-12 text-[10rem] text-white/5 font-black uppercase italic pointer-events-none group-hover:scale-110 transition-transform duration-1000">INPUT</div>
+                        
+                        <div class="relative z-10">
+                            <h2 class="text-3xl font-black text-white italic tracking-tighter uppercase mb-2">Alpha Parameters</h2>
+                            <p class="text-[10px] font-black text-blue-300 uppercase tracking-[0.4em]">Feed the terminal your career energy</p>
+                        </div>
+                        
+                        <div class="space-y-8 relative z-10">
+                            <div class="group/input">
+                                <label class="block text-[10px] font-black uppercase tracking-[0.4em] text-pink-400 mb-4 ml-4 italic group-focus-within/input:text-white transition-colors">Select Career Build fr</label>
+                                <div class="relative">
+                                    <select x-model="resumeId" class="w-full bg-indigo-950/60 border border-white/10 rounded-2xl sm:rounded-[2rem] px-6 sm:px-8 py-4 sm:py-6 text-white text-xs sm:text-sm font-black italic focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 transition-all appearance-none shadow-2xl">
+                                        <option value="" class="bg-indigo-900">-- SELECT YOUR ITERATION --</option>
+                                        <template x-for="r in resumes" :key="r.id">
+                                            <option :value="r.id" class="bg-indigo-900" x-text="r.title.toUpperCase()"></option>
+                                        </template>
+                                    </select>
+                                    <div class="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-white/20">▼</div>
+                                </div>
+                            </div>
+                            
+                            <div class="group/input">
+                                <label class="block text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400 mb-4 ml-4 italic group-focus-within/input:text-white transition-colors">Target Objective 💼</label>
+                                <input x-model="jobTitle" type="text" 
+                                       class="w-full bg-indigo-950/60 border border-white/10 rounded-2xl sm:rounded-[2rem] px-6 sm:px-8 py-4 sm:py-6 text-white text-xs sm:text-sm font-black italic focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all shadow-2xl placeholder-white/5" 
+                                       placeholder="E.G. CHIEF VIBE OFFICER">
+                            </div>
+                            
+                            <div class="group/input">
+                                <label class="block text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400 mb-4 ml-4 italic group-focus-within/input:text-white transition-colors">Mission Log 📝</label>
+                                <textarea x-model="jobDescription" rows="8" 
+                                          class="w-full bg-indigo-950/60 border border-white/10 rounded-2xl sm:rounded-[2.5rem] px-6 sm:px-8 py-4 sm:py-6 text-white text-[13px] font-medium leading-relaxed focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all shadow-2xl placeholder-white/5 scrollbar-hide resize-none" 
+                                          placeholder="Paste the target requirements here... (no cap allowed)"></textarea>
+                            </div>
 
-                    <button @click="generate()" :disabled="loading || !canGenerate()" 
-                            class="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100">
-                        <span x-show="!loading">✨ Generate Cover Letter</span>
-                        <span x-show="loading">Generating...</span>
-                    </button>
-
-                    <!-- Error -->
-                    <div x-show="error" class="bg-red-500/20 border border-red-400/40 rounded-xl p-4 text-red-200 text-sm" x-text="error"></div>
+                            <button @click="generate()" :disabled="loading || !canGenerate()" 
+                                    class="relative w-full overflow-hidden rounded-2xl sm:rounded-[3rem] bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 py-6 sm:py-8 shadow-[0_20px_50px_rgba(236,72,153,0.3)] transition-all hover:scale-[1.03] active:scale-[0.97] disabled:opacity-50 disabled:grayscale">
+                                <span x-show="!loading" class="text-lg sm:text-2xl font-black text-white flex items-center justify-center gap-4 italic uppercase tracking-tighter">Manifest Protocol ✨</span>
+                                <div x-show="loading" class="flex items-center justify-center gap-4">
+                                    <div class="animate-spin text-3xl">⚙️</div>
+                                    <span class="text-[12px] font-black text-white uppercase tracking-[0.4em]">AI is Cooking...</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Output -->
-            <div class="bg-white/10 backdrop-blur-xl border-2 border-cyan-400/30 rounded-2xl p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-bold text-white flex items-center">📄 Cover Letter</h2>
-                    <div class="flex gap-2" x-show="coverLetter">
-                        <button @click="copyToClipboard()" class="text-sm bg-white/10 hover:bg-white/20 text-blue-300 px-3 py-1.5 rounded-lg font-bold transition-all">📋 Copy</button>
-                        <button @click="downloadPDF()" class="text-sm bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-3 py-1.5 rounded-lg font-bold transition-all shadow-lg">📥 Download PDF</button>
+            <!-- Deployment Field (R) -->
+            <div class="lg:col-span-12 xl:col-span-7">
+                <div class="bg-white/10 backdrop-blur-[50px] border border-white/20 rounded-3xl sm:rounded-[4rem] p-0.5 sm:p-1 shadow-2xl min-h-[500px] sm:min-h-[750px] flex flex-col group">
+                    <div class="bg-indigo-950/20 flex-1 rounded-[1.7rem] sm:rounded-[3.9rem] p-6 sm:p-8 md:p-14 flex flex-col relative overflow-hidden">
+                        <div class="absolute -right-12 -top-12 text-[10rem] text-white/5 font-black uppercase italic pointer-events-none group-hover:scale-110 transition-transform duration-1000">DEPLOY</div>
+                        
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-12 pb-10 border-b border-white/5 relative z-10">
+                            <div>
+                                <h2 class="text-4xl font-black text-white italic tracking-tighter uppercase mb-2">The Manifest</h2>
+                                <p class="text-[10px] font-black text-blue-300 uppercase tracking-[0.4em]">Ready for tactical deployment</p>
+                            </div>
+                            <div class="flex items-center gap-4" x-show="coverLetter">
+                                <button @click="copyToClipboard()" class="px-8 py-4 rounded-2xl bg-white/10 border border-white/20 text-white font-black text-[10px] uppercase tracking-widest hover:bg-white/20 transition-all active:scale-95 shadow-xl">
+                                    Copy 📋
+                                </button>
+                                <button @click="downloadPDF()" class="px-10 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-black text-[10px] uppercase tracking-widest shadow-[0_15px_30px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 transition-all">
+                                    PDF fr 📥
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Interface States -->
+                        <div class="flex-1 flex flex-col items-center justify-center relative z-10">
+                            <!-- Empty ERA -->
+                            <div x-show="!coverLetter && !loading" class="text-center max-w-sm px-4">
+                                <div class="w-32 h-32 mx-auto rounded-[3rem] bg-indigo-500/10 flex items-center justify-center text-6xl mb-10 border border-white/10 shadow-3xl animate-float grayscale opacity-20">📝</div>
+                                <h3 class="text-2xl font-black text-white/20 italic tracking-tighter mb-4 uppercase">Archive Terminal Empty</h3>
+                                <p class="text-[10px] font-bold text-white/10 uppercase tracking-[0.4em] leading-relaxed italic">Initiate protocol on the left to manifest results.</p>
+                            </div>
+
+                            <!-- Cooking ERA -->
+                            <div x-show="loading" class="text-center">
+                                <div class="relative w-32 h-32 mx-auto mb-10">
+                                    <div class="absolute inset-0 border-2 border-pink-500/10 rounded-full"></div>
+                                    <div class="absolute inset-0 border-t-2 border-pink-500 rounded-full animate-spin"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center text-4xl">🔥</div>
+                                    <div class="absolute inset-0 bg-pink-500/20 blur-3xl rounded-full"></div>
+                                </div>
+                                <h3 class="text-4xl font-black text-white italic tracking-tighter uppercase animate-pulse mb-4 leading-none">AI is Cooking...</h3>
+                                <p class="text-[10px] font-black text-pink-400 uppercase tracking-[0.5em] italic">Baking the perfect corporate frequency</p>
+                            </div>
+
+                            <!-- Final Manifest -->
+                            <div x-show="coverLetter" class="w-full animate-fade-in">
+                                <div class="bg-white border-8 border-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.5)] overflow-hidden">
+                                     <div class="bg-white/50 backdrop-blur-sm p-10 sm:p-16 text-slate-900 relative group/paper">
+                                         <div class="absolute top-8 right-8 text-4xl font-black italic text-slate-100 uppercase select-none pointer-events-none">OFFICIAL SIGNAL</div>
+                                         <div class="whitespace-pre-wrap text-[14px] sm:text-[18px] leading-[1.8] font-medium selection:bg-pink-100" x-text="coverLetter"></div>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Empty State -->
-                <div x-show="!coverLetter && !loading" class="text-center py-16 text-white/40">
-                    <div class="text-7xl mb-4">📝</div>
-                    <p class="text-lg">Your cover letter will appear here</p>
-                </div>
-
-                <!-- Loading -->
-                <div x-show="loading" class="text-center py-16">
-                    <div class="animate-spin inline-block h-12 w-12 border-4 border-purple-500 border-t-transparent rounded-full mb-4"></div>
-                    <p class="text-lg text-blue-200">AI is writing your cover letter...</p>
-                </div>
-
-                <!-- Generated Letter -->
-                <div x-show="coverLetter" class="bg-white rounded-xl p-6 text-gray-900 min-h-[400px]">
-                    <div class="whitespace-pre-wrap text-sm leading-relaxed" x-text="coverLetter"></div>
-                </div>
-
-                <!-- Word Count -->
-                <div x-show="wordCount > 0" class="mt-4 text-center text-blue-300 text-sm">
-                    📊 <span x-text="wordCount"></span> words
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-@keyframes blob { 0% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-50px) scale(1.1); } 66% { transform: translate(-20px,20px) scale(0.9); } 100% { transform: translate(0,0) scale(1); } }
-.animate-blob { animation: blob 7s infinite; }
-.animation-delay-2000 { animation-delay: 2s; }
-@media (max-width: 768px) {
-    .grid.lg\:grid-cols-2 { grid-template-columns: 1fr !important; }
-    .text-5xl { font-size: 28px !important; }
-    .p-6 { padding: 16px !important; }
-    .gap-8 { gap: 16px !important; }
-    .text-xl { font-size: 18px !important; }
-    .min-h-\[400px\] { min-height: 300px !important; }
-}
-@media (max-width: 480px) {
-    .text-5xl { font-size: 24px !important; }
-    .text-lg { font-size: 14px !important; }
-    .p-6 { padding: 12px !important; }
-    .text-sm { font-size: 12px !important; }
-    .py-3 { padding-top: 8px !important; padding-bottom: 8px !important; }
-    .px-4 { padding-left: 8px !important; padding-right: 8px !important; }
-    textarea { font-size: 14px !important; }
-    input { font-size: 14px !important; }
-    select { font-size: 14px !important; }
-}
-</style>
 {% endblock %}
 
 {% block scripts %}
@@ -121,12 +143,9 @@ function coverLetterApp() {
         coverLetter: '', wordCount: 0, loading: false, error: '',
         async init() {
             try {
-                // First get the actual user ID from auth
                 const authRes = await fetch('/api/auth/me');
                 if (!authRes.ok) return;
                 const user = await authRes.json();
-                
-                // Then fetch their resumes
                 const res = await fetch(`/api/resume/user/${user.id}`);
                 if (res.ok) this.resumes = await res.json();
             } catch(e) { console.error('Failed to load resumes:', e); }
@@ -150,8 +169,6 @@ function coverLetterApp() {
         copyToClipboard() { navigator.clipboard.writeText(this.coverLetter); alert('✅ Copied!'); },
         downloadPDF() {
             if (!this.coverLetter) return;
-            
-            // Create a new window with formatted cover letter
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
                 <!DOCTYPE html>
@@ -159,55 +176,21 @@ function coverLetterApp() {
                 <head>
                     <title>Cover Letter - ${this.jobTitle || 'AuraRise'}</title>
                     <style>
-                        body {
-                            font-family: 'Georgia', 'Times New Roman', serif;
-                            max-width: 700px;
-                            margin: 40px auto;
-                            padding: 40px;
-                            line-height: 1.8;
-                            color: #1a1a1a;
-                            font-size: 12pt;
-                        }
-                        .header {
-                            text-align: center;
-                            border-bottom: 2px solid #333;
-                            padding-bottom: 20px;
-                            margin-bottom: 30px;
-                        }
-                        .header h1 {
-                            margin: 0;
-                            font-size: 24pt;
-                            color: #1a1a1a;
-                        }
-                        .header p {
-                            margin: 5px 0 0;
-                            color: #666;
-                            font-size: 11pt;
-                        }
-                        .content {
-                            white-space: pre-wrap;
-                        }
-                        @media print {
-                            body { margin: 0; padding: 20px; }
-                            @page { margin: 1in; }
-                        }
+                        body { font-family: 'Georgia', serif; max-width: 700px; margin: 40px auto; padding: 40px; line-height: 1.8; color: #1a1a1a; font-size: 12pt; }
+                        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+                        .header h1 { margin: 0; font-size: 24pt; color: #1a1a1a; }
+                        .content { white-space: pre-wrap; }
+                        @media print { body { margin: 0; padding: 20px; } @page { margin: 1in; } }
                     </style>
                 </head>
                 <body>
-                    <div class="header">
-                        <h1>Cover Letter</h1>
-                        <p>${this.jobTitle || ''} • ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                    </div>
+                    <div class="header"><h1>Cover Letter</h1><p>${this.jobTitle || ''} • ${new Date().toLocaleDateString()}</p></div>
                     <div class="content">${this.coverLetter}</div>
                 </body>
                 </html>
             `);
             printWindow.document.close();
-            
-            // Wait for content to load, then trigger print
-            setTimeout(() => {
-                printWindow.print();
-            }, 500);
+            setTimeout(() => { printWindow.print(); }, 500);
         }
     };
 }

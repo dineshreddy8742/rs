@@ -47,96 +47,109 @@
 {% endblock %}
 
 {% block content %}
-<!-- Animated Background -->
-<div class="relative min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-    <!-- Floating Orbs -->
-    <div class="absolute top-20 left-10 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-    <div class="absolute top-40 right-10 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+<!-- Animated Core -->
+<div class="relative min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-t border-white/5">
+    <!-- Pulse Waves -->
+    <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-[120px] animate-blob"></div>
+    <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] animate-blob animation-delay-2000"></div>
     
-    <div class="relative z-10 max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <!-- Page Title -->
-        <div class="text-center mb-8">
-            <h1 class="text-5xl font-black bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-3">
-                Create Your Optimized Resume
+    <div class="relative z-10 max-w-7xl mx-auto py-12 px-6 lg:px-12 backdrop-blur-[2px]">
+        <!-- Hero Header Protocol -->
+        <div class="text-center mb-16">
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <span class="px-4 py-1.5 bg-pink-500/20 border border-pink-500/30 rounded-full text-[10px] font-black text-pink-400 uppercase tracking-widest italic animate-pulse">Alpha Generation Protocol 🚀</span>
+            </div>
+            <h1 class="text-5xl sm:text-7xl md:text-9xl font-black text-white italic tracking-tighter uppercase leading-none mb-6">
+                Resume <span class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">Magnifier</span>
             </h1>
-            <p class="text-lg text-blue-200">Transform your resume with AI-powered ATS optimization</p>
+            <p class="text-[12px] font-bold text-white/40 uppercase tracking-[0.4em]">Propelling your professional signal past the ATS robots.</p>
         </div>
 
-        <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8"
+        <div class="bg-white/[0.02] backdrop-blur-3xl border border-white/10 rounded-[4rem] shadow-[0_0_100px_rgba(0,0,0,0.5)] p-12"
              x-data="resumeCreator()"
              x-init="init()">
             
-            <!-- Modern Progress Stepper -->
-            <div class="flex items-center justify-between mb-10 px-4">
+            <!-- Strategic Progression Stepper -->
+            <div class="max-w-4xl mx-auto flex flex-wrap sm:flex-nowrap items-center justify-between gap-4 mb-20 px-2 sm:px-8">
                 <template x-for="(step, index) in [
-                    {num: 1, label: 'Upload', icon: '📄'},
-                    {num: 2, label: 'Analyze', icon: '🔍'},
-                    {num: 3, label: 'Review', icon: '✨'},
-                    {num: 4, label: 'Results', icon: '🎯'}
+                    {num: 1, label: 'Extraction', icon: '📄'},
+                    {num: 2, label: 'Analysis', icon: '🔍'},
+                    {num: 3, label: 'Simulation', icon: '✨'},
+                    {num: 4, label: 'Deployment', icon: '🎯'}
                 ]" :key="index">
                     <div class="flex items-center flex-1">
-                        <div class="flex flex-col items-center">
-                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl transition-all duration-500"
+                        <div class="flex flex-col items-center cursor-pointer group" 
+                             @click="if(step.num < currentStep || (step.num === 1)) currentStep = step.num">
+                            <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl sm:rounded-[2rem] flex items-center justify-center text-xl sm:text-3xl transition-all duration-500 relative overflow-hidden"
                                  :class="currentStep >= step.num ? 
-                                    'bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white shadow-lg shadow-purple-500/50 scale-110' : 
-                                    'bg-white/20 text-white/50 border-2 border-white/30'">
+                                    'bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-[0_0_30px_rgba(236,72,153,0.3)] scale-110' : 
+                                    'bg-white/5 text-white/20 border border-white/10 group-hover:bg-white/10 group-hover:scale-105'">
+                                <div x-show="currentStep === step.num" class="absolute inset-x-0 bottom-0 h-1 bg-white animate-pulse"></div>
                                 <span x-text="step.icon"></span>
                             </div>
-                            <div class="mt-3 text-sm font-bold transition-all"
-                                 :class="currentStep >= step.num ? 'text-white' : 'text-white/50'"
+                            <div class="mt-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all italic"
+                                 :class="currentStep >= step.num ? 'text-white' : 'text-white/20'"
                                  x-text="step.label"></div>
                         </div>
-                        <div class="flex-1 h-1 mx-3 rounded-full bg-white/20" x-show="index < 3">
-                            <div class="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-700"
+                        <div class="hidden sm:block flex-1 h-0.5 mx-6 bg-white/5 rounded-full" x-show="index < 3">
+                            <div class="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-1000"
                                  :class="currentStep > step.num ? 'w-full' : 'w-0'"></div>
                         </div>
                     </div>
                 </template>
             </div>
 
-            <!-- Step 1: Upload -->
-            <div x-show="currentStep === 1" class="fade-in">
-                <!-- Upload Section -->
-                <div class="grid md:grid-cols-2 gap-6 mb-8">
-                    <!-- Resume Upload -->
-                    <div class="bg-gradient-to-br from-pink-500/10 to-purple-500/10 border-2 border-pink-400/30 rounded-2xl p-6 backdrop-blur-sm">
-                        <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                            <span class="mr-2">📄</span> Upload Your Resume
-                        </h2>
+            <!-- Step 1: Data Extraction -->
+            <div x-show="currentStep === 1" class="fade-in space-y-12">
+                <div class="grid lg:grid-cols-2 gap-12 mb-12">
+                    <!-- Source Node -->
+                    <div class="bg-white/5 border border-white/5 rounded-[3.5rem] p-10 relative overflow-hidden group">
+                        <div class="absolute -right-12 -top-12 text-[10rem] text-white/5 font-black uppercase italic pointer-events-none group-hover:scale-110 transition-transform duration-1000">LOAD</div>
                         
-                        <div class="border-2 border-dashed border-white/30 rounded-2xl p-8 text-center bg-white/5 transition-all hover:border-pink-400/50 hover:bg-white/10"
-                             :class="{'border-pink-400 bg-pink-500/20': isDraggingResume, 'border-green-400 bg-green-500/20': resumeFile}"
+                        <h2 class="text-2xl font-black text-white italic tracking-tighter uppercase mb-2 flex items-center gap-4 relative z-10 transition-all group-hover:translate-x-2">
+                            <span class="w-1.5 h-6 bg-pink-500 rounded-full"></span>
+                            Primary Source
+                        </h2>
+                        <p class="text-[10px] font-bold text-white/30 uppercase tracking-[0.3em] mb-10 relative z-10">Upload your current professional log.</p>
+                        
+                        <div class="relative z-10 border-2 border-dashed border-white/10 rounded-[2.5rem] p-12 text-center bg-white/[0.03] transition-all hover:bg-white/[0.07] hover:border-pink-500/30 cursor-pointer overflow-hidden group/box"
+                             :class="{'border-pink-500/50 bg-pink-500/5': isDraggingResume, 'border-green-500/50 bg-green-500/5': resumeFile}"
                              @dragover.prevent="isDraggingResume = true"
                              @dragleave.prevent="isDraggingResume = false"
                              @drop.prevent="handleResumeDrop($event)"
                              @click="$refs.fileInput.click()">
                             
                             <template x-if="!resumeFile">
-                                <div>
-                                    <div class="text-6xl mb-3">⬆️</div>
-                                    <p class="text-lg font-bold text-white mb-2">Drag & Drop your PDF</p>
-                                    <p class="text-sm text-blue-200 mb-3">or click to browse</p>
-                                    <p class="text-xs text-blue-300">PDF only (max 5MB)</p>
+                                <div class="space-y-6">
+                                    <div class="w-20 h-20 bg-white/5 rounded-3xl mx-auto flex items-center justify-center text-4xl group-hover/box:scale-110 transition-transform">📄</div>
+                                    <div>
+                                        <p class="text-lg font-black text-white uppercase italic tracking-widest mb-2">Drop Signal File</p>
+                                        <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.5em]">PDF FORMAT • MAX 5MB</p>
+                                    </div>
+                                    <button class="px-8 py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black text-white uppercase tracking-widest hover:bg-white/10 transition-all">Select Local Drive</button>
                                 </div>
                             </template>
                             
                             <template x-if="resumeFile">
-                                <div>
-                                    <div class="text-6xl mb-3">✅</div>
-                                    <p class="text-lg font-bold text-green-400 mb-2" x-text="resumeFile.name"></p>
-                                    <p class="text-sm text-blue-200" x-text="'Size: ' + (resumeFile.size / 1024).toFixed(2) + ' KB'"></p>
+                                <div class="space-y-6">
+                                    <div class="w-20 h-20 bg-green-500/20 border border-green-500/30 rounded-3xl mx-auto flex items-center justify-center text-4xl animate-bounce">✅</div>
+                                    <div>
+                                        <p class="text-lg font-black text-green-400 uppercase italic truncate max-w-[250px] mx-auto" x-text="resumeFile.name"></p>
+                                        <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.5em]" x-text="'PURITY: ' + (resumeFile.size / 1024).toFixed(2) + ' KB'"></p>
+                                    </div>
                                     
-                                    <!-- Upload Progress -->
-                                    <div x-show="isUploading" class="mt-4">
-                                        <div class="animate-spin inline-block h-6 w-6 border-3 border-pink-500 border-t-transparent rounded-full"></div>
-                                        <p class="mt-2 text-sm text-pink-300">Extracting text...</p>
+                                    <div x-show="isUploading" class="flex flex-col items-center">
+                                        <div class="w-12 h-1 bg-white/10 rounded-full overflow-hidden mb-4">
+                                            <div class="h-full bg-pink-500 animate-pulse"></div>
+                                        </div>
+                                        <p class="text-[9px] font-black text-pink-400 uppercase tracking-widest italic animate-pulse">Extracting Raw Data...</p>
                                     </div>
                                     
                                     <button type="button" 
                                             @click.stop="resumeFile = null; resumeContent = ''; resumeId = null"
                                             x-show="!isUploading"
-                                            class="mt-3 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-bold transition-all">
-                                        Remove
+                                            class="text-[9px] font-black text-red-500 border-b border-red-500/30 uppercase tracking-widest hover:text-red-400 transition-all">
+                                        Purge Buffer
                                     </button>
                                 </div>
                             </template>
@@ -145,189 +158,250 @@
                     </div>
 
                     <!-- Resume Preview -->
-                    <div class="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border-2 border-cyan-400/30 rounded-2xl p-6 backdrop-blur-sm">
-                        <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                            <span class="mr-2">👁️</span> Resume Preview
-                        </h2>
+                    <!-- Preview Terminal -->
+                    <div class="bg-white/5 border border-white/5 rounded-[3.5rem] p-10 relative overflow-hidden group">
+                        <div class="absolute -right-12 -top-12 text-[10rem] text-white/5 font-black uppercase italic pointer-events-none group-hover:scale-110 transition-transform duration-1000">VIEW</div>
                         
-                        <div class="h-64 overflow-y-auto bg-white/5 border border-white/20 rounded-xl p-4 text-sm text-blue-100" 
+                        <h2 class="text-2xl font-black text-white italic tracking-tighter uppercase mb-2 flex items-center gap-4 relative z-10 transition-all group-hover:translate-x-2">
+                            <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span>
+                            Visual Proof
+                        </h2>
+                        <p class="text-[10px] font-bold text-white/30 uppercase tracking-[0.3em] mb-10 relative z-10">Verification of extracted plaintext.</p>
+                        
+                        <div class="h-64 overflow-y-auto bg-white/5 border border-white/10 rounded-[2.5rem] p-8 text-[11px] font-medium text-blue-100/60 leading-relaxed sidebar-scroll relative z-10" 
                              x-show="resumeContent && resumeContent !== 'Extracting text...' && !resumeContent.includes('timed out')">
-                            <p class="whitespace-pre-wrap" x-text="resumeContent"></p>
+                            <p class="whitespace-pre-wrap font-mono" x-text="resumeContent"></p>
                         </div>
                         
-                        <div class="h-64 flex items-center justify-center" x-show="!resumeContent || resumeContent === ''">
-                            <div class="text-center text-white/40">
-                                <div class="text-5xl mb-3">📄</div>
-                                <p class="text-sm">Upload to see preview</p>
+                        <div class="h-64 flex items-center justify-center relative z-10" x-show="!resumeContent || resumeContent === ''">
+                            <div class="text-center opacity-20">
+                                <div class="text-6xl mb-4 grayscale">📄</div>
+                                <p class="text-[10px] font-black uppercase tracking-[0.4em]">Awaiting Uplink</p>
                             </div>
                         </div>
                         
-                        <div class="h-64 flex items-center justify-center" x-show="resumeContent === 'Extracting text...'">
+                        <div class="h-64 flex items-center justify-center relative z-10" x-show="resumeContent === 'Extracting text...'">
                             <div class="text-center">
-                                <div class="animate-spin inline-block h-12 w-12 border-4 border-cyan-500 border-t-transparent rounded-full mb-3"></div>
-                                <p class="text-sm text-cyan-300">Extracting text...</p>
+                                <div class="animate-spin inline-block h-12 w-12 border-2 border-cyan-500 border-t-transparent rounded-full mb-6 relative">
+                                    <div class="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full"></div>
+                                </div>
+                                <p class="text-[10px] font-black text-cyan-400 uppercase tracking-widest animate-pulse italic">Scanning Core Threads...</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Job Description -->
-                <div class="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-400/30 rounded-2xl p-6 backdrop-blur-sm mb-8">
-                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <span class="mr-2">💼</span> Job Description
+                <!-- Mission Specs -->
+                <div class="bg-white/5 border border-white/5 rounded-[4rem] p-12 relative overflow-hidden group mb-12">
+                    <div class="absolute -right-16 -top-16 text-[12rem] text-white/5 font-black uppercase italic pointer-events-none group-hover:scale-110 transition-transform duration-1000">SPECS</div>
+                    
+                    <h2 class="text-3xl font-black text-white italic tracking-tighter uppercase mb-2 flex items-center gap-4 relative z-10 transition-all group-hover:translate-x-2">
+                        <span class="w-2 h-8 bg-yellow-400 rounded-full"></span>
+                        Target Deployment
                     </h2>
+                    <p class="text-[10px] font-bold text-white/30 uppercase tracking-[0.3em] mb-12 relative z-10">Simulating alignment with corporate requirements.</p>
 
-                    <div class="grid md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-2">Job Title</label>
+                    <div class="grid md:grid-cols-2 gap-8 mb-10 relative z-10">
+                        <div class="group/input">
+                            <label class="block text-[10px] font-black text-yellow-400 uppercase tracking-[0.4em] mb-4 italic ml-2">Objective Title</label>
                             <input type="text"
-                                   class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/30 transition-all"
-                                   placeholder="e.g. Senior Software Developer"
+                                   class="w-full bg-indigo-950/40 border border-white/10 rounded-2xl px-6 py-4 text-white font-black italic shadow-2xl focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all placeholder-white/5"
+                                   placeholder="E.G. SENIOR SOFTWARE ARCHITECT"
                                    x-model="jobTitle">
                         </div>
-                        <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-2">Company Name</label>
+                        <div class="group/input">
+                            <label class="block text-[10px] font-black text-yellow-400 uppercase tracking-[0.4em] mb-4 italic ml-2">Target Entity</label>
                             <input type="text"
-                                   class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/30 transition-all"
-                                   placeholder="e.g. Google, Microsoft, Amazon"
+                                   class="w-full bg-indigo-950/40 border border-white/10 rounded-2xl px-6 py-4 text-white font-black italic shadow-2xl focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all placeholder-white/5"
+                                   placeholder="E.G. GOOGLE / MICROSOFT / STARTUP ERA"
                                    x-model="companyName">
                         </div>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-bold text-blue-200 mb-2">
-                            Job Description <span class="text-red-400">*</span>
+                    <div class="relative z-10">
+                        <label class="block text-[10px] font-black text-yellow-400 uppercase tracking-[0.4em] mb-4 italic ml-2">
+                            Log Requirements <span class="text-red-500 animate-pulse">*</span>
                         </label>
-                        <textarea class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/30 transition-all resize-none"
+                        <textarea class="w-full bg-indigo-950/40 border border-white/10 rounded-3xl px-8 py-6 text-white text-sm font-medium leading-relaxed focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all resize-none shadow-2xl placeholder-white/5"
                                   rows="8"
-                                  placeholder="Paste the full job description here..."
+                                  placeholder="Paste the full job criteria here..."
                                   x-model="jobDescription"></textarea>
                     </div>
                 </div>
 
-                <!-- Analyze Button -->
-                <div class="text-center">
+                <!-- Action Hub -->
+                <div class="text-center relative">
+                    <div class="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
+                        <div class="w-64 h-64 bg-pink-500 rounded-full blur-[100px] animate-pulse"></div>
+                    </div>
                     <button type="button"
-                            class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-black py-4 px-12 rounded-2xl shadow-lg shadow-purple-500/50 transition-all hover:scale-105 hover:shadow-purple-500/70 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-lg"
+                            class="relative z-10 bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white font-black py-8 px-20 rounded-[3rem] shadow-[0_20px_60px_rgba(236,72,153,0.4)] transition-all hover:scale-105 hover:shadow-[0_25px_80px_rgba(236,72,153,0.6)] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100 text-2xl italic tracking-tighter uppercase"
                             :disabled="!canProceedToAnalysis()"
                             @click="startAnalysis()">
-                        <span>🚀 Analyze Resume</span>
+                        <span>Initiate Analysis 🚀</span>
                     </button>
+                    <p class="mt-8 text-[9px] font-black text-white/20 uppercase tracking-[0.6em] animate-pulse">Neural Core Engine is Active</p>
                 </div>
             </div>
 
             <!-- Step 2: Analysis -->
             <div x-show="currentStep === 2" class="fade-in text-center py-12">
-                <!-- Spinner -->
-                <div class="relative inline-block mb-6">
-                    <div class="animate-spin inline-block h-24 w-24 border-4 border-purple-500 border-t-transparent rounded-full"></div>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl font-black text-white">⚡</span>
+                <!-- Viral Meme Visuals (Auto-Cycling every 5s) -->
+                <div class="mb-10 flex flex-col items-center">
+                    <div class="relative">
+                        <!-- Fast Cycling Meme GIFs -->
+                        <div class="w-48 h-48 rounded-3xl overflow-hidden border-4 border-pink-500 shadow-[0_0_40px_rgba(236,72,153,0.5)] relative mb-6">
+                            <img :src="loadingMemes[currentMemeIndex].url" class="w-full h-full object-cover transition-opacity duration-500">
+                        </div>
+                        
+                        <!-- Floating Moods (Cycling) -->
+                        <div class="absolute -top-6 -right-6 bg-pink-500 text-white text-xs font-black px-3 py-1.5 rounded-full animate-bounce shadow-xl uppercase tracking-tighter"
+                             x-text="loadingMemes[currentMemeIndex].badge1"></div>
+                        <div class="absolute -bottom-6 -left-6 bg-cyan-400 text-slate-900 text-xs font-black px-3 py-1.5 rounded-full animate-pulse shadow-xl uppercase tracking-tighter"
+                             x-text="loadingMemes[currentMemeIndex].badge2"></div>
                     </div>
                 </div>
                 
-                <!-- Title -->
-                <h2 class="text-3xl font-black text-white mb-2">AI is Analyzing Your Resume...</h2>
-                <p class="text-lg text-blue-200 mb-6" x-text="analysisProgressMessage"></p>
+                <!-- Status Messages -->
+                <div class="max-w-md mx-auto">
+                    <h2 class="text-4xl font-black text-white mb-2 tracking-tighter italic" 
+                        :class="estimatedTimeRemaining === 0 ? 'text-pink-400 animate-pulse' : ''"
+                        x-text="estimatedTimeRemaining === 0 ? '💀 TOTAL DELULU MODE' : '🔥 AI IS COOKING...'"></h2>
+                    
+                    <div class="h-12 flex items-center justify-center">
+                         <p class="text-lg font-black bg-white/10 text-pink-300 border border-pink-500/30 px-5 py-2 rounded-2xl shadow-xl italic"
+                            x-text="analysisProgressMessage"></p>
+                    </div>
+                </div>
                 
-                <!-- Countdown Timer -->
-                <div class="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-4 mb-6">
+                <!-- Countdown Timer Card -->
+                <div class="mt-8 inline-flex items-center gap-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl px-8 py-5 shadow-2xl">
                     <div class="text-center">
-                        <div class="text-4xl font-black bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent" x-text="estimatedTimeRemaining"></div>
-                        <div class="text-xs text-blue-300 font-bold">SECONDS</div>
+                        <div class="text-5xl font-black text-white" x-text="estimatedTimeRemaining === 0 ? '∞' : estimatedTimeRemaining"></div>
+                        <div class="text-[10px] font-black text-cyan-400 uppercase tracking-widest mt-1">S Remaining</div>
                     </div>
-                    <div class="h-10 w-px bg-white/20"></div>
+                    <div class="h-12 w-px bg-white/10"></div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-white" x-text="analysisProgress + '%'"></div>
-                        <div class="text-xs text-blue-300">COMPLETE</div>
+                        <div class="text-3xl font-black text-pink-400" x-text="Math.floor(analysisProgress) + '%'"></div>
+                        <div class="text-[10px] font-black text-purple-400 uppercase tracking-widest mt-1">Confidence</div>
                     </div>
                 </div>
                 
-                <!-- Progress Bar -->
-                <div class="w-80 mx-auto h-3 bg-white/20 rounded-full overflow-hidden mb-4">
-                    <div class="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 transition-all duration-500 rounded-full"
-                         :style="`width: ${analysisProgress}%`"></div>
-                </div>
-                
-                <!-- Animated Dots -->
-                <div class="flex justify-center gap-2 mt-4">
-                    <div class="w-2 h-2 rounded-full bg-pink-500 animate-bounce" style="animation-delay: 0s;"></div>
-                    <div class="w-2 h-2 rounded-full bg-purple-500 animate-bounce" style="animation-delay: 0.2s;"></div>
-                    <div class="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style="animation-delay: 0.4s;"></div>
+                <!-- Progress Loader -->
+                <div class="mt-10 max-w-sm mx-auto">
+                    <div class="h-4 bg-white/10 rounded-full overflow-hidden p-1 border border-white/5">
+                        <div class="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 transition-all duration-700 rounded-full shadow-[0_0_15px_rgba(236,72,153,0.5)]"
+                             :style="`width: ${analysisProgress}%`"></div>
+                    </div>
+                    <p class="mt-4 text-xs font-bold text-white/40 uppercase tracking-widest animate-pulse">
+                        Please do not close this window • Your future is loading
+                    </p>
                 </div>
             </div>
 
-            <!-- Step 3: Review -->
-            <div x-show="currentStep === 3" class="fade-in">
-                <div class="text-center mb-8">
-                    <div class="text-6xl mb-4">✨</div>
-                    <h2 class="text-4xl font-black bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-2">Resume Analysis Complete</h2>
-                    <p class="text-lg text-blue-200">Here's how your resume currently matches</p>
+            <!-- Step 3: Battle Review -->
+            <div x-show="currentStep === 3" class="fade-in space-y-12">
+                <div class="text-center mb-16">
+                    <div class="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-[2rem] mx-auto flex items-center justify-center text-5xl mb-8 shadow-2xl animate-float">✨</div>
+                    <h2 class="text-5xl font-black text-white italic tracking-tighter uppercase mb-4 leading-none">Diagnostic Synchronized</h2>
+                    <p class="text-[10px] font-black text-blue-200 uppercase tracking-[0.4em]">Comparison of extracted signal vs. target frequency.</p>
                 </div>
 
-                <!-- Score Cards -->
-                <div class="grid md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-2 border-amber-400/40 rounded-2xl p-6 text-center">
-                        <p class="text-sm font-bold text-amber-300 mb-2">Original ATS Score</p>
-                        <p class="text-6xl font-black text-amber-400" x-text="originalScore + '%'"></p>
+                <!-- Data Visualizers -->
+                <div class="grid lg:grid-cols-3 gap-8 mb-12">
+                    <div class="bg-white/5 border border-white/10 rounded-[3rem] p-10 text-center relative overflow-hidden group">
+                        <div class="absolute -right-8 -top-8 text-8xl text-white/5 font-black uppercase italic pointer-events-none group-hover:scale-110 transition-transform">RAW</div>
+                        <p class="text-[10px] font-black text-amber-500 uppercase tracking-[0.4em] mb-4 italic ml-2">Legacy Score</p>
+                        <p class="text-7xl font-black text-white italic tracking-tighter" x-text="originalScore + '%'"></p>
+                        <p class="text-[8px] font-black text-white/20 uppercase tracking-[0.3em] mt-4">Pre-Optimization State</p>
                     </div>
                     
-                    <div class="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-2 border-green-400/40 rounded-2xl p-6">
-                        <p class="text-sm font-bold text-green-300 mb-3">Matched Skills</p>
+                    <div class="bg-white/5 border border-white/10 rounded-[3rem] p-10 relative overflow-hidden group">
+                         <div class="absolute -right-8 -top-8 text-8xl text-white/5 font-black uppercase italic pointer-events-none group-hover:scale-110 transition-transform">SYNC</div>
+                        <h4 class="text-[10px] font-black text-green-400 uppercase tracking-[0.4em] mb-6 italic ml-2">Frequency Overlap</h4>
                         <div class="flex flex-wrap gap-2">
                             <template x-for="skill in matchedSkills" :key="skill">
-                                <span class="px-3 py-1 bg-green-500/30 border border-green-400/40 rounded-full text-xs font-bold text-green-200" x-text="skill"></span>
+                                <span class="px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-xl text-[9px] font-black text-green-400 uppercase italic tracking-widest shadow-lg" x-text="skill"></span>
                             </template>
                         </div>
                     </div>
                     
-                    <div class="bg-gradient-to-br from-red-500/20 to-pink-500/20 border-2 border-red-400/40 rounded-2xl p-6">
-                        <p class="text-sm font-bold text-red-300 mb-3">Missing Skills</p>
+                    <div class="bg-white/5 border border-white/10 rounded-[3rem] p-10 relative overflow-hidden group">
+                        <div class="absolute -right-8 -top-8 text-8xl text-white/5 font-black uppercase italic pointer-events-none group-hover:scale-110 transition-transform">GAP</div>
+                        <h4 class="text-[10px] font-black text-red-500 uppercase tracking-[0.4em] mb-6 italic ml-2">Critical Voids</h4>
                         <div class="flex flex-wrap gap-2">
                             <template x-for="skill in missingSkills" :key="skill">
-                                <span class="px-3 py-1 bg-red-500/30 border border-red-400/40 rounded-full text-xs font-bold text-red-200" x-text="skill"></span>
+                                <span class="px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-xl text-[9px] font-black text-red-400 uppercase italic tracking-widest shadow-lg" x-text="skill"></span>
                             </template>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Mandatory Advice Shield -->
+                <div class="bg-gradient-to-br from-indigo-950/40 to-slate-900 border border-white/10 rounded-[4rem] p-12 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="flex flex-col md:flex-row items-center gap-12 relative z-10">
+                        <div class="w-32 h-32 bg-indigo-500/20 rounded-[2.5rem] flex items-center justify-center text-6xl shadow-2xl animate-pulse">💡</div>
+                        <div class="text-center md:text-left">
+                            <h4 class="text-2xl font-black text-white italic tracking-tighter uppercase mb-2">Alpha Operational Intel</h4>
+                            <p class="text-[12px] font-bold text-white/60 leading-relaxed uppercase tracking-tight max-w-2xl italic">
+                                Mandatory Deployment Advice: Mastery of identified voids is required for interview survival. Our AI will now bridge the gap in your signal, but terminal competency remains your responsibility.
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Optimize Button -->
-                <div class="text-center">
+                <!-- Strategic Transition -->
+                <div class="flex flex-col sm:flex-row justify-center gap-6 pt-12">
                     <button type="button"
-                            class="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white font-black py-4 px-12 rounded-2xl shadow-lg shadow-green-500/50 transition-all hover:scale-105 text-lg"
+                            @click="currentStep = 1"
+                            class="px-12 py-6 bg-white/5 border border-white/10 text-white/40 font-black uppercase italic tracking-widest rounded-[2rem] hover:bg-white/10 hover:text-white transition-all">
+                        Abort Reset ⬅️
+                    </button>
+                    <button type="button"
+                            class="bg-gradient-to-r from-green-500 via-emerald-600 to-teal-600 text-white font-black py-8 px-20 rounded-[3rem] shadow-[0_20px_60px_rgba(16,185,129,0.3)] transition-all hover:scale-105 active:scale-95 text-2xl italic tracking-tighter uppercase"
                             @click="optimizeResume()">
-                        <span>🚀 Optimize My Resume</span>
+                        <span>Execute Synergy 🚀</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Step 4: Results -->
-            <div x-show="currentStep === 4" class="fade-in">
-                <div class="text-center mb-8">
-                    <div class="text-6xl mb-4">🎉</div>
-                    <h2 class="text-4xl font-black bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent mb-2">Optimization Complete!</h2>
+            <!-- Step 4: Final Deployment -->
+            <div x-show="currentStep === 4" class="fade-in space-y-16 py-12">
+                <div class="text-center">
+                    <div class="w-32 h-32 bg-gradient-to-br from-green-400 to-emerald-600 rounded-[3rem] mx-auto flex items-center justify-center text-6xl mb-10 shadow-[0_30px_60px_rgba(16,185,129,0.4)] animate-bounce">🎉</div>
+                    <h2 class="text-6xl font-black text-white italic tracking-tighter uppercase leading-none mb-4">Optimization Locked</h2>
+                    <p class="text-[10px] font-black text-green-400 uppercase tracking-[0.5em] italic">Peak Signal Performance Achieved</p>
                 </div>
 
-                <!-- Score Comparison -->
-                <div class="grid md:grid-cols-2 gap-6 mb-8 max-w-2xl mx-auto">
-                    <div class="bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-2 border-amber-400/40 rounded-2xl p-6 text-center">
-                        <p class="text-sm font-bold text-amber-300 mb-2">Before</p>
-                        <p class="text-7xl font-black text-amber-400" x-text="originalScore + '%'"></p>
+                <!-- Performance Differential -->
+                <div class="grid md:grid-cols-2 gap-12 max-w-3xl mx-auto">
+                    <div class="bg-white/5 border border-white/5 rounded-[3rem] p-10 text-center relative overflow-hidden opacity-50">
+                        <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-4 italic">Baseline</p>
+                        <p class="text-8xl font-black text-white italic tracking-tighter" x-text="originalScore + '%'"></p>
                     </div>
                     
-                    <div class="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-2 border-green-400/40 rounded-2xl p-6 text-center">
-                        <p class="text-sm font-bold text-green-300 mb-2">After</p>
-                        <p class="text-7xl font-black text-green-400" x-text="matchScore + '%'"></p>
-                        <p class="text-lg font-bold text-green-300 mt-2" x-text="'+' + (matchScore - originalScore) + '% improvement'"></p>
+                    <div class="bg-white/5 border border-white/10 rounded-[3rem] p-10 text-center relative overflow-hidden shadow-[0_0_50px_rgba(52,211,153,0.15)]">
+                        <div class="absolute inset-0 bg-green-500/5 backdrop-blur-sm pointer-events-none"></div>
+                        <p class="text-[10px] font-black text-green-400 uppercase tracking-[0.4em] mb-4 italic">Optimized Alpha</p>
+                        <p class="text-8xl font-black text-white italic tracking-tighter" x-text="matchScore + '%'"></p>
+                        <div class="mt-6 inline-block px-4 py-1.5 bg-green-500/20 rounded-full border border-green-500/30">
+                            <p class="text-[10px] font-bold text-green-300 uppercase italic tracking-widest" x-text="'+' + (matchScore - originalScore) + '% POWER UP'"></p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Download Button -->
-                <div class="text-center">
+                <!-- Final Hub -->
+                <div class="flex flex-col sm:flex-row justify-center gap-6 pt-12">
                     <button type="button"
-                            class="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white font-black py-4 px-12 rounded-2xl shadow-lg shadow-purple-500/50 transition-all hover:scale-105 text-lg"
+                            @click="currentStep = 3"
+                            class="px-12 py-6 bg-white/5 border border-white/10 text-white/40 font-black uppercase italic tracking-widest rounded-[2rem] hover:bg-white/10 transition-all">
+                        Review Archive
+                    </button>
+                    <button type="button"
+                            class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-black py-8 px-24 rounded-[3rem] shadow-[0_20px_60px_rgba(79,70,229,0.4)] transition-all hover:scale-105 active:scale-95 text-2xl italic tracking-tighter uppercase"
                             @click="downloadOptimizedResume()">
-                        <span>📥 Download Optimized Resume</span>
+                        <span>Deploy Optimized Signal 📥</span>
                     </button>
                 </div>
             </div>
@@ -375,6 +449,20 @@ function resumeCreator() {
         resumePreviewUrl: '',
         resumePreviewLoaded: false,
         progressInterval: null,
+        currentMemeIndex: 0,
+        loadingMemes: [
+            { url: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/vfsAZnqDvoHzUpMPY4/giphy.gif', badge1: 'no cap 🧢', badge2: 'slay ✨' },
+            { url: 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/BmmfW45fSOUpy/giphy.gif', badge1: 'fr fr 💯', badge2: 'bet 🤝' },
+            { url: 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/13HgwGsXF0aiGY/giphy.gif', badge1: 'rizz lvl 99 📈', badge2: 'main character ✨' },
+            { url: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/yr7n0u3qzJC8mAkp7F/giphy.gif', badge1: 'shook 💀', badge2: 'delulu era 🧠' },
+            { url: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/99GwoXp4ZpOGs/giphy.gif', badge1: 'vibing 🎧', badge2: 'it’s a mood 💅' },
+            { url: 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/lKXEBR8m1jWso/giphy.gif', badge1: 'cooking 🍳', badge2: 'big brain 🧠' },
+            { url: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/sSGV_iSInYl0I/giphy.gif', badge1: 'manifesting ✨', badge2: 'rich era 💸' },
+            { url: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/7kn27lnWSAE9O/giphy.gif', badge1: 'hype 🚀', badge2: 'w move 📈' },
+            { url: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/nVXzt7FSQLXJaJDWiv/giphy.gif', badge1: 'slaying 💅', badge2: 'on fleek ✨' },
+            { url: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/pS9v6mZ858Jq0/giphy.gif', badge1: 'it’s giving 💅', badge2: 'hired era 💼' }
+        ],
+        memeInterval: null,
 
         handleResumeFileChange(e) {
             const file = e.target.files[0];
@@ -456,6 +544,7 @@ function resumeCreator() {
                 const result = await this.pollOptimizationStatus();
                 
                 clearInterval(this.progressInterval);
+                clearInterval(this.memeInterval);
                 
                 if (result.status === 'completed') {
                     this.analysisProgress = 100;
@@ -468,12 +557,16 @@ function resumeCreator() {
                     this.resumePreviewUrl = `/api/resume/${this.resumeId}/download?use_optimized=true`;
                     this.resumePreviewLoaded = true;
                     this.currentStep = 3;
+                    if (window.showNotification) {
+                        window.showNotification('⚠️ Study these missing skills before applying!', 'warning');
+                    }
                 } else {
                     throw new Error(result.recommendation || 'Optimization failed');
                 }
             } catch (error) {
                 console.error('Analysis error:', error);
                 clearInterval(this.progressInterval);
+                clearInterval(this.memeInterval);
                 window.alert('Error: ' + error.message);
                 this.currentStep = 1;
             } finally {
@@ -482,37 +575,91 @@ function resumeCreator() {
         },
 
         startProgressSimulation() {
-            const totalTime = 120; // Total seconds
+            const totalTime = 90; // Optimized: Cut from 180 to 90 thanks to parallel backend execution
             let elapsed = 0;
             
             this.analysisProgress = 0;
             this.estimatedTimeRemaining = totalTime;
+            this.currentMemeIndex = 0;
+
+            // Meme/GIF rotation interval (every 5 seconds)
+            this.memeInterval = setInterval(() => {
+                this.currentMemeIndex = (this.currentMemeIndex + 1) % this.loadingMemes.length;
+            }, 5000);
 
             this.progressInterval = setInterval(() => {
                 elapsed += 1;
-                // Progress percentage based on elapsed time (max 95% until completion)
-                this.analysisProgress = Math.min(Math.floor((elapsed / totalTime) * 100), 95);
+                // Faster initial progress, then slows down significantly after 95%
+                let progressFactor = elapsed / totalTime;
+                if (progressFactor < 0.95) {
+                    this.analysisProgress = Math.floor(progressFactor * 100);
+                } else if (this.analysisProgress < 99.9) {
+                    this.analysisProgress = parseFloat((this.analysisProgress + 0.1).toFixed(1)); // Slow creep for the last few percent
+                }
+                
                 this.estimatedTimeRemaining = Math.max(totalTime - elapsed, 0);
 
-                // Update messages based on progress
-                if (this.analysisProgress < 15) {
-                    this.analysisProgressMessage = 'Analyzing resume structure...';
-                } else if (this.analysisProgress < 35) {
-                    this.analysisProgressMessage = 'Extracting skills and experience...';
-                } else if (this.analysisProgress < 55) {
-                    this.analysisProgressMessage = 'Comparing with job description...';
-                } else if (this.analysisProgress < 75) {
-                    this.analysisProgressMessage = 'Calculating ATS compatibility...';
-                } else if (this.analysisProgress < 90) {
-                    this.analysisProgressMessage = 'AI is optimizing your resume...';
+                // Deep Thinking Mode
+                if (elapsed > totalTime) {
+                    const funMessages = [
+                        "no cap, this resume's gonna be fire... 🔥",
+                        "rizz-ponsibilities are being optimized... 💅",
+                        "giving your profile main character energy... ✨",
+                        "cringe detection in progress... 🕵️‍♂️",
+                        "optimizing your rizz for the recruiter... 🫡",
+                        "manifesting that six-figure offer for you... 💸",
+                        "cooking up something better than iced coffee... 🧊☕",
+                        "AI is entering its 'Job Getter' era... 💅",
+                        "fr fr, this JD is a whole mood... 🔍",
+                        "bet, the ATS won't know what hit it... 🚀",
+                        "pov: you are about to get hired... 🎥",
+                        "slay-ing the job application game... 💅✨",
+                        "AI is in its delulu era (high confidence tho)... 🧠"
+                    ];
+                    const overtimeSecs = elapsed - totalTime;
+                    if (overtimeSecs === 1 || overtimeSecs % 5 === 0) {
+                        this.overtimeMsgIndex = Math.floor(Math.random() * funMessages.length);
+                    }
+                    const msg = funMessages[this.overtimeMsgIndex || 0];
+                    this.analysisProgressMessage = `${msg} (${overtimeSecs}s overtime)`;
+                    this.estimatedTimeRemaining = 0;
                 } else {
-                    this.analysisProgressMessage = 'Finalizing analysis...';
+                    // Detailed multi-round messages with some fun injections
+                    const standardMessages = [
+                        "🔍 Round 1: Analyzing Resume Structure...",
+                        "📊 Round 1: Extracting Skills & Experience...",
+                        "🎯 Round 2: Comparing with Job Description...",
+                        "⚡ Round 2: Generating Optimization Keywords...",
+                        "✨ Round 3: Finalizing ATS-Optimized Version...",
+                        "💎 Wrapping up deep analysis..."
+                    ];
+
+                    const extraFun = [
+                        "🚀 launching your career into hyperspace...",
+                        "🌈 adding 10% more 'slay' to your profile...",
+                        "🕵️‍♂️ investigating why you are so main character...",
+                        "🤖 polishing your vibe for robot eyes..."
+                    ];
+
+                    if (this.analysisProgress < 20) {
+                        this.analysisProgressMessage = standardMessages[0];
+                    } else if (this.analysisProgress < 40) {
+                        this.analysisProgressMessage = standardMessages[1];
+                    } else if (this.analysisProgress < 60) {
+                        this.analysisProgressMessage = elapsed % 10 < 5 ? standardMessages[2] : extraFun[0];
+                    } else if (this.analysisProgress < 80) {
+                        this.analysisProgressMessage = elapsed % 10 < 5 ? standardMessages[3] : extraFun[1];
+                    } else if (this.analysisProgress < 95) {
+                        this.analysisProgressMessage = elapsed % 10 < 5 ? standardMessages[4] : extraFun[2];
+                    } else {
+                        this.analysisProgressMessage = standardMessages[5];
+                    }
                 }
-            }, 1000); // Update every second
+            }, 1000);
         },
 
         async pollOptimizationStatus() {
-            const maxAttempts = 60;
+            const maxAttempts = 180; // Extended to 6 minutes (180 * 2s) for very deep analysis
             let attempts = 0;
             
             return new Promise((resolve, reject) => {

@@ -1,0 +1,17 @@
+{
+  "name": "AuraRise AI Resume",
+  "short_name": "AuraRise",
+  "description": "Premium AI-powered ATS Resume Optimizer",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e1b4b",
+  "theme_color": "#1e1b4b",
+  "icons": [
+    {
+      "src": "/static/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

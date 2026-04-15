@@ -4,94 +4,102 @@
 
 {% block content %}
 <div class="flex-grow flex items-center justify-center px-4 py-12 relative overflow-hidden">
-    <!-- Fluid background elements -->
-    <div class="absolute top-1/4 -left-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-blob"></div>
-    <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+    <!-- Stunning Neon Blobs -->
+    <div class="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-pink-600/10 rounded-full blur-[120px] animate-pulse"></div>
+    <div class="absolute bottom-1/4 -right-20 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[120px] animate-pulse-slow"></div>
     
-    <div class="relative z-10 max-w-lg w-full">
+    <div class="relative z-10 max-w-2xl w-full" x-data="registerForm()">
         <div class="text-center mb-10">
             <a href="/" class="inline-flex items-center gap-3 text-white mb-6 hover:scale-105 transition-transform">
-                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-lg font-black text-white shadow-lg">🚀</span>
-                <span class="text-2xl font-black bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">AuraRise</span>
+                <span class="inline-flex h-14 w-14 items-center justify-center rounded-[1.5rem] bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-2xl font-black text-white shadow-[0_0_30px_rgba(168,85,247,0.5)]">🚀</span>
+                <span class="text-3xl font-black bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-400 bg-clip-text text-transparent italic tracking-tighter">AuraRise</span>
             </a>
-            <h1 class="text-4xl font-black text-white mb-3">Join the Future! ✨</h1>
-            <p class="text-blue-200">Create your account and land your dream job</p>
+            <h1 class="text-3xl sm:text-5xl font-black text-white mb-3 tracking-tighter italic">Join the Future! ✨</h1>
+            <p class="text-blue-200 text-base sm:text-lg font-medium px-4">Create your profile and start the Slay Era.</p>
         </div>
 
-        <div class="bg-white/10 backdrop-blur-xl border-2 border-white/20 rounded-[2.5rem] overflow-hidden shadow-2xl">
-            <div x-data="registerForm()" class="p-8 md:p-10">
+        <div class="bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-[40px] border border-white/20 rounded-3xl sm:rounded-[3rem] p-0.5 sm:p-1 shadow-2xl">
+            <div class="bg-indigo-950/40 rounded-[1.7rem] sm:rounded-[2.9rem] p-6 sm:p-8 md:p-12">
                 <form @submit.prevent="handleRegister()">
-                    <div class="space-y-6">
-                        <div x-show="error" class="bg-red-500/20 border border-red-400/40 rounded-2xl p-4 text-red-200 text-sm flex items-center gap-3 animate-shake">
-                            <span>⚠️</span>
+                    <div class="space-y-8">
+                        <!-- Dynamic Vibe Message -->
+                        <div class="h-6 flex items-center justify-center">
+                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400 italic animate-pulse" 
+                               x-text="vibeMessage"></p>
+                        </div>
+
+                        <div x-show="error" class="bg-red-500/20 border border-red-400/40 rounded-2xl p-5 text-red-200 text-xs font-bold flex items-center gap-3 animate-shake">
+                            <span>💀 FUMBLE:</span>
                             <span x-text="error"></span>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-bold text-blue-200 mb-2 ml-1">Full Name</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="group">
+                                <label class="block text-xs font-black uppercase tracking-widest text-blue-300 mb-2 ml-2">Full Identity</label>
                                 <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">👤</span>
-                                    <input x-model="name" type="text" required
-                                           class="w-full bg-white/5 border border-white/20 rounded-2xl pl-12 pr-4 py-3.5 text-white placeholder-white/30 focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all font-medium"
-                                           placeholder="John Doe">
+                                    <span class="absolute left-5 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:opacity-100 transition-all text-xl">👤</span>
+                                    <input x-model="name" @focus="vibeMessage = 'WHO DIS? 👀'" type="text" required
+                                           class="w-full bg-slate-950/40 border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-white placeholder-white/20 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 transition-all font-bold"
+                                           placeholder="e.g. John Slay">
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-sm font-bold text-blue-200 mb-2 ml-1">Email Address</label>
+                            <div class="group">
+                                <label class="block text-xs font-black uppercase tracking-widest text-blue-300 mb-2 ml-2">E-Mail Address</label>
                                 <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">📧</span>
-                                    <input x-model="email" type="email" required
-                                           class="w-full bg-white/5 border border-white/20 rounded-2xl pl-12 pr-4 py-3.5 text-white placeholder-white/30 focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all font-medium"
-                                           placeholder="22781a1234@svcet.edu.in">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-bold text-blue-200 mb-2 ml-1">Roll Number</label>
-                                <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">🆔</span>
-                                    <input x-model="roll_number" type="text" required
-                                           class="w-full bg-white/5 border border-white/20 rounded-2xl pl-12 pr-4 py-3.5 text-white placeholder-white/30 focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all font-medium"
-                                           placeholder="22781a1234">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-blue-200 mb-2 ml-1">College/Institution</label>
-                                <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">🏫</span>
-                                    <input x-model="college" type="text" required
-                                           class="w-full bg-white/5 border border-white/20 rounded-2xl pl-12 pr-4 py-3.5 text-white placeholder-white/30 focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all font-medium"
-                                           placeholder="SVCET">
+                                    <span class="absolute left-5 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:opacity-100 transition-all text-xl">📧</span>
+                                    <input x-model="email" @focus="vibeMessage = 'WHERE THE UPDATES LAND 📨'" type="email" required
+                                           class="w-full bg-slate-950/40 border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-white placeholder-white/20 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 transition-all font-bold"
+                                           placeholder="slay@college.edu">
                                 </div>
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-2 ml-1">Secure Password</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="group">
+                                <label class="block text-xs font-black uppercase tracking-widest text-blue-300 mb-2 ml-2">Roll Number</label>
+                                <div class="relative">
+                                    <span class="absolute left-5 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:opacity-100 transition-all text-xl">🆔</span>
+                                    <input x-model="roll_number" @focus="vibeMessage = 'UNIQUE AURA ID DETECTED'" type="text" required
+                                           class="w-full bg-slate-950/40 border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-white placeholder-white/20 focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all font-bold"
+                                           placeholder="22781a12??">
+                                </div>
+                            </div>
+                            <div class="group">
+                                <label class="block text-xs font-black uppercase tracking-widest text-blue-300 mb-2 ml-2">The Base (College)</label>
+                                <div class="relative">
+                                    <span class="absolute left-5 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:opacity-100 transition-all text-xl">🏫</span>
+                                    <input x-model="college" @focus="vibeMessage = 'CAMPUS VIBES ONLY'" type="text" required
+                                           class="w-full bg-slate-950/40 border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-white placeholder-white/20 focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all font-bold"
+                                           placeholder="e.g. SVCET">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="group">
+                            <label class="block text-xs font-black uppercase tracking-widest text-blue-300 mb-2 ml-2">Secure The Code (Password)</label>
                             <div class="relative">
-                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">🔒</span>
-                                <input x-model="password" type="password" required 
-                                       class="w-full bg-white/5 border border-white/20 rounded-2xl pl-12 pr-4 py-3.5 text-white placeholder-white/30 focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all font-medium" 
+                                <span class="absolute left-5 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:opacity-100 transition-all text-xl">🔒</span>
+                                <input x-model="password" @focus="vibeMessage = 'KEEP IT SECURE FR FR 💯'" type="password" required 
+                                       class="w-full bg-slate-950/40 border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-white placeholder-white/20 focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-bold" 
                                        placeholder="••••••••">
                             </div>
                         </div>
 
                         <button type="submit" :disabled="loading" 
-                                class="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-black py-4 rounded-2xl shadow-xl shadow-purple-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3">
-                            <span x-show="!loading" class="text-lg">Create My Account 🚀</span>
-                            <span x-show="loading" class="animate-spin text-xl">⏳</span>
-                            <span x-show="loading">Building Workspace...</span>
+                                class="group relative w-full overflow-hidden rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-px shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
+                            <div class="relative flex h-16 items-center justify-center rounded-[calc(1rem+4px)] bg-indigo-950/40 group-hover:bg-transparent transition-all">
+                                <span x-show="!loading" class="text-xl font-black text-white flex items-center gap-3 italic">EXECUTE ENTRANCE 🚀</span>
+                                <span x-show="loading" class="animate-spin text-2xl text-white">⏳</span>
+                                <span x-show="loading" class="text-white font-black ml-3 uppercase tracking-widest">BUILDING YOUR ERA...</span>
+                            </div>
                         </button>
                     </div>
                 </form>
 
-                <div class="mt-8 text-center pt-8 border-t border-white/10">
-                    <p class="text-blue-200 text-sm">
-                        Already have an account? 
-                        <a href="/login" class="text-pink-400 font-black hover:text-pink-300 ml-1">Sign In instead →</a>
+                <div class="mt-10 text-center pt-8 border-t border-white/10">
+                    <p class="text-blue-200 text-sm font-medium">
+                        Already in the squad? 
+                        <a href="/login" class="text-pink-400 font-extrabold hover:text-cyan-400 ml-2 transition-colors italic">Sign In instead →</a>
                     </p>
                 </div>
             </div>
@@ -109,10 +117,11 @@ function registerForm() {
         password: '',
         error: '',
         loading: false,
-
+        vibeMessage: 'WAITING FOR INPUT...',
         async handleRegister() {
             this.error = '';
             this.loading = true;
+            this.vibeMessage = 'MANIFESTING YOUR PROFILE... 🕯️';
             try {
                 const response = await fetch('/api/auth/register', {
                     method: 'POST',
@@ -128,12 +137,16 @@ function registerForm() {
                 
                 const data = await response.json();
                 if (response.ok) {
-                    window.location.href = '/dashboard';
+                    this.vibeMessage = 'ENTRANCE GRANTED ✅';
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 800);
                 } else {
+                    this.vibeMessage = 'FUMBLE IN REGISTRATION 💀';
                     this.error = data.detail || 'Registration failed';
                 }
             } catch (error) {
-                this.error = 'Network error. Please try again.';
+                this.error = 'Network fumble. Try again?';
             } finally {
                 this.loading = false;
             }
@@ -143,14 +156,11 @@ function registerForm() {
 </script>
 
 <style>
-@keyframes blob {
-    0% { transform: translate(0px, 0px) scale(1); }
-    33% { transform: translate(30px, -50px) scale(1.1); }
-    66% { transform: translate(-20px, 20px) scale(0.9); }
-    100% { transform: translate(0px, 0px) scale(1); }
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.2; }
 }
-.animate-blob { animation: blob 7s infinite; }
-.animation-delay-2000 { animation-delay: 2s; }
+.animate-pulse-slow { animation: pulse-slow 8s infinite; }
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }

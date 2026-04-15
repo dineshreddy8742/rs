@@ -168,7 +168,13 @@
                             <p class="text-xs text-blue-300">Add a single student or employee</p>
                         </div>
                     </div>
-                    <button @click="showAddModal = true" class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2.5 rounded-xl font-black transition-all">Add User</button>
+                    <div class="flex gap-2">
+                        <button @click="exportUsers" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Export CSV
+                        </button>
+                        <button @click="showAddModal = true" class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2.5 rounded-xl font-black transition-all">Add User</button>
+                    </div>
                 </div>
             </div>
 
@@ -446,6 +452,10 @@ function adminDashboard() {
 
         viewCollegeDetails(collegeId) {
             window.location.href = `/admin/colleges/${collegeId}`;
+        },
+
+        exportUsers() {
+            window.location.href = '/api/auth/admin/export-users';
         },
 
         deleteCollege(collegeId, collegeName) {

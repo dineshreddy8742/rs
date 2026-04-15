@@ -3,81 +3,99 @@
 {% block title %}Login - AuraRise{% endblock %}
 
 {% block content %}
-<div class="flex-grow flex items-center justify-center px-4 py-12 relative overflow-hidden">
-    <!-- Premium Blobs -->
-    <div class="absolute top-20 left-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-20 right-10 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s"></div>
+<!-- Deployment Background -->
+<div class="flex-grow flex items-center justify-center px-6 py-16 relative overflow-hidden bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <!-- Energy Field Node -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[160px] animate-blob"></div>
     
-    <div class="relative z-10 max-w-md w-full">
-        <div class="text-center mb-8">
-            <a href="/" class="inline-flex items-center gap-3 text-white mb-6 hover:scale-105 transition-transform">
-                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-lg font-black text-white shadow-lg">🚀</span>
-                <span class="text-2xl font-black bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">AuraRise</span>
-            </a>
-            <h1 class="text-4xl font-black text-white">Welcome Back! 👋</h1>
-            <p class="text-blue-200 mt-2">Login to your account to continue</p>
+    <div class="relative z-10 max-w-lg w-full" x-data="loginForm()">
+        <!-- Aura Meter -->
+        <div class="absolute -top-20 -right-20 rotate-12 bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-3xl hidden xl:block animate-float shadow-3xl">
+            <p class="text-[9px] font-black uppercase text-pink-500 tracking-[0.4em] mb-2 italic">Current Aura</p>
+            <p class="text-3xl font-black text-white italic tracking-tighter uppercase" x-text="rollNumber.length > 5 ? 'IMMACULATE ✨' : 'PENDING ⏳'"></p>
         </div>
 
-        <div class="bg-white/10 backdrop-blur-xl border-2 border-white/20 rounded-[2rem] p-8 shadow-2xl">
-            <div x-data="loginForm()">
+        <div class="text-center mb-12">
+            <a href="/" class="inline-flex items-center gap-4 text-white mb-10 hover:scale-105 transition-all">
+                <span class="inline-flex h-16 w-16 items-center justify-center rounded-[2rem] bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 text-3xl font-black text-white shadow-[0_20px_40px_rgba(236,72,153,0.4)]">🚀</span>
+                <span class="text-4xl font-black bg-gradient-to-r from-yellow-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent italic tracking-tighter uppercase leading-none">AuraRise</span>
+            </a>
+            <h1 class="text-5xl md:text-6xl font-black text-white italic tracking-tighter uppercase leading-none mb-4">Secure The Entrance</h1>
+            <p class="text-[10px] font-black text-white/30 uppercase tracking-[0.5em] italic">Inducting your professional rizz into the archive.</p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/10 to-transparent backdrop-blur-3xl border border-white/10 rounded-3xl sm:rounded-[4rem] p-0.5 sm:p-1 shadow-2xl">
+            <div class="bg-indigo-950/40 rounded-[1.7rem] sm:rounded-[3.9rem] p-6 sm:p-10 md:p-14">
                 <form @submit.prevent="handleLogin()">
-                    <div class="space-y-6">
-                        <div x-show="error" class="bg-red-500/20 border border-red-400/40 rounded-xl p-4 text-red-200 text-sm flex items-center gap-3 animate-shake">
-                            <span>❌</span>
+                    <div class="space-y-10">
+                        <!-- Frequency Indicator -->
+                        <div class="h-10 flex items-center justify-center">
+                            <p class="text-[12px] font-black uppercase tracking-[0.4em] text-cyan-400 italic animate-pulse" 
+                               x-text="vibeMessage"></p>
+                        </div>
+
+                        <div x-show="error" class="bg-red-500/10 border border-red-500/20 rounded-[2rem] p-6 text-red-200 text-[10px] font-black uppercase tracking-widest flex items-center gap-4 animate-shake">
+                            <span class="text-3xl">💀</span>
                             <span x-text="error"></span>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-2">Login Type</label>
-                            <div class="grid grid-cols-2 gap-2">
+                            <label class="block text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-4 ml-4 italic">Select Rank fr</label>
+                            <div class="grid grid-cols-2 gap-4">
                                 <button type="button" 
                                         @click="role = 'student'" 
-                                        :class="role === 'student' ? 'bg-pink-500 text-white border-pink-400' : 'bg-white/5 text-white/60 border-white/10'"
-                                        class="py-2.5 text-xs font-bold rounded-xl border transition-all">
-                                    🎓 STUDENT
+                                        :class="role === 'student' ? 'bg-pink-500 text-white shadow-[0_15px_30px_rgba(236,72,153,0.3)]' : 'bg-white/5 text-white/20 border border-white/5'"
+                                        class="py-5 text-[10px] font-black rounded-2xl transition-all hover:scale-105 uppercase tracking-[0.3em] italic">
+                                    Student Era 🎓
                                 </button>
                                 <button type="button" 
                                         @click="role = 'admin'" 
-                                        :class="role === 'admin' ? 'bg-purple-500 text-white border-purple-400' : 'bg-white/5 text-white/60 border-white/10'"
-                                        class="py-2.5 text-xs font-bold rounded-xl border transition-all">
-                                    🛡️ ADMIN
+                                        :class="role === 'admin' ? 'bg-indigo-600 text-white shadow-[0_15px_30px_rgba(79,70,229,0.3)]' : 'bg-white/5 text-white/20 border border-white/5'"
+                                        class="py-5 text-[10px] font-black rounded-2xl transition-all hover:scale-105 uppercase tracking-[0.3em] italic">
+                                    Boss Level 🛡️
                                 </button>
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-2">Email or Roll Number</label>
-                            <div class="relative group">
-                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-pink-400 transition-colors">🆔</span>
-                                <input x-model="rollNumber" type="text" required
-                                       class="w-full bg-white/5 border border-white/20 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder-white/30 focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all font-medium"
-                                       placeholder="e.g. 22781a1234 or 22781a1234@svcet.edu.in">
+                        <div class="space-y-6">
+                            <div class="group/input">
+                                <label class="block text-[9px] font-black uppercase tracking-[0.4em] text-pink-500 mb-4 ml-4 italic group-focus-within/input:text-white transition-colors">Digital Identity / Roll No</label>
+                                <div class="relative">
+                                    <input x-model="rollNumber" 
+                                           @input="updateVibeMessage('roll')"
+                                           type="text" required
+                                           class="w-full bg-slate-950 border border-white/10 rounded-2xl sm:rounded-[2rem] px-6 sm:px-8 py-4 sm:py-6 text-white text-xs sm:text-sm font-black italic focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 transition-all shadow-2xl placeholder-white/5"
+                                           placeholder="E.G. 22781A1263">
+                                </div>
                             </div>
-                        </div>
 
-                        <div>
-                            <label class="block text-sm font-bold text-blue-200 mb-2">Password</label>
-                            <div class="relative group">
-                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-pink-400 transition-colors">🔒</span>
-                                <input x-model="password" type="password" required 
-                                       class="w-full bg-white/5 border border-white/20 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder-white/30 focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all font-medium" 
-                                       placeholder="••••••••">
+                            <div class="group/input">
+                                <label class="block text-[9px] font-black uppercase tracking-[0.4em] text-cyan-400 mb-4 ml-4 italic group-focus-within/input:text-white transition-colors">The Secret Frequency</label>
+                                <div class="relative">
+                                    <input x-model="password" 
+                                           @input="updateVibeMessage('pass')"
+                                           type="password" required 
+                                           class="w-full bg-slate-950 border border-white/10 rounded-2xl sm:rounded-[2rem] px-6 sm:px-8 py-4 sm:py-6 text-white text-xs sm:text-sm font-black italic focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all shadow-2xl placeholder-white/5" 
+                                           placeholder="•••••••••">
+                                </div>
                             </div>
                         </div>
 
                         <button type="submit" :disabled="loading" 
-                                class="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-black py-4 rounded-xl shadow-xl shadow-purple-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2">
-                            <span x-show="!loading" class="text-lg">Login 🚀</span>
-                            <span x-show="loading" class="animate-spin text-xl">⏳</span>
-                            <span x-show="loading">Authenticating...</span>
+                                class="group relative w-full overflow-hidden rounded-2xl sm:rounded-[2.5rem] bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 py-5 sm:py-7 shadow-[0_20px_50px_rgba(236,72,153,0.3)] transition-all hover:scale-[1.03] active:scale-[0.97] disabled:opacity-50 disabled:grayscale">
+                            <span x-show="!loading" class="text-xl sm:text-2xl font-black text-white flex items-center justify-center gap-4 italic uppercase tracking-tighter">Manifest Access 🚀</span>
+                            <div x-show="loading" class="flex items-center justify-center gap-4">
+                                <div class="animate-spin text-2xl">⚙️</div>
+                                <span class="text-[12px] font-black text-white uppercase tracking-[0.4em]">Calibrating Aura...</span>
+                            </div>
                         </button>
                     </div>
                 </form>
 
-                <div class="mt-8 text-center pt-6 border-t border-white/10">
-                    <p class="text-blue-200 text-sm">
-                        New to AuraRise? 
-                        <a href="/register" class="text-pink-400 font-bold hover:text-pink-300 ml-1 underline decoration-2 underline-offset-4">Create Account ✨</a>
+                <div class="mt-12 text-center pt-10 border-t border-white/5">
+                    <p class="text-[11px] font-bold text-white/40 uppercase tracking-widest italic">
+                        New to the squad? 
+                        <a href="/register" class="text-pink-500 font-black hover:text-cyan-400 ml-3 transition-colors underline underline-offset-8">MANIFEST ACCOUNT ✨</a>
                     </p>
                 </div>
             </div>
@@ -93,9 +111,29 @@ function loginForm() {
         role: 'student',
         loading: false,
         error: '',
+        vibeMessage: 'INITIATING RIZZ INDUCTION...',
+        updateVibeMessage(type) {
+            const rollVibes = [
+                'SCANNING AURA INTENSITY...',
+                'IMMACULATE DIGITS DETECTED.',
+                'CALIBRATING PROFESSIONAL RIZZ...',
+                'REAL ONE IDENTIFIED.',
+                'TERMINAL UPLINK READY.'
+            ];
+            const passVibes = [
+                'ZERO L\'S DETECTED...',
+                'SECURING THE BAG ENERGY.',
+                'ENCRYPTION ON FLEEK.',
+                'NO DELULU PASSWORDS ALLOWED.',
+                'VIBE VERIFICATION ACTIVE...'
+            ];
+            const items = type === 'roll' ? rollVibes : passVibes;
+            this.vibeMessage = items[Math.floor(Math.random() * items.length)];
+        },
         async handleLogin() {
             this.loading = true;
             this.error = '';
+            this.vibeMessage = 'MANIFESTING UPLINK... 🕯️';
             try {
                 const res = await fetch('/api/auth/login', {
                     method: 'POST',
@@ -104,32 +142,24 @@ function loginForm() {
                 });
                 const data = await res.json();
                 if (!res.ok) {
-                    // Handle both string and array error details
-                    let errorMsg = data.detail || 'Login failed';
-                    if (Array.isArray(errorMsg)) {
-                        errorMsg = errorMsg.map(e => e.msg || e.message).join(', ');
-                    } else if (typeof errorMsg === 'object') {
-                        errorMsg = JSON.stringify(errorMsg);
-                    }
-                    throw new Error(errorMsg);
+                    this.vibeMessage = 'GHOSTED BY SERVER 💀';
+                    this.error = data.detail || 'Access Denied fr';
+                } else {
+                    this.vibeMessage = 'ACCESS GRANTED 👑';
+                    localStorage.setItem('token', data.access_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    setTimeout(() => window.location.href = '/dashboard', 800);
                 }
-                
-                // Save user info to local storage for quick access if needed
+                this.vibeMessage = 'VIBES VERIFIED ✅';
                 localStorage.setItem('user', JSON.stringify(data));
 
-                console.log('Login response:', data);
-                console.log('is_admin:', data.is_admin, 'role:', this.role);
-
-                // Brief pause then redirect
                 setTimeout(() => {
                     if (data.is_admin || this.role === 'admin') {
-                        alert('Login successful! Redirecting to admin panel...');
                         window.location.href = '/admin';
                     } else {
-                        alert('Login successful! Redirecting to dashboard...');
                         window.location.href = '/dashboard';
                     }
-                }, 500);
+                }, 800);
             } catch(e) {
                 this.error = e.message;
             } finally {
@@ -146,6 +176,13 @@ function loginForm() {
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
 }
+@keyframes float {
+    0% { transform: translate(0, 0) rotate(12deg); }
+    50% { transform: translate(-10px, -15px) rotate(15deg); }
+    100% { transform: translate(0, 0) rotate(12deg); }
+}
 .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+.animate-float { animation: float 5s ease-in-out infinite; }
+.animate-pulse-slow { animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 </style>
 {% endblock %}

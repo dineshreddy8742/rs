@@ -1,6 +1,6 @@
 """Authentication API router - Login, Register, Admin."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Request, Response, Depends, status
@@ -594,3 +594,47 @@ async def get_recent_activity(user_id: str = Depends(get_current_user)):
     
     result = repo._get_supabase_client().table("users").select("id, name, email, college, created_at").order("created_at", desc=True).limit(10).execute()
     return result.data or []
+
+@auth_router.get("/admin/export-users")
+async def export_users_csv(user_id: str = Depends(get_current_user)):
+    """Export all users as a CSV file (admin only)."""
+    import io
+    import csv
+    from fastapi.responses import StreamingResponse
+    
+    repo = UserRepository()
+    admin = await repo.get_user_by_id(user_id)
+    if not admin or (not admin.get("is_admin", False) and admin.get("role") != "admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    users = await repo.get_all_users()
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow(["ID", "Name", "Email", "Roll Number", "College", "Role", "Is Active", "Is Admin", "Resume Count", "Status", "Created At"])
+    
+    # Data
+    for u in users:
+        writer.writerow([
+            u.get("id"),
+            u.get("name"),
+            u.get("email"),
+            u.get("roll_number"),
+            u.get("college"),
+            u.get("role"),
+            u.get("is_active"),
+            u.get("is_admin"),
+            u.get("resume_count"),
+            u.get("status"),
+            u.get("created_at")
+        ])
+    
+    output.seek(0)
+    return StreamingResponse(
+        io.BytesIO(output.getvalue().encode()),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=aurarise_users_{datetime.now().strftime('%Y%m%d')}.csv"}
+    )
+
