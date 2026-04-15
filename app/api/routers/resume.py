@@ -417,6 +417,46 @@ async def run_optimization_task(
                 # Exponential backoff before retry
                 await asyncio.sleep(2 ** attempt)
 
+@resume_router.get(
+    "/mine",
+    response_model=List[ResumeSummary],
+    summary="Get all resumes for the current logged-in user",
+    response_description="Resumes retrieved successfully",
+)
+async def get_my_resumes(
+    request: Request,
+    user_id: str = Depends(get_current_user),
+    repo: ResumeRepository = Depends(get_resume_repository),
+):
+    """Get all resumes for the currently authenticated user.
+
+    Args:
+        request: The incoming request
+        user_id: ID of the current authenticated user
+        repo: Resume repository instance
+
+    Returns:
+    -------
+        List of resume summaries for the current user
+    """
+    resumes = await repo.get_resumes_by_user_id(user_id)
+    formatted_resumes = []
+    for resume in resumes:
+        # Handle both MongoDB (_id) and Supabase (id) field names
+        resume_id = resume.get("_id") or resume.get("id", "")
+        if resume_id and hasattr(resume_id, '__str__'):
+            resume_id = str(resume_id)
+        formatted_resumes.append(
+            {
+                "id": resume_id,
+                "title": resume.get("title"),
+                "ats_score": resume.get("ats_score"),
+                "created_at": resume.get("created_at"),
+                "updated_at": resume.get("updated_at"),
+            }
+        )
+    return formatted_resumes
+
 
 @resume_router.get(
     "/{resume_id}",
@@ -462,47 +502,6 @@ async def get_resume(
         if live_job_status.get("error"):
             resume_data["error_message"] = live_job_status["error"]
     return resume_data
-
-
-@resume_router.get(
-    "/mine",
-    response_model=List[ResumeSummary],
-    summary="Get all resumes for the current logged-in user",
-    response_description="Resumes retrieved successfully",
-)
-async def get_my_resumes(
-    request: Request,
-    user_id: str = Depends(get_current_user),
-    repo: ResumeRepository = Depends(get_resume_repository),
-):
-    """Get all resumes for the currently authenticated user.
-
-    Args:
-        request: The incoming request
-        user_id: ID of the current authenticated user
-        repo: Resume repository instance
-
-    Returns:
-    -------
-        List of resume summaries for the current user
-    """
-    resumes = await repo.get_resumes_by_user_id(user_id)
-    formatted_resumes = []
-    for resume in resumes:
-        # Handle both MongoDB (_id) and Supabase (id) field names
-        resume_id = resume.get("_id") or resume.get("id", "")
-        if resume_id and hasattr(resume_id, '__str__'):
-            resume_id = str(resume_id)
-        formatted_resumes.append(
-            {
-                "id": resume_id,
-                "title": resume.get("title"),
-                "ats_score": resume.get("ats_score"),
-                "created_at": resume.get("created_at"),
-                "updated_at": resume.get("updated_at"),
-            }
-        )
-    return formatted_resumes
 
 
 @resume_router.get(
