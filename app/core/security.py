@@ -51,26 +51,68 @@ def decode_access_token(token: str) -> dict:
         raise HTTPException(status_code=401, detail="Invalid token. Please login again.")
 
 
-async def get_current_user(request: Request) -> str:
-    """FastAPI dependency to get current logged-in user ID from session cookie."""
+async def get_current_user(request: Request):
+    """FastAPI dependency to get current logged-in user object from session cookie."""
     token = request.cookies.get("auth_token")
     if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    payload = decode_access_token(token)
-    user_id = payload.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    return user_id
-
-
-async def get_current_user_optional(request: Request) -> str:
-    """Get current user ID or None if not logged in."""
-    token = request.cookies.get("auth_token")
-    if not token:
-        return None
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    
     try:
         payload = decode_access_token(token)
-        return payload.get("sub")
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+            
+        from app.database.repositories.user_repository import UserRepository
+        from app.database.models.user import UserResponse
+        
+        repo = UserRepository()
+        user_data = await repo.get_user_by_id(user_id)
+        if not user_data:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+            
+        return UserResponse(
+            id=user_data.get("id"),
+            email=user_data.get("email"),
+            name=user_data.get("name"),
+            role=user_data.get("role", "student"),
+            is_admin=user_data.get("is_admin", False) or user_data.get("role") == "admin",
+            created_at=user_data.get("created_at")
+        )
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+
+
+async def get_current_user_optional(request: Request):
+    """Get current user object or None if not logged in."""
+    try:
+        token = request.cookies.get("auth_token")
+        if not token:
+            return None
+            
+        payload = decode_access_token(token)
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+            
+        from app.database.repositories.user_repository import UserRepository
+        from app.database.models.user import UserResponse
+        
+        repo = UserRepository()
+        user_data = await repo.get_user_by_id(user_id)
+        if not user_data:
+            return None
+            
+        return UserResponse(
+            id=user_data.get("id"),
+            email=user_data.get("email"),
+            name=user_data.get("name"),
+            role=user_data.get("role", "student"),
+            is_admin=user_data.get("is_admin", False) or user_data.get("role") == "admin",
+            created_at=user_data.get("created_at")
+        )
     except Exception:
         return None
 

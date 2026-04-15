@@ -283,10 +283,16 @@
                     
                     <div class="bg-gradient-to-br from-red-500/20 to-pink-500/20 border-2 border-red-400/40 rounded-2xl p-6">
                         <p class="text-sm font-bold text-red-300 mb-3">Missing Skills</p>
-                        <div class="flex flex-wrap gap-2">
+                        <div class="flex flex-wrap gap-2 mb-4">
                             <template x-for="skill in missingSkills" :key="skill">
                                 <span class="px-3 py-1 bg-red-500/30 border border-red-400/40 rounded-full text-xs font-bold text-red-200" x-text="skill"></span>
                             </template>
+                        </div>
+                        <!-- Learning Reminder Note -->
+                        <div class="p-3 bg-orange-500/10 border-l-4 border-orange-400 rounded-lg" x-show="missingSkills.length > 0">
+                            <p class="text-xs text-orange-200 italic">
+                                <span class="font-bold">Note:</span> You should learn these technologies before applying! 🚀
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -322,13 +328,58 @@
                     </div>
                 </div>
 
+                <!-- AI Rationale -->
+                <div class="max-w-2xl mx-auto mb-8 bg-white/5 border border-white/10 rounded-2xl p-6" x-show="rationale">
+                    <h3 class="text-lg font-bold text-white mb-3 flex items-center">
+                        <span class="mr-2">📝</span> AI Analysis Rationale
+                    </h3>
+                    <p class="text-sm text-blue-100 leading-relaxed whitespace-pre-wrap" x-text="rationale"></p>
+                </div>
+
                 <!-- Download Button -->
                 <div class="text-center">
                     <button type="button"
                             class="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white font-black py-4 px-12 rounded-2xl shadow-lg shadow-purple-500/50 transition-all hover:scale-105 text-lg"
-                            @click="downloadOptimizedResume()">
+                            @click="showDownloadPopup = true">
                         <span>📥 Download Optimized Resume</span>
                     </button>
+                </div>
+            </div>
+
+            <!-- Download Warning Modal -->
+            <div x-show="showDownloadPopup" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+                <div class="flex items-center justify-center min-h-screen px-4">
+                    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showDownloadPopup = false"></div>
+                    
+                    <div class="relative bg-slate-900 border-2 border-orange-500/30 rounded-3xl p-8 max-w-lg w-full shadow-2xl transform transition-all">
+                        <div class="text-center">
+                            <div class="text-5xl mb-4">🚀</div>
+                            <h3 class="text-2xl font-black text-white mb-4">Wait! One Last Thing...</h3>
+                            <p class="text-slate-300 mb-6">
+                                We've added the missing keywords to your resume, but remember: you should <span class="text-orange-400 font-bold underline">learn these skills and technologies</span> while applying to ensure you're fully prepared for the job!
+                            </p>
+                            
+                            <div class="bg-white/5 rounded-2xl p-4 mb-8 text-left" x-show="missingSkills.length > 0">
+                                <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Skills you should learn:</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <template x-for="skill in missingSkills" :key="skill">
+                                        <span class="px-2 py-1 bg-orange-500/20 border border-orange-400/40 rounded-lg text-[10px] font-bold text-orange-200" x-text="skill"></span>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-3">
+                                <button @click="confirmDownload()" 
+                                        class="w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-orange-500/30 transition-all hover:scale-105">
+                                    I'll Learn Them, Download Now
+                                </button>
+                                <button @click="showDownloadPopup = false" 
+                                        class="w-full bg-white/5 text-slate-400 font-bold py-3 rounded-2xl hover:bg-white/10 transition-all">
+                                    Wait, let me review again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -372,9 +423,15 @@ function resumeCreator() {
         matchedSkills: [],
         missingSkills: [],
         recommendation: '',
+        rationale: '',
         resumePreviewUrl: '',
         resumePreviewLoaded: false,
+        showDownloadPopup: false,
         progressInterval: null,
+
+        init() {
+            // Initial checks if needed
+        },
 
         handleResumeFileChange(e) {
             const file = e.target.files[0];
@@ -465,6 +522,7 @@ function resumeCreator() {
                     this.matchedSkills = result.matching_skills || [];
                     this.missingSkills = result.missing_skills || [];
                     this.recommendation = result.recommendation || '';
+                    this.rationale = result.rationale || '';
                     this.resumePreviewUrl = `/api/resume/${this.resumeId}/download?use_optimized=true`;
                     this.resumePreviewLoaded = true;
                     this.currentStep = 3;
@@ -572,6 +630,7 @@ function resumeCreator() {
                     this.matchedSkills = result.matching_skills || [];
                     this.missingSkills = result.missing_skills || [];
                     this.recommendation = result.recommendation || '';
+                    this.rationale = result.rationale || '';
                     this.resumePreviewUrl = `/api/resume/${this.resumeId}/download?use_optimized=true`;
                     this.resumePreviewLoaded = true;
                     this.currentStep = 4;
@@ -589,7 +648,20 @@ function resumeCreator() {
         },
 
         downloadOptimizedResume() {
-            window.location.href = `/api/resume/${this.resumeId}/download?use_optimized=true`;
+            console.log('Attempting to download resume with ID:', this.resumeId);
+            if (!this.resumeId) {
+                console.error('No resumeId found, cannot download.');
+                return;
+            }
+            const url = `/api/resume/${this.resumeId}/download?use_optimized=true`;
+            console.log('Navigating to download URL:', url);
+            window.location.href = url;
+        },
+
+        confirmDownload() {
+            console.log('Download confirmed by user');
+            this.showDownloadPopup = false;
+            this.downloadOptimizedResume();
         }
     };
 }

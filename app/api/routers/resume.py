@@ -388,6 +388,7 @@ async def run_optimization_task(
                 missing_skills=optimized_score_result.get("missing_skills", []),
                 score_improvement=score_improvement,
                 recommendation=optimized_score_result.get("recommendation", ""),
+                rationale=optimized_score_result.get("rationale", ""),
             )
             await repo.update_one(
                 {"id": resume_id},
@@ -459,6 +460,47 @@ async def get_my_resumes(
 
 
 @resume_router.get(
+    "/user/{user_id}",
+    response_model=List[ResumeSummary],
+    summary="Get all resumes for a user",
+    response_description="Resumes retrieved successfully",
+)
+async def get_user_resumes(
+    user_id: str,
+    request: Request,
+    repo: ResumeRepository = Depends(get_resume_repository),
+):
+    """Get all resumes for a specific user.
+
+    Args:
+        user_id: ID of the user whose resumes to retrieve
+        request: The incoming request
+        repo: Resume repository instance
+
+    Returns:
+    -------
+        List of resume summaries for the specified user
+    """
+    resumes = await repo.get_resumes_by_user_id(user_id)
+    formatted_resumes = []
+    for resume in resumes:
+        # Handle both MongoDB (_id) and Supabase (id) field names
+        resume_id = resume.get("_id") or resume.get("id", "")
+        if resume_id and hasattr(resume_id, '__str__'):
+            resume_id = str(resume_id)
+        formatted_resumes.append(
+            {
+                "id": resume_id,
+                "title": resume.get("title"),
+                "ats_score": resume.get("ats_score"),
+                "created_at": resume.get("created_at"),
+                "updated_at": resume.get("updated_at"),
+            }
+        )
+    return formatted_resumes
+
+
+@resume_router.get(
     "/{resume_id}",
     response_model=Dict[str, Any],
     summary="Get a resume",
@@ -502,47 +544,6 @@ async def get_resume(
         if live_job_status.get("error"):
             resume_data["error_message"] = live_job_status["error"]
     return resume_data
-
-
-@resume_router.get(
-    "/user/{user_id}",
-    response_model=List[ResumeSummary],
-    summary="Get all resumes for a user",
-    response_description="Resumes retrieved successfully",
-)
-async def get_user_resumes(
-    user_id: str,
-    request: Request,
-    repo: ResumeRepository = Depends(get_resume_repository),
-):
-    """Get all resumes for a specific user.
-
-    Args:
-        user_id: ID of the user whose resumes to retrieve
-        request: The incoming request
-        repo: Resume repository instance
-
-    Returns:
-    -------
-        List of resume summaries for the specified user
-    """
-    resumes = await repo.get_resumes_by_user_id(user_id)
-    formatted_resumes = []
-    for resume in resumes:
-        # Handle both MongoDB (_id) and Supabase (id) field names
-        resume_id = resume.get("_id") or resume.get("id", "")
-        if resume_id and hasattr(resume_id, '__str__'):
-            resume_id = str(resume_id)
-        formatted_resumes.append(
-            {
-                "id": resume_id,
-                "title": resume.get("title"),
-                "ats_score": resume.get("ats_score"),
-                "created_at": resume.get("created_at"),
-                "updated_at": resume.get("updated_at"),
-            }
-        )
-    return formatted_resumes
     
 @resume_router.post("/{resume_id}/track-download")
 async def track_download(
@@ -760,6 +761,7 @@ async def get_optimization_status(
             "matching_skills": resume.get("matching_skills", []),
             "missing_skills": resume.get("missing_skills", []),
             "recommendation": resume.get("recommendation", ""),
+            "rationale": resume.get("rationale", ""),
             "error_message": live_job_status.get("error") or resume.get("error_message", ""),
         }
     except HTTPException:

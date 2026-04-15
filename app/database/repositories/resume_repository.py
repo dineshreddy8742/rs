@@ -96,7 +96,8 @@ class ResumeRepository(BaseRepository):
         matching_skills: Optional[List[str]] = None,
         missing_skills: Optional[List[str]] = None,
         score_improvement: Optional[int] = None,
-        recommendation: Optional[str] = None
+        recommendation: Optional[str] = None,
+        rationale: Optional[str] = None
     ) -> bool:
         """Update a resume with AI-optimized data and ATS scores.
 
@@ -109,6 +110,7 @@ class ResumeRepository(BaseRepository):
             missing_skills (Optional[List[str]]): Skills missing from resume but in job description.
             score_improvement (Optional[int]): Difference between optimized and original scores.
             recommendation (Optional[str]): AI recommendation for improving the resume.
+            rationale (Optional[str]): Detailed rationale for the score.
 
         Returns:
         -------
@@ -156,6 +158,9 @@ class ResumeRepository(BaseRepository):
                 
             if recommendation is not None:
                 update_dict["recommendation"] = recommendation
+            
+            if rationale is not None:
+                update_dict["rationale"] = rationale
             
             return await self.update_one(
                 {"id": resume_id},

@@ -419,6 +419,13 @@
                             <template x-if="!optimizationResults.missing_skills || optimizationResults.missing_skills.length === 0">
                                 <p class="text-sm text-gray-500">No additional skills recommended.</p>
                             </template>
+                            
+                            <!-- Learning Reminder Note -->
+                            <div class="mt-4 p-3 bg-orange-50 border-l-4 border-orange-400 rounded" x-show="optimizationResults.missing_skills && optimizationResults.missing_skills.length > 0">
+                                <p class="text-xs text-orange-800 italic">
+                                    <span class="font-bold">Note:</span> While we've optimized your resume with these keywords, it's essential to actually learn these technologies to succeed in interviews and the role! 🚀
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -442,7 +449,7 @@
                         <button
                             type="button"
                             class="inline-flex items-center justify-center px-6 py-3 border border-transparent font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                            @click="downloadOptimizedResume()">
+                            @click="showDownloadPopup = true">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
@@ -458,6 +465,72 @@
                         </a>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Download Warning Popup -->
+<div x-show="showDownloadPopup" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div x-show="showDownloadPopup" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0" 
+             x-transition:enter-end="opacity-100" 
+             x-transition:leave="ease-in duration-200" 
+             x-transition:leave-start="opacity-100" 
+             x-transition:leave-end="opacity-0" 
+             class="fixed inset-0 transition-opacity" 
+             aria-hidden="true" 
+             @click="showDownloadPopup = false">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div x-show="showDownloadPopup" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
+             x-transition:leave="ease-in duration-200" 
+             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
+             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+             class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div>
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100">
+                    <svg class="h-6 w-6 text-orange-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="mt-3 text-center sm:mt-5">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Skills to Learn!</h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-500">
+                            We've added relevant keywords to your resume, but remember: you should <span class="font-bold text-orange-600">learn these skills and technologies</span> while applying to ensure you're fully prepared for the job!
+                        </p>
+                        
+                        <div class="mt-4 bg-gray-50 rounded-md p-3 text-left" x-show="optimizationResults.missing_skills?.length > 0">
+                            <p class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">Missing Technologies to Master:</p>
+                            <div class="flex flex-wrap gap-1">
+                                <template x-for="skill in optimizationResults.missing_skills" :key="skill">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-orange-100 text-orange-800" x-text="skill"></span>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                <button type="button" 
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm transition-colors duration-200" 
+                        @click="confirmDownload()">
+                    I'll Learn Them, Download
+                </button>
+                <button type="button" 
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm transition-colors duration-200" 
+                        @click="showDownloadPopup = false">
+                    Wait, Let me review
+                </button>
             </div>
         </div>
     </div>
@@ -533,6 +606,7 @@
                 missing_skills: [],
                 recommendation: ''
             },
+            showDownloadPopup: false,
             progressInterval: null,
             
             init(resumeId) {
@@ -671,6 +745,12 @@
                     console.error('Error downloading resume:', error);
                     window.showErrorToast('Failed to download resume. Please try again.');
                 }
+            },
+            
+            // Confirm and then download
+            confirmDownload() {
+                this.showDownloadPopup = false;
+                this.downloadOptimizedResume();
             },
             
             // Format date for display

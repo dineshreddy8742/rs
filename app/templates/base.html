@@ -65,8 +65,10 @@
     {% block head %}{% endblock %}
 </head>
 <body class="flex flex-col min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white" x-data="appShell()" x-init="init()">
+    {% set hideSidebar = request.url.path == '/' %}
 
     <div class="flex flex-1 overflow-hidden">
+        {% if not hideSidebar %}
         <!-- Mobile Sidebar Overlay -->
         <div x-show="mobileMenuOpen" 
              x-transition:enter="transition-opacity ease-out duration-300"
@@ -83,15 +85,25 @@
         <!-- Sidebar -->
         <aside x-show="showNav"
                x-cloak
-               :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-               class="fixed lg:static inset-y-0 left-0 z-50 lg:z-0 w-64 bg-gradient-to-b from-slate-900 via-purple-900 to-indigo-900 border-r border-white/10 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col">
+               :class="[
+                   mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+                   isSidebarCollapsed ? 'lg:w-20' : 'lg:w-64'
+               ]"
+               class="fixed lg:static inset-y-0 left-0 z-50 lg:z-0 bg-gradient-to-b from-slate-900 via-purple-900 to-indigo-900 border-r border-white/10 shadow-2xl transform transition-all duration-300 ease-in-out flex flex-col">
             
-            <!-- Logo -->
+            <!-- Logo & Collapse Toggle -->
             <div class="flex items-center justify-between h-16 px-4 border-b border-white/10">
-                <a href="/" class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-lg shadow-lg">🚀</div>
-                    <span class="text-xl font-black bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">AuraRise</span>
+                <a href="/" class="flex items-center gap-3 overflow-hidden">
+                    <div class="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-lg shadow-lg">🚀</div>
+                    <span x-show="!isSidebarCollapsed" x-transition class="text-xl font-black bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent truncate">AuraRise</span>
                 </a>
+                <!-- Desktop Collapse Button -->
+                <button @click="isSidebarCollapsed = !isSidebarCollapsed" class="hidden lg:flex p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors">
+                    <svg class="w-5 h-5 transition-transform duration-300" :class="isSidebarCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <!-- Mobile Close Button -->
                 <button @click="mobileMenuOpen = false" class="lg:hidden p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -101,11 +113,19 @@
             <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto sidebar-scroll">
                 <template x-for="item in navItems" :key="item.href">
                     <a :href="item.href" 
-                       @click="mobileMenuOpen = false"
+                       @click="if(item.action === 'showFeedback') { $dispatch('open-feedback'); mobileMenuOpen = false; return; } mobileMenuOpen = false"
+                       :title="isSidebarCollapsed ? item.label : ''"
                        :class="currentPath === item.href ? 'bg-white/15 text-white border-l-4 border-pink-500' : 'text-white/70 hover:bg-white/10 hover:text-white border-l-4 border-transparent'" 
-                       class="flex items-center gap-3 px-4 py-3 rounded-r-lg text-sm font-medium transition-all duration-200">
-                        <span class="text-xl w-6 text-center" x-text="item.icon"></span>
-                        <span x-text="item.label" class="truncate"></span>
+                       class="flex items-center gap-3 px-4 py-3 rounded-r-lg text-sm font-medium transition-all duration-200 relative group">
+                        <span class="text-xl w-6 flex-shrink-0 text-center" x-text="item.icon"></span>
+                        <span x-show="!isSidebarCollapsed" x-transition class="truncate" x-text="item.label"></span>
+                        
+                        <!-- Unread Badge -->
+                        <template x-if="item.action === 'showFeedback' && unreadFeedbackCount > 0">
+                            <span :class="isSidebarCollapsed ? 'top-2 right-2' : 'right-4'" 
+                                  class="absolute bg-pink-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full shadow-lg animate-pulse" 
+                                  x-text="unreadFeedbackCount"></span>
+                        </template>
                     </a>
                 </template>
 
@@ -113,31 +133,34 @@
                 <a href="/admin" 
                    x-show="isAdmin" 
                    @click="mobileMenuOpen = false"
+                   :title="isSidebarCollapsed ? 'Admin Panel' : ''"
                    class="flex items-center gap-3 px-4 py-3 rounded-r-lg text-sm font-medium text-amber-300 bg-amber-500/10 border-l-4 border-amber-500 hover:bg-amber-500/20 transition-all duration-200">
-                    <span class="text-xl w-6 text-center">🛡️</span>
-                    <span class="truncate">Admin Panel</span>
+                    <span class="text-xl w-6 flex-shrink-0 text-center">🛡️</span>
+                    <span x-show="!isSidebarCollapsed" x-transition class="truncate">Admin Panel</span>
                 </a>
             </nav>
 
             <!-- User Profile -->
             <div class="border-t border-white/10 p-4">
-                <div class="bg-white/5 rounded-xl p-3">
+                <div class="bg-white/5 rounded-xl transition-all duration-300" :class="isSidebarCollapsed ? 'p-1' : 'p-3'">
                     <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm" 
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm" 
                              x-text="userInitial"></div>
-                        <div class="min-w-0 flex-1">
+                        <div class="min-w-0 flex-1" x-show="!isSidebarCollapsed" x-transition>
                             <p class="text-sm font-semibold text-white truncate" x-text="userName"></p>
                             <p class="text-xs text-white/50 truncate" x-text="user?.role || 'Student'"></p>
                         </div>
                     </div>
                     <button @click="handleLogout()" 
+                            :title="isSidebarCollapsed ? 'Logout' : ''"
                             class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                        Logout
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        <span x-show="!isSidebarCollapsed" x-transition>Logout</span>
                     </button>
                 </div>
             </div>
         </aside>
+        {% endif %}
 
         <!-- Content Area -->
         <div :class="showNav ? '' : 'w-full'" class="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -203,9 +226,284 @@
     </div>
     {% endif %}
 
+    <!-- Feedback Modal -->
+    <div x-data="feedbackSystem()" 
+     @open-feedback.window="openModal()"
+     x-show="isOpen" 
+     class="fixed inset-0 z-[60] overflow-hidden" 
+     x-cloak>
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="isOpen = false"></div>
+
+    <div class="absolute inset-y-0 right-0 w-full max-w-lg bg-slate-900 shadow-2xl flex flex-col transform transition-transform duration-300"
+         x-show="isOpen"
+         x-transition:enter="translate-x-full"
+         x-transition:enter-end="translate-x-0"
+         x-transition:leave="translate-x-0"
+         x-transition:leave-end="translate-x-full">
+
+        <!-- Header -->
+        <div class="p-6 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-purple-600 to-indigo-600">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">💬</span>
+                <div>
+                    <h2 class="text-lg font-bold text-white">Help & Feedback</h2>
+                    <p class="text-xs text-white/70">We'd love to hear from you!</p>
+                </div>
+            </div>
+            <button @click="isOpen = false" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-white/10 bg-white/5">
+            <button @click="activeTab = 'new'" 
+                    :class="activeTab === 'new' ? 'border-pink-500 text-pink-400' : 'border-transparent text-white/50'"
+                    class="flex-1 py-3 text-sm font-bold border-b-2 transition-all">New Feedback</button>
+            <button @click="activeTab = 'history'; fetchHistory()" 
+                    :class="activeTab === 'history' ? 'border-pink-500 text-pink-400' : 'border-transparent text-white/50'"
+                    class="flex-1 py-3 text-sm font-bold border-b-2 transition-all">My History</button>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto p-6 sidebar-scroll">
+            <!-- New Feedback Tab -->
+            <div x-show="activeTab === 'new'" class="space-y-6">
+                <div>
+                    <label class="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">How would you rate your experience?</label>
+                    <div class="flex gap-2">
+                        <template x-for="star in [1, 2, 3, 4, 5]">
+                            <button @click="rating = star" 
+                                    class="text-3xl transition-transform hover:scale-110 active:scale-95"
+                                    :class="rating >= star ? 'filter-none' : 'grayscale opacity-30'">
+                                ⭐
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">Subject</label>
+                    <input type="text" x-model="subject" 
+                           class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pink-500 transition-all"
+                           placeholder="e.g. Bug report, Suggestion, Praise">
+                </div>
+
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">Message</label>
+                    <textarea x-model="content" 
+                              class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pink-500 transition-all h-40 resize-none"
+                              placeholder="Tell us what's on your mind..."></textarea>
+                </div>
+
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" x-model="isPublic" class="w-5 h-5 rounded border-white/20 bg-white/5 text-pink-500 focus:ring-pink-500 focus:ring-offset-slate-900">
+                    <span class="text-sm text-white/70 group-hover:text-white transition-colors">Show this on our public reviews page</span>
+                </label>
+
+                <button @click="submitFeedback()" 
+                        :disabled="!content.trim() || isSubmitting"
+                        class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-pink-500/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
+                    <span x-show="!isSubmitting">🚀 Submit Feedback</span>
+                    <span x-show="isSubmitting" class="flex items-center justify-center gap-2">
+                        <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        Sending...
+                    </span>
+                </button>
+            </div>
+
+            <!-- History Tab -->
+            <div x-show="activeTab === 'history'" class="space-y-4">
+                <template x-if="loadingHistory">
+                    <div class="flex flex-col items-center justify-center py-12 text-white/40">
+                        <svg class="animate-spin h-8 w-8 mb-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <p>Loading your feedback...</p>
+                    </div>
+                </template>
+
+                <template x-if="!loadingHistory && feedbackHistory.length === 0">
+                    <div class="text-center py-12 text-white/40">
+                        <div class="text-5xl mb-4">🏜️</div>
+                        <p>No feedback found yet.</p>
+                    </div>
+                </template>
+
+                <template x-for="fb in feedbackHistory" :key="fb.id">
+                    <div class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden transition-all hover:border-white/20">
+                        <!-- Summary Header -->
+                        <div class="p-4 flex items-center justify-between bg-white/5">
+                            <div class="flex items-center gap-3">
+                                <span class="text-lg" x-text="'⭐'.repeat(fb.rating)"></span>
+                                <div>
+                                    <h3 class="text-sm font-bold text-white" x-text="fb.subject"></h3>
+                                    <p class="text-[10px] text-white/40" x-text="formatDate(fb.created_at)"></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span :class="{
+                                    'bg-green-500/20 text-green-400': fb.status === 'resolved',
+                                    'bg-blue-500/20 text-blue-400': fb.status === 'open',
+                                    'bg-amber-500/20 text-amber-400': fb.status === 'in-progress'
+                                }" class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md" x-text="fb.status"></span>
+
+                                <button @click="deleteFeedback(fb.id)" class="p-1.5 text-red-400/50 hover:text-red-400 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages Area -->
+                        <div class="p-4 space-y-3 max-h-60 overflow-y-auto sidebar-scroll bg-black/20">
+                            <template x-for="msg in fb.messages" :key="msg.timestamp">
+                                <div class="flex flex-col" :class="msg.sender_role === 'admin' ? 'items-start' : 'items-end'">
+                                    <div :class="msg.sender_role === 'admin' ? 'bg-indigo-600/30 text-indigo-100 rounded-tr-xl rounded-bl-xl rounded-br-xl' : 'bg-pink-600/30 text-pink-100 rounded-tl-xl rounded-bl-xl rounded-br-xl'" 
+                                         class="max-w-[85%] p-3 text-sm">
+                                        <p x-text="msg.content"></p>
+                                        <p class="text-[9px] mt-1 opacity-50" x-text="formatDate(msg.timestamp)"></p>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Quick Reply -->
+                        <div class="p-3 border-t border-white/5 bg-white/5 flex gap-2">
+                            <input type="text" x-model="replies[fb.id]" 
+                                   @keyup.enter="sendReply(fb.id)"
+                                   class="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-white/30 focus:outline-none focus:border-pink-500"
+                                   placeholder="Reply to this thread...">
+                            <button @click="sendReply(fb.id)" 
+                                    class="p-2 bg-pink-500/20 text-pink-400 hover:bg-pink-500 rounded-lg hover:text-white transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+    </div>
+
     <!-- Scripts -->
     <script src="{{ url_for('static', path='js/script.js') }}"></script>
     <script>
+    function feedbackSystem() {
+    return {
+        isOpen: false,
+        activeTab: 'new',
+        rating: 5,
+        subject: '',
+        content: '',
+        isPublic: false,
+        isSubmitting: false,
+        loadingHistory: false,
+        feedbackHistory: [],
+        replies: {},
+
+        openModal() {
+            this.isOpen = true;
+            if (this.activeTab === 'history') this.fetchHistory();
+        },
+
+        async submitFeedback() {
+            if (!this.content.trim()) return;
+            this.isSubmitting = true;
+            try {
+                const res = await fetch('/api/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subject: this.subject || 'User Feedback',
+                        rating: this.rating,
+                        content: this.content,
+                        is_public: !!this.isPublic
+                    })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    this.subject = '';
+                    this.content = '';
+                    this.activeTab = 'history';
+                    this.fetchHistory();
+                    if (window.showToast) window.showToast('Feedback submitted successfully! 🚀', 'success');
+                } else {
+                    const error = await res.json();
+                    if (window.showToast) window.showToast('Error: ' + (error.detail || 'Failed to submit'), 'error');
+                }
+            } catch (e) {
+                if (window.showToast) window.showToast('Connection error. Please try again.', 'error');
+            } finally {
+                this.isSubmitting = false;
+            }
+        },
+
+        async fetchHistory() {
+            this.loadingHistory = true;
+            try {
+                const res = await fetch('/api/feedback/mine');
+                if (res.ok) {
+                    this.feedbackHistory = await res.json();
+                    
+                    // Mark any thread with unread admin messages as read
+                    for (const fb of this.feedbackHistory) {
+                        const hasUnreadAdmin = fb.messages.some(m => m.sender_role === 'admin' && !m.is_read);
+                        if (hasUnreadAdmin) {
+                            this.markAsRead(fb.id);
+                        }
+                    }
+                }
+            } catch (e) {} finally {
+                this.loadingHistory = false;
+            }
+        },
+
+        async markAsRead(fbId) {
+            try {
+                const res = await fetch(`/api/feedback/${fbId}/read`, { method: 'POST' });
+                if (res.ok) {
+                    // Update the global unread count by dispatching an event
+                    this.$dispatch('refresh-unread');
+                }
+            } catch (e) {}
+        },
+
+        async sendReply(fbId) {
+            const content = this.replies[fbId];
+            if (!content?.trim()) return;
+
+            try {
+                const res = await fetch(`/api/feedback/${fbId}/message`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+
+                if (res.ok) {
+                    this.replies[fbId] = '';
+                    this.fetchHistory();
+                }
+            } catch (e) {}
+        },
+
+        async deleteFeedback(fbId) {
+            if (!confirm('Are you sure you want to delete this feedback?')) return;
+
+            try {
+                const res = await fetch(`/api/feedback/${fbId}`, { method: 'DELETE' });
+                if (res.ok) {
+                    this.fetchHistory();
+                }
+            } catch (e) {}
+        },
+
+        formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+    };
+    }
+
     function appShell() {
         return {
             isLoggedIn: false,
@@ -213,45 +511,49 @@
             userInitial: '?',
             user: null,
             isAdmin: false,
-            showNav: true,
+            showNav: {{ 'false' if hideSidebar else 'true' }},
+            isSidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
             showBackBtn: false,
             mobileMenuOpen: false,
             currentPath: window.location.pathname,
             pageTitle: '',
-            navItems: [],
+            navItems: [
+                { href: '/dashboard', label: 'Dashboard', icon: '🏠' },
+                { href: '/build', label: 'Resume Builder', icon: '📝' },
+                { href: '/cover-letter', label: 'Cover Letter', icon: '✉️' },
+                { href: '#', label: 'Help & Feedback', icon: '💬', action: 'showFeedback' }
+            ],
+            unreadFeedbackCount: 0,
+            unreadInterval: null,
 
             async init() {
-                // Only show app navigation on "App" pages
-                const publicPages = ['/', '/login', '/register'];
-                this.showNav = !publicPages.includes(this.currentPath);
-                this.showBackBtn = this.showNav && !['/dashboard', '/admin'].includes(this.currentPath);
-
                 try {
                     const res = await fetch('/api/auth/me');
                     if (res.ok) {
-                        const userData = await res.json();
+                        const data = await res.json();
+                        this.user = data;
                         this.isLoggedIn = true;
-                        this.user = userData;
-                        this.isAdmin = userData.is_admin || userData.role === 'admin';
-                        this.userName = userData.name || 'User';
+                        this.userName = data.full_name || data.username || 'User';
                         this.userInitial = this.userName.charAt(0).toUpperCase();
-
-                        // Set navigation based on role
-                        if (this.isAdmin) {
-                            this.navItems = [
-                                { href: '/dashboard', icon: '📊', label: 'Dashboard' },
-                                { href: '/admin', icon: '🛡️', label: 'Admin Panel' }
-                            ];
-                        } else {
-                            this.navItems = [
-                                { href: '/dashboard', icon: '📊', label: 'Dashboard' },
-                                { href: '/create', icon: '✨', label: 'Optimize' },
-                                { href: '/build', icon: '📝', label: 'Build' },
-                                { href: '/cover-letter', icon: '📄', label: 'Cover Letter' },
-                            ];
-                        }
+                        this.isAdmin = data.role === 'admin';
                     }
-                } catch(e) {}
+                } catch (e) {
+                    this.isLoggedIn = false;
+                }
+                
+                this.checkUnread();
+                this.unreadInterval = setInterval(() => this.checkUnread(), 30000); // Every 30s
+            },
+
+            async checkUnread() {
+                if (!this.isLoggedIn) return;
+                try {
+                    const res = await fetch('/api/feedback/unread-count');
+                    if (res.ok) {
+                        const data = await res.json();
+                        this.unreadFeedbackCount = data.count;
+                    }
+                } catch (e) {}
             },
 
             goBack() {

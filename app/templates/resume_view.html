@@ -169,6 +169,13 @@
                             <span class="text-sm text-gray-500">No missing skills found</span>
                         </template>
                     </div>
+                    
+                    <!-- Learning Reminder Note -->
+                    <div class="mt-4 p-3 bg-orange-50/10 border-l-4 border-orange-400 rounded" x-show="resume.missing_skills && resume.missing_skills.length > 0">
+                        <p class="text-xs text-orange-300 italic">
+                            <span class="font-bold">Note:</span> These skills were identified from the job description. Make sure to learn them before applying! 🚀
+                        </p>
+                    </div>
                 </div>
             </div>
 
