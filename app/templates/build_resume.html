@@ -1053,11 +1053,17 @@ function resumeBuilder() {
             const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
                 .map(s => s.outerHTML).join('\n');
             
+            const name = this.data.name || 'AuraRise';
+            const fontFamily = this.fontFamily;
+            const fontSize = this.fontSize;
+            const textColor = this.textColor;
+            const content = element.innerHTML;
+
             printWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Resume - ${this.data.name || 'AuraRise'}</title>
+                    <title>Resume - ${name}</title>
                     ${styles}
                     <style>
                         body { background: white !important; margin: 0 !important; padding: 0 !important; }
@@ -1070,8 +1076,8 @@ function resumeBuilder() {
                     </style>
                 </head>
                 <body>
-                    <div id="resume-content" style="font-family: ${this.fontFamily}; font-size: ${this.fontSize}; color: ${this.textColor};">
-                        ${element.innerHTML}
+                    <div id="resume-content" style="font-family: ${fontFamily}; font-size: ${fontSize}; color: ${textColor};">
+                        ${content}
                     </div>
                 </body>
                 </html>
@@ -1079,7 +1085,6 @@ function resumeBuilder() {
             printWindow.document.close();
             setTimeout(() => {
                 printWindow.print();
-                // Optional: printWindow.close();
             }, 500);
         },
 
