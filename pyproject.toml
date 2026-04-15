@@ -1,0 +1,26 @@
+[project]
+name = "aurarise"
+version = "2.0.0"
+description = "AuraRise - AI-Powered Resume Builder"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]",
+    "uvicorn[standard]",
+    "pydantic-settings",
+    "pydantic>=2.0.0",
+    "python-multipart",
+    "jinja2",
+    "supabase>=2.0.0",
+    "python-dotenv",
+    "httpx",
+    "openai",
+    "langchain-core",
+    "langchain-openai",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "markdown",
+    "fpdf2",
+    "pypdf",
+    "PyPDF2",
+    "python-docx",
+]
