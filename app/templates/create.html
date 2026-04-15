@@ -322,7 +322,7 @@ function resumeCreator() {
         isAnalyzing: false,
         analysisProgress: 0,
         analysisProgressMessage: 'Initializing...',
-        estimatedTimeRemaining: 30,
+        estimatedTimeRemaining: 120,
         originalScore: 0,
         matchScore: 0,
         matchedSkills: [],
@@ -438,28 +438,33 @@ function resumeCreator() {
         },
 
         startProgressSimulation() {
-            this.analysisProgress = 0;
-            this.estimatedTimeRemaining = 30;
+            const totalTime = 120; // Total seconds
+            let elapsed = 0;
             
+            this.analysisProgress = 0;
+            this.estimatedTimeRemaining = totalTime;
+
             this.progressInterval = setInterval(() => {
-                if (this.analysisProgress < 90) {
-                    this.analysisProgress += 2;
-                    this.estimatedTimeRemaining = Math.max(0, 30 - Math.floor(this.analysisProgress * 0.33));
-                    
-                    // Update messages based on progress
-                    if (this.analysisProgress < 20) {
-                        this.analysisProgressMessage = 'Analyzing resume structure...';
-                    } else if (this.analysisProgress < 40) {
-                        this.analysisProgressMessage = 'Extracting skills and experience...';
-                    } else if (this.analysisProgress < 60) {
-                        this.analysisProgressMessage = 'Comparing with job description...';
-                    } else if (this.analysisProgress < 80) {
-                        this.analysisProgressMessage = 'Calculating ATS compatibility...';
-                    } else {
-                        this.analysisProgressMessage = 'Finalizing analysis...';
-                    }
+                elapsed += 1;
+                // Progress percentage based on elapsed time (max 95% until completion)
+                this.analysisProgress = Math.min(Math.floor((elapsed / totalTime) * 100), 95);
+                this.estimatedTimeRemaining = Math.max(totalTime - elapsed, 0);
+
+                // Update messages based on progress
+                if (this.analysisProgress < 15) {
+                    this.analysisProgressMessage = 'Analyzing resume structure...';
+                } else if (this.analysisProgress < 35) {
+                    this.analysisProgressMessage = 'Extracting skills and experience...';
+                } else if (this.analysisProgress < 55) {
+                    this.analysisProgressMessage = 'Comparing with job description...';
+                } else if (this.analysisProgress < 75) {
+                    this.analysisProgressMessage = 'Calculating ATS compatibility...';
+                } else if (this.analysisProgress < 90) {
+                    this.analysisProgressMessage = 'AI is optimizing your resume...';
+                } else {
+                    this.analysisProgressMessage = 'Finalizing analysis...';
                 }
-            }, 300);
+            }, 1000); // Update every second
         },
 
         async pollOptimizationStatus() {
