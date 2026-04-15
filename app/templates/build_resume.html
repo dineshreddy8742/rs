@@ -21,6 +21,44 @@
 @media print { input[type="checkbox"], button, .nav-btn { display: none !important; } .form-section { display: none !important; } }
 .cursor-text { cursor: text; }
 [contenteditable="true"]:focus { outline: 2px solid rgba(168,85,247,0.5); outline-offset: 2px; border-radius: 4px; background: rgba(168,85,247,0.05); }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    #resume-nav { flex-direction: column !important; gap: 8px !important; padding: 12px !important; }
+    #resume-nav > div:first-child { margin-bottom: 4px; }
+    #resume-nav > div:last-child { flex-wrap: wrap !important; justify-content: center !important; gap: 4px !important; }
+    #resume-nav .nav-btn { font-size: 11px !important; padding: 6px 8px !important; white-space: nowrap; }
+    h1.text-4xl { font-size: 24px !important; }
+    .grid-cols-2 { grid-template-columns: 1fr !important; }
+    .flex-col.md\\:flex-row { flex-direction: column !important; }
+    .md\\:ml-auto { margin-left: 0 !important; margin-top: 8px !important; }
+    select.flex-1 { width: 100% !important; }
+    .md\\:flex-none { width: 100% !important; }
+    button.px-6 { width: 100% !important; }
+    .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 { grid-template-columns: 1fr !important; }
+    .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 { grid-template-columns: 1fr !important; }
+    .md\\:w-64 { width: 100% !important; }
+    #resume-content { font-size: 14px !important; padding: 16px !important; }
+    #resume-content h1, #resume-content h2, #resume-content h3 { font-size: 16px !important; }
+    #resume-content p, #resume-content li { font-size: 12px !important; }
+    input, textarea, select { font-size: 14px !important; }
+    /* Main layout: stack form and preview vertically on mobile */
+    .lg\\:grid-cols-\\[1fr_1\\.3fr\\] { grid-template-columns: 1fr !important; }
+    #form-section { max-h: none !important; overflow: visible !important; }
+    .bg-white\\/10.backdrop-blur-xl { margin-bottom: 16px !important; }
+    /* Make inputs full width on mobile */
+    .col-span-2 { grid-column: span 1 !important; }
+}
+@media (max-width: 480px) {
+    h1.text-4xl { font-size: 20px !important; }
+    .text-xl { font-size: 16px !important; }
+    #resume-nav .nav-btn { font-size: 10px !important; padding: 4px 6px !important; }
+    .px-4 { padding-left: 8px !important; padding-right: 8px !important; }
+    .py-6 { padding-top: 12px !important; padding-bottom: 12px !important; }
+    .gap-6 { gap: 12px !important; }
+    .p-5 { padding: 12px !important; }
+    .text-lg { font-size: 16px !important; }
+}
 </style>
 {% endblock %}
 
@@ -950,13 +988,20 @@ function resumeBuilder() {
 
         async downloadPDF() {
             this.showDownloadModal = false;
-            
-            // 1. Encourage saving to server first so download works reliably
-            if (confirm('Save your progress to the server before downloading? (Recommended for best PDF quality)')) {
+
+            // 1. Save to server first
+            try {
                 await this.saveToServer();
+            } catch(e) {
+                console.log('Save before download failed, continuing with local download.');
             }
 
             const element = document.getElementById('resume-content');
+            if (!element) {
+                alert('Resume preview not found. Please refresh the page.');
+                return;
+            }
+
             const opt = {
                 margin: 0,
                 filename: (this.data.name || 'Resume') + '.pdf',
@@ -964,19 +1009,23 @@ function resumeBuilder() {
                 html2canvas: { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
-            
+
             try {
-                // If we have an ID, we can also offer the backend download which is often more stable
-                if (this.selectedResumeId && confirm('Use high-fidelity server-side PDF generator? (Click Cancel to use browser-side generator)')) {
-                    window.open(`/api/resume/${this.selectedResumeId}/download?use_optimized=true`, '_blank');
+                // Check if html2pdf is loaded
+                if (typeof html2pdf === 'undefined') {
+                    alert('PDF library is loading. Please wait a moment and try again, or use Ctrl+P to Print and Save as PDF.');
                     return;
                 }
 
-                this.isSaving = true; // Show loading state
+                this.isSaving = true;
                 await html2pdf().set(opt).from(element).save();
+                alert('✅ PDF downloaded successfully!');
             } catch (e) {
                 console.error('PDF Generation error:', e);
-                alert('Frontend PDF generation failed. Please use "Sync to Server" then download from Dashboard, OR use Ctrl+P to Print and Save as PDF.');
+                // Fallback: use browser print
+                if (confirm('PDF generation failed. Use Print dialog to Save as PDF instead?')) {
+                    window.print();
+                }
             } finally {
                 this.isSaving = false;
             }

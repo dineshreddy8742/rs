@@ -243,16 +243,16 @@
                                             <button @click="viewStudentResumes(user.id)" class="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500 hover:text-white transition-all" title="View Resumes">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             </button>
-                                            <button @click="showResetModal(user.id, user.name)" class="p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500 hover:text-white transition-all" title="Reset Password">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                            <button x-show="user.status === 'blocked'" @click="updateStatus(user.id, 'approved')" class="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500 hover:text-white transition-all shadow-lg shadow-emerald-500/10" title="Unblock Account">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
                                             </button>
-                                            <button x-show="user.status !== 'approved'" @click="updateStatus(user.id, 'approved')" class="p-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500 hover:text-white transition-all" title="Approve/Unblock">
+                                            <button x-show="user.status === 'pending'" @click="updateStatus(user.id, 'approved')" class="p-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500 hover:text-white transition-all" title="Approve Student">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                             </button>
                                             <button x-show="user.status !== 'blocked'" @click="updateStatus(user.id, 'blocked')" class="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all" title="Block Account">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636"/></svg>
                                             </button>
-                                            <button @click="deleteUser(user.id)" class="p-2 bg-white/10 text-white rounded-lg hover:bg-red-600 transition-all" title="Delete User">
+                                            <button @click="deleteUser(user.id, user.name)" class="p-2 bg-white/10 text-white rounded-lg hover:bg-red-600 transition-all font-bold" title="Delete User">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h14"/></svg>
                                             </button>
                                         </div>
@@ -449,26 +449,27 @@ function adminDashboard() {
         },
 
         deleteCollege(collegeId, collegeName) {
-            if (confirm(`Are you sure you want to delete "${collegeName}"?\n\nThis will remove the organization BUT will not delete students already enrolled under this name.`)) {
-                this.loading = true;
-                fetch(`/api/auth/admin/colleges/${collegeId}`, {
-                    method: 'DELETE'
-                })
-                .then(async res => {
-                    const data = await res.json();
-                    if (res.ok) {
-                        alert(data.message || "College deleted successfully!");
-                        this.refreshData();
-                    } else {
-                        alert("Error: " + (data.detail || "Delete failed"));
-                    }
-                })
-                .catch(e => {
-                    console.error(e);
-                    alert("Network error: " + e.message);
-                })
-                .finally(() => { this.loading = false; });
-            }
+            if (!confirm(`⚠️ DELETE ORGANIZATION: Are you sure you want to delete "${collegeName}"?\n\nThis will remove the organization record. It will fail if students are currently enrolled in this college.`)) return;
+            
+            this.loading = true;
+            fetch(`/api/auth/admin/colleges/${collegeId}`, {
+                method: 'DELETE'
+            })
+            .then(async res => {
+                const data = await res.json();
+                if (res.ok) {
+                    alert("✅ " + (data.message || "College deleted successfully!"));
+                    await this.refreshData();
+                } else {
+                    // Show the specific error from backend (like "Cannot delete college with enrolled students")
+                    alert("🚫 Deletion Blocked: " + (data.detail || "Server error"));
+                }
+            })
+            .catch(e => {
+                console.error(e);
+                alert("❌ Network error: " + e.message);
+            })
+            .finally(() => { this.loading = false; });
         },
 
 
@@ -488,20 +489,39 @@ function adminDashboard() {
             } catch (e) { alert("Failed to add user"); }
         },
 
-        async updateStatus(uid, status) {
-            if (!confirm(`Are you sure you want to set this user to ${status}?`)) return;
+        async updateStatus(id, status) {
+            const verb = status === 'approved' ? 'Unblock/Approve' : 'Block';
+            if (!confirm(`Are you sure you want to ${verb} this student?`)) return;
+            
+            this.loading = true;
             try {
-                const res = await fetch(`/api/auth/admin/users/${uid}/status?status=${status}`, { method: 'POST' });
-                if (res.ok) await this.refreshData();
-            } catch (e) { alert("Status update failed"); }
+                const res = await fetch(`/api/auth/admin/users/${id}/status?status=${status}`, { method: 'POST' });
+                if (res.ok) {
+                    await this.refreshData();
+                    alert(`✅ User status updated to ${status}`);
+                } else {
+                    const data = await res.json();
+                    alert("⚠️ Error: " + (data.detail || "Update failed"));
+                }
+            } catch (e) { alert("❌ Failed to update status: " + e.message); }
+            finally { this.loading = false; }
         },
 
-        async deleteUser(uid) {
-            if (!confirm("⚠️ PERMANENT DELETE: This cannot be undone. Delete this student?")) return;
+        async deleteUser(id, name) {
+            if (!confirm(`⚠️ PERMANENT DELETE: Are you sure you want to delete ${name}?\nThis action is irreversible.`)) return;
+            
+            this.loading = true;
             try {
-                const res = await fetch(`/api/auth/admin/users/${uid}`, { method: 'DELETE' });
-                if (res.ok) await this.refreshData();
-            } catch (e) { alert("Delete failed"); }
+                const res = await fetch(`/api/auth/admin/users/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    await this.refreshData();
+                    alert("✅ User account deleted from system.");
+                } else {
+                    const data = await res.json();
+                    alert("⚠️ Error: " + (data.detail || "Delete failed"));
+                }
+            } catch (e) { alert("❌ Failed to delete user: " + e.message); }
+            finally { this.loading = false; }
         },
 
         handleFileSelect(e) {
@@ -512,20 +532,7 @@ function adminDashboard() {
             window.location.href = `/dashboard?user=${uid}`;
         },
 
-        async deleteUser(id) {
-            if (confirm("Permanently delete this user account? This action is irreversible.")) {
-                try {
-                    const res = await fetch(`/api/auth/admin/users/${id}`, { method: 'DELETE' });
-                    if (res.ok) {
-                        await this.refreshData();
-                        alert("User removed from the system.");
-                    } else {
-                        const data = await res.json();
-                        alert("Error: " + (data.detail || "Delete failed"));
-                    }
-                } catch (e) { alert("Failed to delete user: " + e.message); }
-            }
-        },
+
 
         showResetModal(id, name) {
             this.targetUserId = id;
@@ -556,18 +563,7 @@ function adminDashboard() {
             finally { this.loading = false; }
         },
 
-        async updateStatus(id, status) {
-            try {
-                const res = await fetch(`/api/auth/admin/users/${id}/status?status=${status}`, { method: 'POST' });
-                if (res.ok) {
-                    await this.refreshData();
-                    alert(`User account is now ${status}!`);
-                } else {
-                    const data = await res.json();
-                    alert("Error: " + (data.detail || "Status update failed"));
-                }
-            } catch (e) { alert("Failed to update status: " + e.message); }
-        },
+
 
         handleDrop(e) {
             this.dragOver = false;
