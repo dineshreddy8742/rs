@@ -796,7 +796,17 @@ function resumeBuilder() {
         async loadExistingResumes() { 
             console.log('Fetching resumes for import...');
             try { 
-                const res = await fetch('/api/resume/mine'); 
+                // First get the actual user ID from auth (just like cover_letter.html does)
+                const authRes = await fetch('/api/auth/me');
+                if (!authRes.ok) {
+                    console.error('Failed to get user profile');
+                    return;
+                }
+                const user = await authRes.json();
+                console.log('User identified:', user.id);
+                
+                // Then fetch their resumes using the specific user ID endpoint
+                const res = await fetch(`/api/resume/user/${user.id}`); 
                 if (res.ok) {
                     this.existingResumes = await res.json();
                     console.log('Loaded ' + this.existingResumes.length + ' resumes.');
