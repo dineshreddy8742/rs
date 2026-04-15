@@ -18,7 +18,34 @@
 @keyframes blob { 0% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-50px) scale(1.1); } 66% { transform: translate(-20px,20px) scale(0.9); } 100% { transform: translate(0,0) scale(1); } }
 .animate-blob { animation: blob 7s infinite; }
 .animation-delay-2000 { animation-delay: 2s; }
-@media print { input[type="checkbox"], button, .nav-btn { display: none !important; } .form-section { display: none !important; } }
+@media print {
+    /* Hide ALL UI elements */
+    #resume-nav, #import-section, #customize-panel, #form-section, .lg\:sticky, .Download-Modal, [x-show="showDownloadModal"], .fixed.inset-0 { 
+        display: none !important; 
+    }
+    
+    /* Reset main container for printing */
+    body { background: white !important; padding: 0 !important; margin: 0 !important; }
+    .relative.min-h-screen { background: none !important; min-height: auto !important; padding: 0 !important; }
+    .animate-blob { display: none !important; }
+    
+    /* Ensure resume is visible and fills page */
+    .lg\:grid-cols-\[1fr_1\.3fr\] { display: block !important; }
+    .lg\:sticky.lg\:top-6 { position: static !important; }
+    #resume-preview-container { 
+        margin: 0 !important; 
+        box-shadow: none !important; 
+        border: none !important;
+        width: 100% !important;
+        background: white !important;
+    }
+    #resume-content { padding: 0 !important; }
+    
+    @page {
+        size: letter;
+        margin: 0.5in;
+    }
+}
 .cursor-text { cursor: text; }
 [contenteditable="true"]:focus { outline: 2px solid rgba(168,85,247,0.5); outline-offset: 2px; border-radius: 4px; background: rgba(168,85,247,0.05); }
 
@@ -704,21 +731,25 @@
                 <button @click="showDownloadModal = false" class="text-white/60 hover:text-white text-2xl">&times;</button>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-4">
+                <button @click="downloadNativePDF()" class="flex flex-col items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-6 rounded-xl font-bold hover:scale-105 transition-all shadow-lg border-2 border-white/20">
+                    <span class="text-4xl mb-2">🚀</span>
+                    <span>Stable PDF</span>
+                    <span class="text-[10px] opacity-70">(High Quality)</span>
+                </button>
                 <button @click="downloadPDF()" class="flex flex-col items-center justify-center bg-gradient-to-r from-red-500 to-pink-500 text-white py-6 rounded-xl font-bold hover:scale-105 transition-all shadow-lg">
                     <span class="text-4xl mb-2">📄</span>
-                    Resume PDF
+                    <span>Quick PDF</span>
+                    <span class="text-[10px] opacity-70">(Client-side)</span>
                 </button>
                 <button @click="downloadCoverLetterPDF()" class="flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-6 rounded-xl font-bold hover:scale-105 transition-all shadow-lg">
                     <span class="text-4xl mb-2">✉️</span>
-                    Cover Letter PDF
+                    <span>Cover Letter</span>
+                    <span class="text-[10px] opacity-70">(Print view)</span>
                 </button>
                 <button @click="printResume()" class="flex flex-col items-center justify-center bg-gradient-to-r from-green-500 to-emerald-500 text-white py-6 rounded-xl font-bold hover:scale-105 transition-all shadow-lg">
                     <span class="text-4xl mb-2">🖨️</span>
-                    Print Resume
-                </button>
-                <button @click="printCoverLetter()" class="flex flex-col items-center justify-center bg-gradient-to-r from-orange-500 to-amber-500 text-white py-6 rounded-xl font-bold hover:scale-105 transition-all shadow-lg">
-                    <span class="text-4xl mb-2">📋</span>
-                    Print Cover Letter
+                    <span>System Print</span>
+                    <span class="text-[10px] opacity-70">(Legacy)</span>
                 </button>
             </div>
             <p class="text-xs text-blue-300 text-center">💡 For best print results, use Chrome or Edge browsers.</p>
@@ -1009,6 +1040,48 @@ function resumeBuilder() {
             const items = this.data[section] || []; if (!items.length) { alert('No items.'); return; } if (!items.some(i => i._selected)) { alert('Select checkboxes to remove.'); return; } this.data[section] = items.filter(i => !i._selected); this.updatePreview();
         },
         removeSkill(category, index) { this.data.skills[category].splice(index, 1); this.updatePreview(); },
+
+        async downloadNativePDF() {
+            this.showDownloadModal = false;
+            // 1. Save to server first
+            try { await this.saveToServer(); } catch(e) { console.log('Save failed, continuing.'); }
+
+            const element = document.getElementById('resume-content');
+            if (!element) return;
+
+            const printWindow = window.open('', '_blank');
+            const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+                .map(s => s.outerHTML).join('\n');
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Resume - ${this.data.name || 'AuraRise'}</title>
+                    ${styles}
+                    <style>
+                        body { background: white !important; margin: 0 !important; padding: 0 !important; }
+                        #resume-content { width: 100% !important; height: auto !important; padding: 0.5in !important; margin: 0 !important; }
+                        @page { size: auto; margin: 0mm; }
+                        @media print {
+                            body { margin: 0; }
+                            #resume-content { padding: 15mm !important; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div id="resume-content" style="font-family: ${this.fontFamily}; font-size: ${this.fontSize}; color: ${this.textColor};">
+                        ${element.innerHTML}
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+                // Optional: printWindow.close();
+            }, 500);
+        },
 
         async downloadPDF() {
             this.showDownloadModal = false;
