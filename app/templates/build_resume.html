@@ -792,7 +792,7 @@ function resumeBuilder() {
             if (!hasSeenTour) { this.$nextTick(() => { setTimeout(() => { this.startTour(); localStorage.setItem('hasSeenResumeTour', 'true'); }, 1000); }); }
         },
 
-        async loadExistingResumes() { try { const res = await fetch('/api/resume/user/temp-user-id'); if (res.ok) this.existingResumes = await res.json(); } catch(e) {} },
+        async loadExistingResumes() { try { const res = await fetch('/api/resume/mine'); if (res.ok) this.existingResumes = await res.json(); } catch(e) {} },
 
         async importSelectedResume() {
             this.importLoading = true;
