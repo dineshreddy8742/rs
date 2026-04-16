@@ -7,7 +7,7 @@
     }
   ],
   "functions": {
-    "index.py": {
+    "api/**": {
       "maxDuration": 60,
       "memory": 1024
     }
@@ -15,6 +15,6 @@
   "env": {
     "PYTHONUNBUFFERED": "1",
     "APP_ENV": "production",
-    "AURA_SYNC_PULSE": "v5-pattern-fix"
+    "AURA_SYNC_PULSE": "v6-glob-pattern"
   }
 }
