@@ -1,15 +1,9 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "api.py"
+      "source": "/(.*)",
+      "destination": "api.py"
     }
   ],
   "functions": {
@@ -21,6 +15,6 @@
   "env": {
     "PYTHONUNBUFFERED": "1",
     "APP_ENV": "production",
-    "DEPLOYMENT_ID": "deployment-override-launch-phase"
+    "DEPLOYMENT_ID": "stateless-deployment-v3"
   }
 }
