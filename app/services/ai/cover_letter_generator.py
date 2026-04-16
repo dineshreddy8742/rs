@@ -10,7 +10,7 @@ class CoverLetterGenerator:
     """Generates tailored cover letters from resume + job description."""
 
     def __init__(self, model_name=None, api_key=None, api_base=None, user_id=None):
-        self.api_key = api_key or settings.API_KEY
+        self.api_key = api_key or (settings.API_KEYS[0] if hasattr(settings, 'API_KEYS') and settings.API_KEYS else None)
         self.api_base = api_base or settings.API_BASE
         self.model_name = model_name or settings.MODEL_NAME
         self.user_id = user_id

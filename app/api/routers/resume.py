@@ -798,7 +798,7 @@ async def optimize_resume(
         background_tasks.add_task(run_maintenance_on_demand)
 
     # Resolve API config at request time (not inside background task)
-    api_key = settings.API_KEYS[0] if hasattr(settings, 'API_KEYS') and settings.API_KEYS else settings.API_KEY
+    api_key = settings.API_KEYS[0] if hasattr(settings, 'API_KEYS') and settings.API_KEYS else getattr(settings, 'API_KEY', None)
     api_base_url = settings.API_BASE
     model_name = settings.MODEL_NAME
 
