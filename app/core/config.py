@@ -5,7 +5,8 @@ a centralized and validated way to manage environment variables and
 application-wide configurations.
 """
 
-from typing import Optional
+from typing import Any, Optional, Union
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,10 +32,19 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str = "sb_publishable_2MMUfh6MHkHhsITxqe3Q_w_t2zPFlCD"
     SUPABASE_SERVICE_ROLE_KEY: Optional[str] = None
 
-    # AI Service Configuration (OpenRouter + Google)
+    # AI Service Configuration (Multi-Key Rotation for 1k+ Users)
     MODEL_NAME: str = "google/gemini-2.0-flash-lite-001"
-    API_KEY: str = "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"
+    # Provide a comma-separated list of keys in your .env
+    API_KEYS: Union[str, list[str]] = ["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"]
     API_BASE: str = "https://openrouter.ai/api/v1"
+    OPENROUTER_MANAGEMENT_KEY: Optional[str] = None
+
+    @field_validator("API_KEYS", mode="before")
+    @classmethod
+    def split_api_keys(cls, v: Any) -> list[str]:
+        if isinstance(v, str):
+            return [k.strip() for k in v.split(",") if k.strip()]
+        return v
     
     # Scaling & Performance
     MAX_CONCURRENT_REQUESTS: int = 50

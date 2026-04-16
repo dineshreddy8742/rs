@@ -7,6 +7,7 @@ to analyze and score resumes based on job descriptions.
 import json
 import os
 import re
+import random
 from typing import List, Optional
 
 from langchain_core.output_parsers import PydanticOutputParser
@@ -57,7 +58,9 @@ class ATSScorerLLM:
             api_base (str, optional): Base URL for the API service.
             user_id (str, optional): User ID for token tracking.
         """
-        self.api_key = api_key or settings.API_KEY
+        # Support single key or rotation from pool
+        self.api_keys = [api_key] if api_key else getattr(settings, 'API_KEYS', [])
+        self.api_key = random.choice(self.api_keys) if self.api_keys else None
         self.api_base = api_base or settings.API_BASE
         self.model_name = model_name or settings.MODEL_NAME
         self.user_id = user_id

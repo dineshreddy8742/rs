@@ -8,6 +8,7 @@ with Applicant Tracking Systems (ATS).
 import json
 import os
 import re
+import random
 from typing import Any, Dict, List, Optional
 
 from langchain_core.output_parsers import JsonOutputParser
@@ -46,7 +47,9 @@ class AtsResumeOptimizer:
         """
         self.model_name = model_name or settings.MODEL_NAME
         self.resume = resume
-        self.api_key = api_key or settings.API_KEY
+        # Support single key or rotation from pool
+        self.api_keys = [api_key] if api_key else getattr(settings, 'API_KEYS', [])
+        self.api_key = random.choice(self.api_keys) if self.api_keys else None
         self.api_base = api_base or settings.API_BASE
         self.user_id = user_id
 
@@ -91,8 +94,8 @@ class AtsResumeOptimizer:
                 openai_api_key=self.api_key,
                 openai_api_base=self.api_base,
                 default_headers={
-                    "HTTP-Referer": "http://localhost:8000",
-                    "X-Title": "AuraRise"
+                    "HTTP-Referer": "https://aurarise.app",
+                    "X-Title": "AuraRise Protocol"
                 }
             )
 

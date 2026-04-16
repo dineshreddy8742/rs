@@ -21,6 +21,8 @@ from app.api.routers.feedback import router as feedback_router
 from app.web.core import core_web_router
 from app.web.base_router import WebRouter
 from app.web.dashboard import web_router as dashboard_web_router
+from app.utils.openrouter_maintenance import start_self_healing_service
+import asyncio
 
 web_router = WebRouter()
 from fastapi.templating import Jinja2Templates
@@ -35,6 +37,11 @@ async def lifespan(app: FastAPI):
         connection_manager = SupabaseConnectionManager()
         app.state.supabase = connection_manager
         print(f"Started {settings.PROJECT_NAME} v{settings.VERSION}")
+        
+        # Start the Self-Healing Guardian (checks every 5 minutes)
+        if settings.OPENROUTER_MANAGEMENT_KEY:
+            asyncio.create_task(start_self_healing_service(interval_seconds=300))
+            print("Self-Healing Guardian Protocol: [INITIATED]")
     except Exception as e:
         print(f"Error during startup: {e}")
         raise
