@@ -160,7 +160,6 @@ class ResumeScoreResponse(BaseModel):
 
 resume_router = APIRouter(prefix="/api/resume", tags=["Resume"])
 
-
 async def get_resume_repository(request: Request) -> ResumeRepository:
     """Dependency for getting the resume repository instance.
 
@@ -172,6 +171,66 @@ async def get_resume_repository(request: Request) -> ResumeRepository:
         ResumeRepository: An instance of the resume repository
     """
     return ResumeRepository()
+
+
+@resume_router.get("/usage/stats")
+async def get_resume_usage_stats(
+    user_id: Optional[str] = None,
+    request: Request = None,
+    repo: ResumeRepository = Depends(get_resume_repository)
+):
+    """Get temporal usage stats for the current user."""
+    from app.core.security import get_current_user
+    try:
+        current_user_id = await get_current_user(request)
+        target_user_id = user_id or current_user_id
+        
+        # Security: Only admins can check other users
+        if user_id and user_id != current_user_id:
+            from app.database.repositories.user_repository import UserRepository
+            user_repo = UserRepository()
+            admin = await user_repo.get_user_by_id(current_user_id)
+            if not admin or (not admin.get("is_admin") and admin.get("role") != "admin"):
+                target_user_id = current_user_id
+
+        stats = await repo.get_usage_stats(target_user_id)
+        
+        # Also get current limit
+        from app.database.repositories.user_repository import UserRepository
+        user_repo = UserRepository()
+        user = await user_repo.get_user_by_id(target_user_id)
+        stats["limit"] = user.get("daily_limit", 5) if user else 5
+        
+        return stats
+    except Exception as e:
+        logger.error(f"Failed to get usage stats: {e}")
+        return {"today": 0, "yesterday": 0, "tomorrow": 0, "weekly": 0, "monthly": 0, "limit": 5}
+
+class QuotaUpdate(BaseModel):
+    user_id: str
+    daily_limit: int
+
+@resume_router.post("/admin/limit")
+async def update_user_limit(
+    req: QuotaUpdate,
+    current_user_id: str = Depends(get_current_user),
+    repo: ResumeRepository = Depends(get_resume_repository)
+):
+    """Update a user's daily resume creation limit (admin only)."""
+    # Verify requester is admin
+    from app.database.repositories.user_repository import UserRepository
+    user_repo = UserRepository()
+    admin_user = await user_repo.get_user_by_id(current_user_id)
+    
+    if not admin_user or (not admin_user.get("is_admin") and admin_user.get("role") != "admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Update directly in the user document/row
+    success = await user_repo.update_user(req.user_id, {"daily_limit": req.daily_limit})
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update limit")
+    
+    return {"success": True, "message": f"Daily limit set to {req.daily_limit}"}
 
 
 async def process_resume_upload(resume_id: str, temp_file_path: str, repo: ResumeRepository):
@@ -246,6 +305,15 @@ async def create_resume(
         # Try to get logged-in user ID from session
         auth_user_id = await get_current_user_optional(request)
         effective_user_id = auth_user_id or user_id or "anonymous"
+        
+        # New Feature: Daily Quota Enforcement
+        if effective_user_id != "anonymous":
+            can_create = await repo.can_create_resume(effective_user_id)
+            if not can_create:
+                raise HTTPException(
+                    status_code=429, 
+                    detail="SERVER MID-CRASH (FR): Your professional rizz is too strong. Our GPUs are literally sweating. Manifest again tomorrow! 💀🔥"
+                )
         
         content = await file.read()
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -702,6 +770,19 @@ async def optimize_resume(
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
 
+    # New Feature: Daily Quota Enforcement for AI Synthesis
+    can_create = await repo.can_create_resume(resume.get("user_id", "anonymous"))
+    if not can_create:
+        raise HTTPException(
+            status_code=429, 
+            detail="SYSTEM OVERHEATED: You're cooking too hard, chief. The server needs a nap fr. Try again after touching some grass! 🛌💤"
+        )
+    
+    # Consume quota for AI Optimization
+    from app.database.repositories.user_repository import UserRepository
+    user_repo = UserRepository()
+    await user_repo.increment_resume_count(resume.get("user_id", "anonymous"))
+
     job_description = optimization_request.job_description or resume.get(
         "job_description", ""
     )
@@ -837,6 +918,18 @@ async def score_resume(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Resume with ID {resume_id} not found",
         )
+
+    # New Feature: Daily Quota Enforcement for AI Scoring
+    can_create = await repo.can_create_resume(resume.get("user_id", "anonymous"))
+    if not can_create:
+        raise HTTPException(
+            status_code=429, 
+            detail="429: BANDWIDTH EXHAUSTED. Your aura is literally breaking the scale. Manifest again in 24h to secure the bag! 💼💸"
+        )
+    
+    # Consume quota for AI Scoring
+    user_repo = UserRepository()
+    await user_repo.increment_resume_count(resume.get("user_id", "anonymous"))
 
     # Get API configuration
     api_key = settings.API_KEY
@@ -1118,6 +1211,19 @@ async def generate_cover_letter(req: CoverLetterRequest):
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
 
+    # New Feature: Daily Quota Enforcement for Cover Letter
+    can_create = await repo.can_create_resume(resume.get("user_id", "anonymous"))
+    if not can_create:
+        raise HTTPException(
+            status_code=429, 
+            detail="SERVER DOWN (KIDDING): But seriously, you hit your limit for today. AI is tired of cooking letter eras. Come back tomorrow! 🥘✨"
+        )
+    
+    # Consume quota for Cover Letter Cooking
+    from app.database.repositories.user_repository import UserRepository
+    user_repo = UserRepository()
+    await user_repo.increment_resume_count(resume.get("user_id", "anonymous"))
+
     resume_text = resume.get("original_content", "")
     if not resume_text or resume_text == "Extracting text...":
         raise HTTPException(status_code=400, detail="Resume text not available")
@@ -1152,6 +1258,19 @@ async def analyze_resume(req: EnrichmentAnalyzeRequest):
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
 
+    # New Feature: Daily Quota Enforcement for Enrichment
+    can_create = await repo.can_create_resume(resume.get("user_id", "anonymous"))
+    if not can_create:
+        raise HTTPException(
+            status_code=429, 
+            detail="ENRICHMENT OVERLOAD: Our AI wizard is currently recharging its mana. Manifest more descriptions again tomorrow! 🧙‍♂️✨"
+        )
+    
+    # Consume quota for AI Enrichment
+    from app.database.repositories.user_repository import UserRepository
+    user_repo = UserRepository()
+    await user_repo.increment_resume_count(resume.get("user_id", "anonymous"))
+
     resume_text = resume.get("original_content", "")
     if not resume_text:
         raise HTTPException(status_code=400, detail="Resume text not available")
@@ -1172,6 +1291,52 @@ async def enhance_resume(req: EnrichmentEnhanceRequest):
     wizard = ResumeEnrichmentWizard()
     result = wizard.enhance_descriptions(req.qa_pairs, job_desc)
     return result
+
+
+@resume_router.post("/enrichment/apply")
+async def apply_enrichment(req: EnrichmentEnhanceRequest):
+    """Apply enhanced descriptions back to the resume document."""
+    repo = ResumeRepository()
+    resume_doc = await repo.get_resume_by_id(req.resume_id)
+    if not resume_doc:
+        raise HTTPException(status_code=404, detail="Resume not found")
+
+    # Get the optimized_data (Structured ResumeData)
+    resume_data = resume_doc.get("optimized_data")
+    if not resume_data:
+        # Fallback to original data if optimized doesn't exist yet
+        resume_data = resume_doc.get("data")
+    
+    if not resume_data:
+        raise HTTPException(status_code=400, detail="No structured data found to update")
+
+    # Simple replacement strategy for now
+    for qa in req.qa_pairs:
+        original = qa.get("original", "").strip()
+        improved = qa.get("improved", "").strip()
+        if not original or not improved:
+            continue
+
+        # Convert back to JSON and string replace if needed, or structured walk
+        # For robustness, we walk the dict
+        def walk_and_replace(data):
+            if isinstance(data, dict):
+                for k, v in data.items():
+                    if isinstance(v, str) and original in v:
+                        data[k] = v.replace(original, improved)
+                    else:
+                        walk_and_replace(v)
+            elif isinstance(data, list):
+                for i, v in enumerate(data):
+                    if isinstance(v, str) and original in v:
+                        data[i] = v.replace(original, improved)
+                    else:
+                        walk_and_replace(v)
+        
+        walk_and_replace(resume_data)
+
+    await repo.update_resume(req.resume_id, {"optimized_data": resume_data})
+    return {"status": "success"}
 
 
 # ===== AI PHRASE BLACKLIST =====

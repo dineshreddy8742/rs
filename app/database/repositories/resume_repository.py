@@ -6,8 +6,9 @@ updating, and deleting resume information.
 """
 
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional
+import json
 
 from app.database.models.resume import Resume, ResumeData
 from app.database.repositories.base_repo import BaseRepository
@@ -179,3 +180,69 @@ class ResumeRepository(BaseRepository):
             return await self.delete_one({"id": resume_id})
         except Exception:
             return False
+
+    async def get_usage_stats(self, user_id: str) -> Dict:
+        """Calculate resume creation stats for different time periods using UTC for consistency."""
+        try:
+            from datetime import timezone
+            resumes = await self.get_resumes_by_user_id(user_id)
+            
+            # Use UTC for all server-side logic to match DB/Supabase standard
+            now = datetime.now(timezone.utc)
+            today_date = now.date()
+            yesterday_date = today_date - timedelta(days=1)
+            week_ago = now - timedelta(days=7)
+            month_ago = now - timedelta(days=30)
+            
+            stats = {"today": 0, "yesterday": 0, "tomorrow": 0, "weekly": 0, "monthly": 0, "last_today": None}
+            
+            for r in resumes:
+                raw_created_at = r.get("created_at")
+                if not raw_created_at: continue
+                
+                try:
+                    # Robust parsing for ISO format strings
+                    if isinstance(raw_created_at, str):
+                        # Ensure T separator and remove Z or offsets for naive comparison if needed
+                        # but ideally we parse the offset
+                        try:
+                            created_at = datetime.fromisoformat(raw_created_at.replace('Z', '+00:00'))
+                        except ValueError:
+                            # Fallback for formats like "2024-04-16 12:00:00"
+                            created_at = datetime.fromisoformat(raw_created_at.replace(' ', 'T') + '+00:00')
+                    else:
+                        created_at = raw_created_at
+                        if created_at.tzinfo is None:
+                            created_at = created_at.replace(tzinfo=timezone.utc)
+                    
+                    val_date = created_at.date()
+                    
+                    if val_date == today_date:
+                        stats["today"] += 1
+                        if not stats["last_today"] or created_at > datetime.fromisoformat(stats["last_today"]):
+                            stats["last_today"] = created_at.isoformat()
+                    elif val_date == yesterday_date:
+                        stats["yesterday"] += 1
+                    
+                    if created_at >= week_ago:
+                        stats["weekly"] += 1
+                    if created_at >= month_ago:
+                        stats["monthly"] += 1
+                        
+                except Exception as parse_err:
+                    continue
+            
+            return stats
+        except Exception as e:
+            return {"today": 0, "yesterday": 0, "tomorrow": 0, "weekly": 0, "monthly": 0, "last_today": None}
+
+    async def can_create_resume(self, user_id: str) -> bool:
+        """Check if user has reached their daily resume limit."""
+        from app.database.repositories.user_repository import UserRepository
+        user_repo = UserRepository()
+        user = await user_repo.get_user_by_id(user_id)
+        if not user: return False
+        
+        limit = user.get("daily_limit", 5)
+        stats = await self.get_usage_stats(user_id)
+        return stats["today"] < limit

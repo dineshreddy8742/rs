@@ -31,14 +31,14 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str = "sb_publishable_2MMUfh6MHkHhsITxqe3Q_w_t2zPFlCD"
     SUPABASE_SERVICE_ROLE_KEY: Optional[str] = None
 
-    # AI Service Configuration (OpenRouter + DeepSeek)
-    MODEL_NAME: str = "deepseek/deepseek-v3.2"
-    API_KEY: str = "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"
+    # AI Service Configuration (OpenRouter + Google)
+    MODEL_NAME: str = "google/gemini-2.0-flash-lite-001"
+    API_KEY: str = "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"
     API_BASE: str = "https://openrouter.ai/api/v1"
     
     # Scaling & Performance
-    MAX_CONCURRENT_REQUESTS: int = 100
-    REQUEST_TIMEOUT: int = 150
+    MAX_CONCURRENT_REQUESTS: int = 50
+    REQUEST_TIMEOUT: int = 120
     
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

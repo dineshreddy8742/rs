@@ -3,7 +3,7 @@
 {% block title %}College Details • AuraRise{% endblock %}
 
 {% block content %}
-<div x-data="collegeDetailApp()" x-init="loadCollegeData()" class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12 px-4">
+<div x-data="collegeDetailApp()" x-init="loadCollegeData()" class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 py-12 px-4 text-white">
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
@@ -58,6 +58,7 @@
                             <th class="px-6 py-4 text-left text-xs font-bold text-blue-300 uppercase">Email</th>
                             <th class="px-6 py-4 text-left text-xs font-bold text-blue-300 uppercase">Roll Number</th>
                             <th class="px-6 py-4 text-center text-xs font-bold text-blue-300 uppercase">Resumes</th>
+                            <th class="px-6 py-4 text-center text-xs font-bold text-blue-300 uppercase">Daily Limit</th>
                             <th class="px-6 py-4 text-center text-xs font-bold text-blue-300 uppercase">Status</th>
                             <th class="px-6 py-4 text-center text-xs font-bold text-blue-300 uppercase">Actions</th>
                         </tr>
@@ -74,9 +75,16 @@
                                 </td>
                                 <td class="px-6 py-4 text-blue-300" x-text="student.email || '-'"></td>
                                 <td class="px-6 py-4 text-blue-300" x-text="student.roll_number || '-'"></td>
-                                <td class="px-6 py-4 text-center">
                                     <span class="bg-cyan-500/20 text-cyan-300 px-3 py-1 rounded-full text-sm font-bold" 
                                         x-text="student.resume_count || 0"></span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <input type="number" x-model="student.daily_limit" 
+                                               class="w-16 bg-white/5 border border-white/20 rounded-lg px-2 py-1 text-center text-white text-sm focus:outline-none focus:border-pink-500"
+                                               @change="updateDailyLimit(student.id, student.daily_limit)">
+                                        <span class="text-[8px] text-white/20 font-black uppercase tracking-tighter">ERA</span>
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <span class="px-3 py-1 rounded-full text-xs font-bold"
@@ -92,7 +100,7 @@
                                         <button @click="toggleStudentStatus(student.id, student.is_active)" 
                                             class="px-3 py-1 rounded-lg text-xs font-bold transition-all"
                                             :class="student.is_active ? 'bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300' : 'bg-green-500/20 hover:bg-green-500/30 text-green-300'"
-                                            x-text="student.is_active ? 'Block' : 'Approve'">
+                                            x-text="student.is_active ? 'Block' : 'Unblock'">
                                         </button>
                                     </div>
                                 </td>
@@ -156,13 +164,32 @@ function collegeDetailApp() {
                 });
                 if (res.ok) {
                     await this.loadCollegeData();
-                    alert(`Student ${newStatus === 'approved' ? 'approved' : 'blocked'} successfully!`);
+                    alert(`Student ${newStatus === 'approved' ? 'unblocked' : 'blocked'} successfully!`);
                 } else {
                     alert('Failed to update student status');
                 }
             } catch (e) {
                 console.error(e);
                 alert('Error updating student status');
+            }
+        },
+
+        async updateDailyLimit(studentId, newLimit) {
+            try {
+                const res = await fetch(`/api/resume/admin/limit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ target_user_id: studentId, limit: parseInt(newLimit) })
+                });
+                if (res.ok) {
+                    // Success silently or with subtle toast if needed
+                    console.log(`Limit updated for ${studentId} to ${newLimit}`);
+                } else {
+                    alert('Failed to update daily limit');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error updating daily limit');
             }
         }
     };

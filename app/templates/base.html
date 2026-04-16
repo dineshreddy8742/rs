@@ -1,3 +1,4 @@
+<!-- PERSISTENCE_LAYER: V2.1_STABILITY_PROTOCOL -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +7,7 @@
     <link rel="manifest" href="/static/manifest.json">
     <meta name="theme-color" content="#1e1b4b">
     <link rel="apple-touch-icon" href="/static/icon-512.png">
+    <link rel="icon" type="image/png" href="/static/icon-512.png">
     <title>{% block title %}AuraRise - AI Resume Optimizer{% endblock %}</title>
 
     <!-- Tailwind CSS -->
@@ -98,16 +100,17 @@
                :class="{
                    'translate-x-0': mobileMenuOpen,
                    '-translate-x-full lg:translate-x-0': !mobileMenuOpen,
-                   'w-72': !sidebarCollapsed,
-                   'w-28': sidebarCollapsed
+                   'w-[280px] sm:w-80': !sidebarCollapsed,
+                   'w-28': sidebarCollapsed,
+                   'lg:w-72': !sidebarCollapsed
                }"
-               class="fixed lg:static inset-y-4 left-4 z-50 lg:z-0 bg-white/5 backdrop-blur-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.4)] transform transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) flex flex-col rounded-[3rem] overflow-hidden my-4 ml-4 lg:my-6 lg:ml-6 h-[calc(100vh-2rem)] lg:h-[calc(100vh-3rem)]">
+               class="fixed lg:static inset-y-0 lg:inset-y-4 left-0 lg:left-4 z-50 lg:z-0 bg-indigo-950/60 lg:bg-white/5 backdrop-blur-[40px] border-r lg:border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.4)] transform transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) flex flex-col lg:rounded-[3rem] overflow-hidden lg:my-6 lg:ml-6 h-screen lg:h-[calc(100vh-3rem)]">
             
             <!-- Branding Flare -->
-            <div class="flex items-center justify-between h-24 px-6 border-b border-white/5 overflow-hidden">
+            <div class="flex items-center justify-between h-20 lg:h-24 px-6 border-b border-white/5 overflow-hidden">
                 <a href="/" class="flex items-center gap-3 transition-all duration-500" :class="sidebarCollapsed ? 'opacity-0 scale-50' : 'opacity-100 scale-100'">
-                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xl shadow-lg shadow-pink-500/20">🚀</div>
-                    <span class="text-2xl font-black italic tracking-tighter uppercase bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">AuraRise</span>
+                    <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-xl lg:rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-lg lg:text-xl shadow-lg shadow-pink-500/20">🚀</div>
+                    <span class="text-xl lg:text-2xl font-black italic tracking-tighter uppercase bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">AuraRise</span>
                 </a>
                 
                 <button @click="sidebarCollapsed = !sidebarCollapsed" class="hidden lg:flex p-2.5 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-all hover:scale-110" :class="sidebarCollapsed ? 'mx-auto' : ''">
@@ -116,8 +119,8 @@
                     </svg>
                 </button>
 
-                <button @click="mobileMenuOpen = false" class="lg:hidden p-3 rounded-2xl bg-white/5 border border-white/10 text-white hover:bg-red-500/20 transition-all">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                <button @click="mobileMenuOpen = false" class="lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-red-500/20 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
 
@@ -187,22 +190,22 @@
         </aside>
 
         <!-- Content Area ERA -->
-        <div :class="showNav ? 'sm:m-4 lg:my-6 lg:mr-6 lg:ml-2 sm:rounded-[3rem] border-0 sm:border border-white/10 bg-indigo-950/20 backdrop-blur-3xl shadow-2xl overflow-x-hidden' : 'w-full'" class="flex-1 flex flex-col min-w-0 transition-all duration-500 min-h-screen sm:min-h-0">
+        <div :class="showNav ? 'lg:m-4 lg:my-6 lg:mr-6 lg:ml-2 lg:rounded-[3rem] border-0 lg:border border-white/10 bg-indigo-950/20 backdrop-blur-3xl shadow-2xl overflow-x-hidden w-full' : 'w-full'" class="flex-1 flex flex-col min-w-0 transition-all duration-500 min-h-screen sm:min-h-0">
             <!-- Global Top Bar Protocol -->
-            <header :class="showNav ? 'bg-white/5' : 'bg-transparent backdrop-blur-3xl'" class="h-24 flex-shrink-0 z-30 border-b border-white/5 transition-all">
-                <div class="flex items-center justify-between h-full px-6 lg:px-12">
-                    <div class="flex items-center gap-6">
+            <header :class="showNav ? 'bg-white/5' : 'bg-transparent backdrop-blur-3xl'" class="h-20 lg:h-24 flex-shrink-0 z-30 border-b border-white/5 transition-all">
+                <div class="flex items-center justify-between h-full px-4 lg:px-12">
+                    <div class="flex items-center gap-4 lg:gap-6">
                         <!-- Menu Toggle -->
                         <button x-show="showNav" @click="mobileMenuOpen = true" 
-                                class="lg:hidden p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white shadow-xl active:scale-90 transition-all">
-                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                class="lg:hidden p-3 rounded-xl bg-white/5 border border-white/10 text-white shadow-xl active:scale-90 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"/></svg>
                         </button>
 
-                        <div class="flex items-center gap-8">
+                        <div class="flex items-center gap-4 lg:gap-8">
                             <!-- Header Logo (Non-app pages) -->
-                            <a href="/" x-show="!showNav" class="flex items-center gap-3 group transition-transform hover:scale-105">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-2xl shadow-2xl shadow-pink-500/30 group-hover:rotate-12 transition-transform duration-500">🚀</div>
-                                <span class="text-3xl font-black italic tracking-tighter uppercase bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent hidden sm:block">AuraRise</span>
+                            <a href="/" x-show="!showNav" class="flex items-center gap-2 lg:gap-3 group transition-transform hover:scale-105">
+                                <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xl lg:text-2xl shadow-2xl shadow-pink-500/30 group-hover:rotate-12 transition-transform duration-500">🚀</div>
+                                <span class="text-xl lg:text-3xl font-black italic tracking-tighter uppercase bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent hidden sm:block">AuraRise</span>
                             </a>
 
                             <div class="hidden sm:flex flex-col">
@@ -235,6 +238,7 @@
             <main class="flex-1 overflow-y-auto">
                 {% block content %}{% endblock %}
 
+                {% block footer %}
                 <!-- Final Boss Footer -->
                 <footer class="mt-auto border-t border-white/10 bg-indigo-950/40 backdrop-blur-3xl pt-16 pb-12 px-8 overflow-hidden relative">
                     <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-pink-500/10 rounded-full blur-[100px]"></div>
@@ -281,6 +285,7 @@
                         </div>
                     </div>
                 </footer>
+                {% endblock %}
             </main>
         </div>
     </div>
@@ -316,10 +321,10 @@
     {% endif %}
 
     <!-- Global Feedback ERA Protocol -->
-    <div x-show="showFeedbackModal" class="fixed inset-0 bg-black/80 backdrop-blur-2xl z-[60] flex items-center justify-center p-4 sm:p-8" 
+    <div x-show="showFeedbackModal" class="fixed inset-0 bg-indigo-950/80 backdrop-blur-2xl z-[60] flex items-center justify-center p-4 sm:p-8" 
          x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
          @click.self="showFeedbackModal = false" x-cloak>
-        <div class="bg-indigo-950/40/80 border border-white/10 rounded-[4rem] max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_100px_rgba(0,0,0,1)] relative">
+        <div class="bg-indigo-950/40 border border-white/10 rounded-[4rem] max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.6)] relative">
             
             <div class="absolute top-0 right-0 p-10">
                 <button @click="showFeedbackModal = false" class="w-14 h-14 rounded-3xl bg-white/5 border border-white/10 text-white hover:bg-red-500 hover:scale-110 transition-all flex items-center justify-center text-3xl font-black shadow-2xl">×</button>
@@ -593,6 +598,9 @@
             },
 
             async handleLogout() {
+                if (window.AudioCore) window.AudioCore.play('logout');
+                // Small delay to let the sound play before redirect
+                await new Promise(r => setTimeout(r, 300));
                 await fetch('/api/auth/logout', { method: 'POST' });
                 window.location.href = '/';
             },
@@ -654,7 +662,9 @@
                     } else {
                         const errorData = await res.json().catch(() => ({ detail: 'Unknown error' }));
                         console.error('Feedback Error:', errorData);
-                        alert('❌ Submission failed: ' + (errorData.detail || 'Please try again later.'));
+                        let errMsg = errorData.detail;
+                        if (typeof errMsg === 'object') errMsg = JSON.stringify(errMsg);
+                        alert('❌ Submission failed: ' + (errMsg || 'Please try again later.'));
                     }
                 } catch(e) { 
                     console.error('Network Error:', e);

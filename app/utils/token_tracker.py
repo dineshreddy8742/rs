@@ -249,6 +249,10 @@ class TokenTracker:
             callbacks=[callback],
             request_timeout=120,  # 2 minute timeout for longer requests
             max_retries=2,
+            default_headers={
+                "HTTP-Referer": "http://localhost:8000",
+                "X-Title": "AuraRise"
+            },
             **kwargs
         )
     

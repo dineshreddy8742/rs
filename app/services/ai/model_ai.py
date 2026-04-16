@@ -86,7 +86,15 @@ class AtsResumeOptimizer:
             )
         else:
             # Fallback to standard model if no specific model is configured
-            return ChatOpenAI(temperature=0)
+            return ChatOpenAI(
+                temperature=0,
+                openai_api_key=self.api_key,
+                openai_api_base=self.api_base,
+                default_headers={
+                    "HTTP-Referer": "http://localhost:8000",
+                    "X-Title": "AuraRise"
+                }
+            )
 
     def _get_prompt_template(self, missing_skills: Optional[List[str]] = None) -> PromptTemplate:
         """Create the PromptTemplate for ATS resume optimization.
@@ -196,6 +204,13 @@ class AtsResumeOptimizer:
         - **Fill the Space**: Expand on the most relevant experiences to ensure the resume looks full, professional, and dense.
         - **No Hallucination**: Do not invent new jobs, but feel free to rephrase existing tasks to be 100% aligned with the JD keywords.
 
+        2. **STRICT CONSTRAINTS**:
+        - Each experience MUST have PRECISELY 4 tasks in the `four_tasks` list. Not 3, not 5. Exactly 4.
+        - Each project MUST have PRECISELY 2 goals in the `two_goals_of_the_project` list. Exactly 2.
+        - Each experience MUST include a valid string for job_title, company, start_date, and end_date. Use "Not Specified" or "Pending" if unknown, but NEVER use null/None.
+        - `experiences` and `education` must stay inside `user_information`.
+        - `projects` and `certificate` are top-level keys.
+
         ## OUTPUT FORMAT:
 
         You MUST return ONLY a valid JSON object with NO additional text, explanation, or commentary.
@@ -206,9 +221,13 @@ class AtsResumeOptimizer:
                 "name": "",
                 "main_job_title": "",
                 "profile_description": "",
-                "email": "",
-                "linkedin": "",
-                "github": "",
+                "email": "user@example.com",
+                "phone": "+1-234-567-890",
+                "portfolio": "https://portfolio.me",
+                "linkedin": "https://linkedin.com/in/user",
+                "github": "https://github.com/user",
+                "leetcode": "",
+                "geeksforgeeks": "",
                 "experiences": [
                     {{{{
                         "job_title": "",
@@ -216,7 +235,12 @@ class AtsResumeOptimizer:
                         "start_date": "",
                         "end_date": "",
                         "location": "",
-                        "four_tasks": []
+                        "four_tasks": [
+                            "Task 1: strong action verb + result",
+                            "Task 2: strong action verb + result",
+                            "Task 3: strong action verb + result",
+                            "Task 4: strong action verb + result"
+                        ]
                     }}}}
                 ],
                 "education": [
@@ -238,8 +262,10 @@ class AtsResumeOptimizer:
             "projects": [
                 {{{{
                     "project_name": "",
-                    "project_link": "",
-                    "two_goals_of_the_project": [],
+                    "two_goals_of_the_project": [
+                        "Goal 1: objective cleared",
+                        "Goal 2: objective cleared"
+                    ],
                     "project_end_result": "",
                     "tech_stack": []
                 }}}}
@@ -247,8 +273,7 @@ class AtsResumeOptimizer:
             "certificate": [
                 {{{{
                     "name": "",
-                    "link" : "",
-                    "institution": "",
+                    "institution" : "",
                     "description": "",
                     "date": ""
                 }}}}

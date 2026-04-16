@@ -23,6 +23,7 @@ class UserRepository(BaseRepository):
             user_data["is_active"] = True
             user_data["is_admin"] = False
             user_data["resume_count"] = 0
+            user_data["daily_limit"] = 5  # New Feature: Daily Quota
             result = self._get_table().insert(user_data).execute()
             if result.data:
                 return str(result.data[0].get("id", ""))
@@ -68,13 +69,19 @@ class UserRepository(BaseRepository):
             return None
 
     async def update_user(self, user_id: str, update_data: Dict) -> bool:
-        """Update user data."""
+        """Update user data with resilient schema handling."""
         try:
             update_data["updated_at"] = datetime.now().isoformat()
-            result = self._get_table().update(update_data).eq("id", user_id).execute()
-            return len(result.data) > 0 if result.data else False
+            # Use base_repo's resilient update if it exists, or handle manually
+            success = await self.update_one({"id": user_id}, update_data)
+            if not success and "daily_limit" in update_data:
+                # If first try failed (likely due to missing daily_limit), retry without it
+                print("⚠️ SCHEMA MISMATCH: daily_limit column missing. Retrying update without it...")
+                retry_data = {k: v for k, v in update_data.items() if k != "daily_limit"}
+                success = await self.update_one({"id": user_id}, retry_data)
+            return success
         except Exception as e:
-            print(f"Error updating user: {e}")
+            print(f"🚨 DATABASE UPDATE CRASH: {e}")
             return False
 
     async def update_last_login(self, user_id: str) -> bool:

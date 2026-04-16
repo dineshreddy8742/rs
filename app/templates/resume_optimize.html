@@ -3,7 +3,7 @@
 {% block title %}{{ page_title }} - AuraRise{% endblock %}
 
 {% block content %}
-<div class="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 text-white pb-20">
+<div class="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white pb-20">
     <!-- Dynamic Stars Container -->
     <div id="stars-container" class="absolute inset-0 pointer-events-none z-0"></div>
 
@@ -31,39 +31,39 @@
         <div class="relative mb-20">
             <!-- Glass Main Card -->
             <div class="bg-gradient-to-br from-white/10 to-transparent backdrop-blur-[40px] border border-white/20 rounded-[3rem] p-1 shadow-[0_0_100px_rgba(0,0,0,0.5)]">
-                <div class="bg-slate-900/60 rounded-[2.95rem] p-6 sm:p-10 lg:p-12 overflow-hidden">
+                <div class="bg-indigo-950/40 rounded-[2.95rem] p-6 sm:p-10 lg:p-12 overflow-hidden">
         <!-- Resume Details Section -->
         <div class="mb-8" x-show="resumeDetails">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">Resume Details</h2>
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-black text-white italic tracking-tighter uppercase">Operational Signal</h2>
                 <div x-show="resumeDetails.ats_score !== undefined && resumeDetails.ats_score !== null" 
-                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium"
-                     :class="{
-                        'bg-green-100 text-green-800': resumeDetails.ats_score >= 80,
-                        'bg-yellow-100 text-yellow-800': resumeDetails.ats_score >= 60 && resumeDetails.ats_score < 80,
-                        'bg-red-100 text-red-800': resumeDetails.ats_score < 60
-                     }">
+                     class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-pink-400 italic">
                     <span x-text="resumeDetails.ats_score + '%'"></span>
-                    <span class="ml-1">ATS Score</span>
+                    <span class="ml-1">Baseline Rizz</span>
                 </div>
             </div>
             
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <div class="flex flex-col md:flex-row md:items-start gap-6">
-                    <div class="flex-1">
-                        <h3 class="text-sm font-medium text-gray-700 mb-2">Resume Title</h3>
-                        <p class="text-gray-900 font-semibold" x-text="resumeDetails.title || 'Untitled Resume'"></p>
+            <div class="bg-indigo-900/40 border border-white/10 p-8 rounded-[2.5rem] relative overflow-hidden group/mini">
+                <div class="absolute -right-8 -top-8 text-7xl text-white/5 font-black uppercase italic pointer-events-none group-hover/mini:scale-110 transition-transform duration-1000">INFO</div>
+                <div class="flex flex-col md:flex-row md:items-start gap-10 relative z-10">
+                    <div class="flex-1 space-y-6">
+                        <div>
+                            <h3 class="text-[9px] font-black text-blue-300 uppercase tracking-[0.4em] mb-2 italic">Signal Label</h3>
+                            <p class="text-xl font-black text-white italic tracking-tighter truncate" x-text="resumeDetails.title || 'Untitled Resume'"></p>
+                        </div>
                         
-                        <h3 class="text-sm font-medium text-gray-700 mt-4 mb-2">Last Updated</h3>
-                        <p class="text-gray-900" x-text="formatDate(resumeDetails.updated_at) || 'Not available'"></p>
+                        <div>
+                            <h3 class="text-[9px] font-black text-blue-300 uppercase tracking-[0.4em] mb-2 italic">Last Sync</h3>
+                            <p class="text-sm font-bold text-white/60 uppercase" x-text="formatDate(resumeDetails.updated_at) || 'Not available'"></p>
+                        </div>
                     </div>
                     
                     <div class="flex-1">
-                        <h3 class="text-sm font-medium text-gray-700 mb-2">Resume Preview</h3>
-                        <div class="bg-white border border-gray-200 rounded-md p-3 h-32 overflow-y-auto text-xs">
-                            <p class="text-gray-600 whitespace-pre-line" x-text="resumePreview"></p>
-                            <div x-show="!resumePreview" class="flex items-center justify-center h-full text-gray-400">
-                                <span>Preview not available</span>
+                        <h3 class="text-[9px] font-black text-blue-300 uppercase tracking-[0.4em] mb-3 italic">Waveform Preview</h3>
+                        <div class="bg-indigo-950/60 border border-white/10 rounded-2xl p-6 h-40 overflow-y-auto text-[11px] font-medium text-white/40 italic leading-relaxed sidebar-scroll">
+                            <p class="whitespace-pre-line" x-text="resumePreview"></p>
+                            <div x-show="!resumePreview" class="flex items-center justify-center h-full opacity-20 capitalize">
+                                <span>No wavefront captured</span>
                             </div>
                         </div>
                     </div>
@@ -115,16 +115,16 @@
                                     <div class="space-y-6">
                                         <div class="group/input">
                                             <label class="block text-[10px] font-black uppercase tracking-widest text-blue-300 mb-2 ml-2">Resume Title</label>
-                                            <div class="bg-slate-950/50 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold" x-text="resumeDetails.title || 'Untitled Resume'"></div>
+                                            <div class="bg-indigo-950/40 border border-white/20 rounded-2xl px-6 py-4 text-white font-bold" x-text="resumeDetails.title || 'Untitled Resume'"></div>
                                         </div>
                                         <div class="group/input">
                                             <label class="block text-[10px] font-black uppercase tracking-widest text-blue-300 mb-2 ml-2">Last Phase Shift</label>
-                                            <div class="bg-slate-950/50 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold" x-text="formatDate(resumeDetails.updated_at) || 'Pending'"></div>
+                                            <div class="bg-indigo-950/40 border border-white/20 rounded-2xl px-6 py-4 text-white font-bold" x-text="formatDate(resumeDetails.updated_at) || 'Pending'"></div>
                                         </div>
                                     </div>
                                     <div class="group/input h-full flex flex-col">
                                         <label class="block text-[10px] font-black uppercase tracking-widest text-blue-300 mb-2 ml-2">Content Preview</label>
-                                        <div class="flex-1 min-h-[160px] bg-slate-950/50 border border-white/10 rounded-2xl p-6 text-xs text-white/50 whitespace-pre-line font-mono italic overflow-y-auto scrollbar-hide">
+                                        <div class="flex-1 min-h-[160px] bg-indigo-950/40 border border-white/20 rounded-2xl p-6 text-xs text-white/50 whitespace-pre-line font-mono italic overflow-y-auto scrollbar-hide">
                                             <span x-text="resumePreview || 'No content found...'"></span>
                                         </div>
                                     </div>
@@ -136,7 +136,7 @@
                                 <div class="lg:col-span-2 space-y-6">
                                     <div class="group/input">
                                         <label class="block text-[10px] font-black uppercase tracking-widest text-blue-300 mb-3 ml-2 group-focus-within/input:text-cyan-400">Target Role 🎯</label>
-                                        <input type="text" x-model="jobTitle" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 transition-all placeholder-white/5" placeholder="e.g. Lead Slay Engineer">
+                                        <input type="text" x-model="jobTitle" class="w-full bg-indigo-950/40 border border-white/20 rounded-2xl px-6 py-4 text-white font-bold focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10 transition-all placeholder-white/5" placeholder="e.g. Lead Slay Engineer">
                                     </div>
                                     <div class="p-8 rounded-[2rem] bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/20">
                                         <p class="text-xs text-blue-200 font-bold leading-relaxed">
@@ -146,7 +146,7 @@
                                 </div>
                                 <div class="lg:col-span-3 group/input">
                                     <label class="block text-[10px] font-black uppercase tracking-widest text-blue-300 mb-3 ml-2 group-focus-within/input:text-yellow-400">Target Job Lore (Description) *</label>
-                                    <textarea x-model="jobDescription" rows="12" class="w-full bg-slate-950/50 border border-white/10 rounded-[2rem] p-8 text-white font-medium focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-500/10 transition-all resize-none scrollbar-hide placeholder-white/5" placeholder="Paste the job requirements here... the bigger the block, the better the cook. 👨‍🍳"></textarea>
+                                    <textarea x-model="jobDescription" rows="12" class="w-full bg-indigo-950/40 border border-white/20 rounded-[2rem] p-8 text-white font-medium focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-500/10 transition-all resize-none scrollbar-hide placeholder-white/5" placeholder="Paste the job requirements here... the bigger the block, the better the cook. 👨‍🍳"></textarea>
                                 </div>
                             </div>
 
@@ -409,6 +409,14 @@
                 
                 // Fetch resume details
                 this.fetchResumeDetails();
+
+                // Check for job description from dashboard
+                const savedJD = sessionStorage.getItem('targetJobDescription');
+                if (savedJD) {
+                    this.jobDescription = savedJD;
+                    // Clear it so it doesn't persist forever
+                    sessionStorage.removeItem('targetJobDescription');
+                }
                 
                 // Clean up on navigation
                 window.addEventListener('beforeunload', () => {
@@ -462,6 +470,7 @@
                 this.isOptimizing = true;
                 this.optimizationProgress = 10;
                 this.optimizationProgressMessage = 'Starting optimization...';
+                if (window.AudioCore) window.AudioCore.play('optimize');
                 
                 try {
                     const response = await fetch(`/api/resume/${this.resumeId}/optimize`, {
@@ -506,6 +515,7 @@
                                 missing_skills: data.missing_skills || [],
                                 recommendation: data.recommendation || ''
                             };
+                            if (window.AudioCore) window.AudioCore.play('success');
                             this.optimizationProgress = 100;
                             setTimeout(() => {
                                 this.currentStep = 3;
@@ -531,6 +541,7 @@
             // Download the optimized resume as PDF
             async downloadOptimizedResume() {
                 if (!this.resumeId) return;
+                if (window.AudioCore) window.AudioCore.play('download');
                 
                 try {
                     // Open the download URL in a new tab

@@ -8,7 +8,7 @@
     <!-- Energy Field Node -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[160px] animate-blob"></div>
     
-    <div class="relative z-10 max-w-lg w-full" x-data="loginForm()">
+    <div class="relative z-10 max-w-lg w-full" x-data="loginForm()" x-init="init()">
         <!-- Aura Meter -->
         <div class="absolute -top-20 -right-20 rotate-12 bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-3xl hidden xl:block animate-float shadow-3xl">
             <p class="text-[9px] font-black uppercase text-pink-500 tracking-[0.4em] mb-2 italic">Current Aura</p>
@@ -64,7 +64,7 @@
                                     <input x-model="rollNumber" 
                                            @input="updateVibeMessage('roll')"
                                            type="text" required
-                                           class="w-full bg-slate-950 border border-white/10 rounded-2xl sm:rounded-[2rem] px-6 sm:px-8 py-4 sm:py-6 text-white text-xs sm:text-sm font-black italic focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 transition-all shadow-2xl placeholder-white/5"
+                                           class="w-full bg-indigo-950/30 backdrop-blur-3xl border border-white/10 rounded-2xl sm:rounded-[2rem] px-6 sm:px-8 py-4 sm:py-6 text-white text-xs sm:text-sm font-black italic focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 transition-all shadow-2xl placeholder-white/5"
                                            placeholder="E.G. 22781A1263">
                                 </div>
                             </div>
@@ -75,7 +75,7 @@
                                     <input x-model="password" 
                                            @input="updateVibeMessage('pass')"
                                            type="password" required 
-                                           class="w-full bg-slate-950 border border-white/10 rounded-2xl sm:rounded-[2rem] px-6 sm:px-8 py-4 sm:py-6 text-white text-xs sm:text-sm font-black italic focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all shadow-2xl placeholder-white/5" 
+                                           class="w-full bg-indigo-950/30 backdrop-blur-3xl border border-white/10 rounded-2xl sm:rounded-[2rem] px-6 sm:px-8 py-4 sm:py-6 text-white text-xs sm:text-sm font-black italic focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all shadow-2xl placeholder-white/5" 
                                            placeholder="•••••••••">
                                 </div>
                             </div>
@@ -112,6 +112,17 @@ function loginForm() {
         loading: false,
         error: '',
         vibeMessage: 'INITIATING RIZZ INDUCTION...',
+        async init() {
+            // Check if already logged in
+            const userData = await Alpine.store('auth').checkAuth();
+            if (userData) {
+                if (userData.is_admin || userData.role === 'admin') {
+                    window.location.href = '/admin';
+                } else {
+                    window.location.href = '/dashboard';
+                }
+            }
+        },
         updateVibeMessage(type) {
             const rollVibes = [
                 'SCANNING AURA INTENSITY...',
@@ -134,34 +145,40 @@ function loginForm() {
             this.loading = true;
             this.error = '';
             this.vibeMessage = 'MANIFESTING UPLINK... 🕯️';
+            
+            // Explicitly unlock audio on user gesture
+            if (window.AudioCore) window.AudioCore.init();
+
             try {
                 const res = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roll_number: this.rollNumber, password: this.password, role: this.role })
                 });
+                
                 const data = await res.json();
+                
                 if (!res.ok) {
                     this.vibeMessage = 'GHOSTED BY SERVER 💀';
                     this.error = data.detail || 'Access Denied fr';
                 } else {
                     this.vibeMessage = 'ACCESS GRANTED 👑';
+                    if (window.AudioCore) window.AudioCore.play('login');
+                    
                     localStorage.setItem('token', data.access_token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    setTimeout(() => window.location.href = '/dashboard', 800);
+                    localStorage.setItem('user', JSON.stringify(data));
+                    
+                    setTimeout(() => {
+                        if (data.is_admin || this.role === 'admin') {
+                            window.location.href = '/admin';
+                        } else {
+                            window.location.href = '/dashboard';
+                        }
+                    }, 300);
                 }
-                this.vibeMessage = 'VIBES VERIFIED ✅';
-                localStorage.setItem('user', JSON.stringify(data));
-
-                setTimeout(() => {
-                    if (data.is_admin || this.role === 'admin') {
-                        window.location.href = '/admin';
-                    } else {
-                        window.location.href = '/dashboard';
-                    }
-                }, 800);
             } catch(e) {
-                this.error = e.message;
+                this.error = 'NETWORK ANOMALY DETECTED';
+                console.error(e);
             } finally {
                 this.loading = false;
             }

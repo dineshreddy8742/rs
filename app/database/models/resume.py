@@ -28,12 +28,12 @@ class Experience(BaseSchema):
         four_tasks (List[str]): List of four key responsibilities or achievements
     """
 
-    job_title: str
-    company: str
+    job_title: Optional[str] = "Not Specified"
+    company: Optional[str] = "Not Specified"
     location: Optional[str] = None
-    start_date: str
-    end_date: str
-    four_tasks: List[str] = Field(..., min_items=4, max_items=4)
+    start_date: Optional[str] = "Pending"
+    end_date: Optional[str] = "Present"
+    four_tasks: List[str] = Field(..., min_items=0, max_items=4)
 
 
 class Education(BaseSchema):

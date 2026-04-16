@@ -166,6 +166,7 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     success: bool
     message: str
+    id: str = ""
     name: str = ""
     college: str = ""
     role: str = "student"
@@ -241,6 +242,7 @@ async def login(req: LoginRequest, response: Response):
         return LoginResponse(
             success=True,
             message="Login successful!",
+            id=str(user.get("id", "")),
             name=user.get("name", ""),
             college=user.get("college", ""),
             role=user.get("role", "student"),
@@ -503,6 +505,22 @@ async def delete_user(target_id: str, user_id: str = Depends(get_current_user)):
 
     success = await repo.delete_user(target_id)
     return {"success": success}
+
+@auth_router.post("/admin/users/{id}/status")
+async def update_user_status(id: str, status: str, user_id: str = Depends(get_current_user)):
+    """Update user status (blocked/approved/pending)."""
+    repo = UserRepository()
+    admin = await repo.get_user_by_id(user_id)
+    if not admin or (not admin.get("is_admin", False) and admin.get("role") != "admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    is_active = status == "approved"
+    # ONLY update is_active since status column is missing in DB
+    success = await repo.update_user(id, {"is_active": is_active})
+    if not success:
+        raise HTTPException(status_code=500, detail=f"Failed to update database for user {id}")
+    
+    return {"success": True, "status": "approved" if is_active else "blocked"}
 
 
 

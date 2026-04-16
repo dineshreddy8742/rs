@@ -11,13 +11,20 @@ repo = FeedbackRepository()
 @router.post("/", response_model=str)
 async def create_new_feedback(
     feedback_in: FeedbackCreate,
-    current_user: UserSchema = Depends(get_current_user)
+    user_id: str = Depends(get_current_user)
 ):
     """Submit new feedback, issue, or bug report."""
+    from app.database.repositories.user_repository import UserRepository
+    user_repo = UserRepository()
+    current_user = await user_repo.get_user_by_id(user_id)
+    
+    if not current_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
     feedback = Feedback(
-        user_id=str(current_user.id),
-        user_name=current_user.name,
-        user_email=current_user.email,
+        user_id=user_id,
+        user_name=current_user.get("name", "Anonymous"),
+        user_email=current_user.get("email"),
         type=feedback_in.type,
         title=feedback_in.title,
         content=feedback_in.content,
@@ -26,15 +33,19 @@ async def create_new_feedback(
     return await repo.create_feedback(feedback)
 
 @router.get("/mine", response_model=List[Feedback])
-async def get_my_feedback(current_user: UserSchema = Depends(get_current_user)):
+async def get_my_feedback(user_id: str = Depends(get_current_user)):
     """Retrieve all feedback submitted by the current user."""
-    items = await repo.get_feedback_by_user_id(str(current_user.id))
+    items = await repo.get_feedback_by_user_id(user_id)
     return [Feedback(**item) for item in items]
 
 @router.get("/admin/all", response_model=List[Feedback])
-async def get_all_feedback_for_admin(current_user: UserSchema = Depends(get_current_user)):
+async def get_all_feedback_for_admin(user_id: str = Depends(get_current_user)):
     """Retrieve all system feedback (Admin only)."""
-    if not current_user.is_admin and current_user.role != "admin":
+    from app.database.repositories.user_repository import UserRepository
+    user_repo = UserRepository()
+    current_user = await user_repo.get_user_by_id(user_id)
+    
+    if not current_user or (not current_user.get("is_admin", False) and current_user.get("role") != "admin"):
         raise HTTPException(status_code=403, detail="Not authorized")
     items = await repo.get_all_feedback()
     return [Feedback(**item) for item in items]
@@ -43,15 +54,20 @@ async def get_all_feedback_for_admin(current_user: UserSchema = Depends(get_curr
 async def update_feedback(
     feedback_id: str,
     update_data: FeedbackUpdate,
-    current_user: UserSchema = Depends(get_current_user)
+    user_id: str = Depends(get_current_user)
 ):
     """Update existing feedback (Owner or Admin)."""
+    from app.database.repositories.user_repository import UserRepository
+    user_repo = UserRepository()
+    current_user = await user_repo.get_user_by_id(user_id)
+    
     existing = await repo.get_feedback_by_id(feedback_id)
     if not existing:
         raise HTTPException(status_code=404, detail="Feedback not found")
     
     # Check ownership or admin status
-    if existing["user_id"] != str(current_user.id) and not current_user.is_admin and current_user.role != "admin":
+    is_admin = current_user and (current_user.get("is_admin", False) or current_user.get("role") == "admin")
+    if existing["user_id"] != user_id and not is_admin:
         raise HTTPException(status_code=403, detail="Not authorized")
         
     data = update_data.model_dump(exclude_unset=True)
@@ -63,14 +79,19 @@ async def update_feedback(
 @router.delete("/{feedback_id}")
 async def delete_feedback(
     feedback_id: str,
-    current_user: UserSchema = Depends(get_current_user)
+    user_id: str = Depends(get_current_user)
 ):
     """Delete feedback (Owner or Admin)."""
+    from app.database.repositories.user_repository import UserRepository
+    user_repo = UserRepository()
+    current_user = await user_repo.get_user_by_id(user_id)
+    
     existing = await repo.get_feedback_by_id(feedback_id)
     if not existing:
         raise HTTPException(status_code=404, detail="Feedback not found")
         
-    if existing["user_id"] != str(current_user.id) and not current_user.is_admin and current_user.role != "admin":
+    is_admin = current_user and (current_user.get("is_admin", False) or current_user.get("role") == "admin")
+    if existing["user_id"] != user_id and not is_admin:
         raise HTTPException(status_code=403, detail="Not authorized")
         
     success = await repo.delete_feedback(feedback_id)

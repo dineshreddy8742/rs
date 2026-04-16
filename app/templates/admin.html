@@ -21,6 +21,7 @@
                 <button @click="activeTab = 'stats'" :class="activeTab === 'stats' ? 'bg-white text-purple-900 shadow-xl' : 'bg-white/10 text-white hover:bg-white/20'" class="px-5 py-2.5 rounded-xl font-bold transition-all">Overview</button>
                 <button @click="activeTab = 'colleges'" :class="activeTab === 'colleges' ? 'bg-white text-purple-900 shadow-xl' : 'bg-white/10 text-white hover:bg-white/20'" class="px-5 py-2.5 rounded-xl font-bold transition-all">🏫 Organizations</button>
                 <button @click="activeTab = 'users'" :class="activeTab === 'users' ? 'bg-white text-purple-900 shadow-xl' : 'bg-white/10 text-white hover:bg-white/20'" class="px-5 py-2.5 rounded-xl font-bold transition-all">👤 Student Access</button>
+                <button @click="activeTab = 'blocked'" :class="activeTab === 'blocked' ? 'bg-red-500 text-white shadow-xl shadow-red-500/20' : 'bg-white/10 text-red-300 hover:bg-white/20'" class="px-5 py-2.5 rounded-xl font-bold transition-all">🚫 Blocked Agents</button>
             </div>
         </div>
 
@@ -40,8 +41,8 @@
                     <p class="text-4xl font-black text-white mt-2" x-text="stats.total_resumes"></p>
                 </div>
                 <div class="bg-white/10 border border-white/20 p-6 rounded-3xl backdrop-blur-xl">
-                    <p class="text-xs font-bold text-green-300 uppercase tracking-widest">Blocked Accounts</p>
-                    <p class="text-4xl font-black text-white mt-2" x-text="users.filter(u => u.status === 'blocked').length"></p>
+                    <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Blocked Accounts</p>
+                    <p class="text-4xl font-black text-white mt-2" x-text="users.filter(u => u.is_active === false || u.status === 'blocked').length"></p>
                 </div>
             </div>
 
@@ -205,7 +206,7 @@
                                 <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase">Identity</th>
                                 <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase">College</th>
                                 <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-center">Resumes</th>
-                                <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-center">DLs</th>
+                                <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-center">Daily Limit</th>
                                 <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-center">Status</th>
                                 <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-right">Actions</th>
                             </tr>
@@ -235,27 +236,36 @@
                                         <span class="text-sm font-bold text-cyan-300" x-text="user.resume_count || 0"></span>
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <span class="text-sm font-bold text-yellow-300" x-text="user.download_count || 0"></span>
+                                        <div class="flex items-center justify-center gap-2">
+                                            <input type="number" :value="user.daily_limit || 5" 
+                                                   @change="user.daily_limit = $event.target.value; updateDailyLimit(user.id, $event.target.value)" 
+                                                   class="w-16 bg-white/5 border border-white/20 rounded-lg px-2 py-1 text-center text-white font-bold text-sm focus:outline-none focus:border-yellow-400">
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         <span :class="{
-                                            'bg-green-500/20 text-green-300 border-green-500/30': user.status === 'approved',
-                                            'bg-red-500/20 text-red-300 border-red-500/30': user.status === 'blocked',
+                                            'bg-green-500/20 text-green-300 border-green-500/30': user.is_active !== false,
+                                            'bg-red-500/20 text-red-300 border-red-500/30': user.is_active === false,
                                             'bg-yellow-500/20 text-yellow-300 border-yellow-500/30': user.status === 'pending'
-                                        }" class="px-2 py-1 rounded-lg text-[10px] font-black border uppercase" x-text="user.status || 'approved'"></span>
+                                        }" class="px-2 py-1 rounded-lg text-[10px] font-black border uppercase" x-text="user.is_active !== false ? 'approved' : 'blocked'"></span>
                                     </td>
-                                    <td class="px-6 py-4 text-right">
+                                    <td class="px-6 py-4 text-center">
                                         <div class="flex items-center justify-end gap-2 transition-opacity">
                                             <button @click="viewStudentResumes(user.id)" class="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500 hover:text-white transition-all" title="View Resumes">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             </button>
-                                            <button x-show="user.status === 'blocked'" @click="updateStatus(user.id, 'approved')" class="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500 hover:text-white transition-all shadow-lg shadow-emerald-500/10" title="Unblock Account">
+                                            
+                                            <button @click="showSetLimitModal(user.id, user.name, user.daily_limit || 5)" class="p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500 hover:text-indigo-950 transition-all font-bold" title="Set Daily Limit">
+                                                ⚡
+                                            </button>
+
+                                            <button x-show="user.is_active === false" @click="updateStatus(user.id, 'approved')" class="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500 hover:text-white transition-all shadow-lg shadow-emerald-500/10" title="Unblock Account">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
                                             </button>
                                             <button x-show="user.status === 'pending'" @click="updateStatus(user.id, 'approved')" class="p-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500 hover:text-white transition-all" title="Approve Student">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                             </button>
-                                            <button x-show="user.status !== 'blocked'" @click="updateStatus(user.id, 'blocked')" class="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all" title="Block Account">
+                                            <button x-show="user.is_active !== false && user.role !== 'admin'" @click="updateStatus(user.id, 'blocked')" class="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all" title="Block Account">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636"/></svg>
                                             </button>
                                             <button @click="deleteUser(user.id, user.name)" class="p-2 bg-white/10 text-white rounded-lg hover:bg-red-600 transition-all font-bold" title="Delete User">
@@ -268,6 +278,60 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 4: Blocked Sector (Institutional View) -->
+    <div x-show="activeTab === 'blocked'" x-cloak class="space-y-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-2xl font-black text-white">🚫 Blocked Agents Hub</h3>
+                <p class="text-blue-300 text-sm italic">Restricted entities organized by organization protocol</p>
+            </div>
+            <div class="bg-red-500/20 text-red-300 px-4 py-2 rounded-xl border border-red-500/30 font-bold">
+                Total Restricted: <span x-text="users.filter(u => u.is_active === false).length"></span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6">
+            <template x-for="college in colleges" :key="college.id">
+                <div x-show="users.filter(u => u.college === college.name && u.is_active === false).length > 0" 
+                     class="bg-white/10 border border-white/20 rounded-3xl backdrop-blur-xl overflow-hidden shadow-2xl transition-all hover:border-red-500/40">
+                    <div class="px-6 py-4 bg-red-500/10 border-b border-white/10 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">🏫</span>
+                            <h4 class="font-black text-white uppercase tracking-wider" x-text="college.name"></h4>
+                        </div>
+                        <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black" x-text="users.filter(u => u.college === college.name && u.is_active === false).length + ' BLOCKED'"></span>
+                    </div>
+                    <div class="divide-y divide-white/5">
+                        <template x-for="user in users.filter(u => u.college === college.name && u.is_active === false)" :key="user.id">
+                            <div class="px-6 py-4 flex items-center justify-between group hover:bg-white/5 transition-all">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 font-bold" x-text="user.name.charAt(0)"></div>
+                                    <div>
+                                        <p class="font-bold text-white" x-text="user.name"></p>
+                                        <p class="text-xs text-blue-300" x-text="user.roll_number + ' • ' + user.email"></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button @click="updateStatus(user.id, 'approved')" class="px-4 py-2 bg-emerald-500 text-white rounded-xl font-black text-xs hover:scale-105 transition-all shadow-lg shadow-emerald-500/20">
+                                        RESTORE ACCESS 🔓
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            
+            <!-- Empty State -->
+            <div x-show="users.filter(u => u.is_active === false).length === 0" 
+                 class="bg-white/5 border border-white/10 rounded-3xl p-12 text-center backdrop-blur-xl">
+                <div class="text-6xl mb-4 opacity-20">🕊️</div>
+                <h3 class="text-xl font-bold text-white mb-2">Protocol Equilibrium Reached</h3>
+                <p class="text-blue-300">No students are currently restricted across the neural network.</p>
             </div>
         </div>
     </div>
@@ -328,6 +392,25 @@
             </form>
         </div>
     </div>
+
+    <!-- Set Daily Limit Modal -->
+    <div x-show="showLimitModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-indigo-950 border border-white/20 rounded-3xl p-8 max-w-sm w-full shadow-2xl shadow-yellow-500/10">
+            <h3 class="text-xl font-black text-white mb-2">⚡ Set Daily Limit</h3>
+            <p class="text-xs text-blue-300 mb-6">Manifesting capacity for <span class="text-white font-bold" x-text="targetUserName"></span></p>
+            
+            <form @submit.prevent="submitLimitUpdate" class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-blue-300 mb-1 uppercase">Allowed Resumes Per Day</label>
+                    <input x-model="tempLimit" type="number" required min="1" max="100" class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white text-center text-2xl font-black focus:outline-none focus:border-yellow-400">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" @click="showLimitModal = false" class="flex-1 px-6 py-3 rounded-xl text-white font-bold bg-white/10 hover:bg-white/20 transition-all">Cancel</button>
+                    <button type="submit" :disabled="loading" class="flex-1 px-6 py-3 rounded-xl text-indigo-950 font-black bg-yellow-400 hover:bg-yellow-500 transition-all italic">SYNC ERA 🚀</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -342,9 +425,11 @@ function adminDashboard() {
         recentActivity: [],
         showAddModal: false,
         showPassModal: false,
+        showLimitModal: false,
         targetUserId: '',
         targetUserName: '',
         newPassword: '',
+        tempLimit: 5,
         newCollege: { name: '', email: '' },
         showEditModal: false,
         editingCollege: { id: '', name: '', email: '' },
@@ -355,6 +440,43 @@ function adminDashboard() {
         dragOver: false,
         csvPreview: [],
         loading: false,
+
+        showSetLimitModal(id, name, limit) {
+            this.targetUserId = id;
+            this.targetUserName = name;
+            this.tempLimit = limit;
+            this.showLimitModal = true;
+        },
+
+        async submitLimitUpdate() {
+            console.log("Limit Update Triggered", { 
+                userId: this.targetUserId, 
+                limit: this.tempLimit,
+                numericLimit: parseInt(this.tempLimit)
+            });
+            this.loading = true;
+            try {
+                const res = await fetch('/api/resume/admin/limit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: this.targetUserId, daily_limit: parseInt(this.tempLimit) })
+                });
+                const data = await res.json();
+                console.log("Server Response (Limit):", { status: res.status, data });
+
+                if (res.ok) {
+                    this.showLimitModal = false;
+                    await this.refreshData();
+                    window.showNotification?.(`✅ Manifest quota updated for ${this.targetUserName}`, 'success');
+                } else {
+                    alert("⚠️ Command Execution Failed: " + (data.detail || "Update failed"));
+                }
+            } catch (e) { 
+                console.error("Limit Sync Critical Error:", e);
+                alert("❌ Action failed: " + e.message); 
+            }
+            finally { this.loading = false; }
+        },
 
         async init() {
             await this.refreshData();
@@ -372,13 +494,23 @@ function adminDashboard() {
                 this.users = await usersRes.json();
                 this.colleges = await collegesRes.json();
                 this.recentActivity = await activityRes.json();
-            } catch (e) { console.error("Admin init failed", e); }
+                console.log("Admin Dashboard Context Refreshed:", {
+                    total_users: this.users.length,
+                    blocked: this.users.filter(u => u.is_active === false).length
+                });
+            } catch (e) { console.error("Admin Refresh Failed", e); }
         },
 
         get filteredUsers() {
             let filtered = this.users;
             if (this.statusFilter !== 'all') {
-                filtered = filtered.filter(u => (u.status || 'approved') === this.statusFilter);
+                if (this.statusFilter === 'approved') {
+                    filtered = filtered.filter(u => u.is_active !== false);
+                } else if (this.statusFilter === 'blocked') {
+                    filtered = filtered.filter(u => u.is_active === false);
+                } else {
+                    filtered = filtered.filter(u => u.status === this.statusFilter);
+                }
             }
             if (this.searchQuery) {
                 const q = this.searchQuery.toLowerCase();
@@ -506,15 +638,32 @@ function adminDashboard() {
             this.loading = true;
             try {
                 const res = await fetch(`/api/auth/admin/users/${id}/status?status=${status}`, { method: 'POST' });
+                const data = await res.json();
+                console.log(`Command Sequence [${status.toUpperCase()}]:`, { id, serverResponse: data });
+                
                 if (res.ok) {
                     await this.refreshData();
-                    alert(`✅ User status updated to ${status}`);
+                    window.showNotification?.(`✅ User ${status} successfully`, 'success');
                 } else {
-                    const data = await res.json();
-                    alert("⚠️ Error: " + (data.detail || "Update failed"));
+                    alert("⚠️ Command Execution Failed: " + (data.detail || "Update failed"));
                 }
-            } catch (e) { alert("❌ Failed to update status: " + e.message); }
+            } catch (e) { alert("❌ Neural Sync Error: " + e.message); }
             finally { this.loading = false; }
+        },
+
+        async updateDailyLimit(userId, limit) {
+            try {
+                const res = await fetch('/api/resume/admin/limit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, daily_limit: parseInt(limit) })
+                });
+                if (res.ok) {
+                    window.showNotification?.('✅ Daily limit updated', 'success');
+                } else {
+                    alert("Failed to update limit");
+                }
+            } catch (e) { console.error(e); }
         },
 
         async deleteUser(id, name) {

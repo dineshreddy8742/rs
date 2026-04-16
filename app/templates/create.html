@@ -250,8 +250,13 @@
                 <div class="mb-10 flex flex-col items-center">
                     <div class="relative">
                         <!-- Fast Cycling Meme GIFs -->
-                        <div class="w-48 h-48 rounded-3xl overflow-hidden border-4 border-pink-500 shadow-[0_0_40px_rgba(236,72,153,0.5)] relative mb-6">
-                            <img :src="loadingMemes[currentMemeIndex].url" class="w-full h-full object-cover transition-opacity duration-500">
+                        <div class="w-48 h-48 rounded-3xl overflow-hidden border-4 border-pink-500 shadow-[0_0_40px_rgba(236,72,153,0.5)] relative mb-6 flex items-center justify-center bg-indigo-950">
+                            <img :src="loadingMemes[currentMemeIndex].url" 
+                                 referrerpolicy="no-referrer"
+                                 @error="$event.target.classList.add('hidden')"
+                                 @load="$event.target.classList.remove('hidden')"
+                                 class="w-full h-full object-cover transition-opacity duration-500">
+                            <span class="text-7xl animate-pulse">👨‍🍳</span>
                         </div>
                         
                         <!-- Floating Moods (Cycling) -->
@@ -318,7 +323,7 @@
                     
                     <div class="bg-white/5 border border-white/10 rounded-[3rem] p-10 relative overflow-hidden group">
                          <div class="absolute -right-8 -top-8 text-8xl text-white/5 font-black uppercase italic pointer-events-none group-hover:scale-110 transition-transform">SYNC</div>
-                        <h4 class="text-[10px] font-black text-green-400 uppercase tracking-[0.4em] mb-6 italic ml-2">Frequency Overlap</h4>
+                        <h4 class="text-[10px] font-black text-green-400 uppercase tracking-[0.4em] mb-6 italic ml-2">Matched Skills</h4>
                         <div class="flex flex-wrap gap-2">
                             <template x-for="skill in matchedSkills" :key="skill">
                                 <span class="px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-xl text-[9px] font-black text-green-400 uppercase italic tracking-widest shadow-lg" x-text="skill"></span>
@@ -328,7 +333,7 @@
                     
                     <div class="bg-white/5 border border-white/10 rounded-[3rem] p-10 relative overflow-hidden group">
                         <div class="absolute -right-8 -top-8 text-8xl text-white/5 font-black uppercase italic pointer-events-none group-hover:scale-110 transition-transform">GAP</div>
-                        <h4 class="text-[10px] font-black text-red-500 uppercase tracking-[0.4em] mb-6 italic ml-2">Critical Voids</h4>
+                        <h4 class="text-[10px] font-black text-red-500 uppercase tracking-[0.4em] mb-6 italic ml-2">Missing Skills</h4>
                         <div class="flex flex-wrap gap-2">
                             <template x-for="skill in missingSkills" :key="skill">
                                 <span class="px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-xl text-[9px] font-black text-red-400 uppercase italic tracking-widest shadow-lg" x-text="skill"></span>
@@ -345,7 +350,7 @@
                         <div class="text-center md:text-left">
                             <h4 class="text-2xl font-black text-white italic tracking-tighter uppercase mb-2">Alpha Operational Intel</h4>
                             <p class="text-[12px] font-bold text-white/60 leading-relaxed uppercase tracking-tight max-w-2xl italic">
-                                Mandatory Deployment Advice: Mastery of identified voids is required for interview survival. Our AI will now bridge the gap in your signal, but terminal competency remains your responsibility.
+                                Mandatory Deployment Advice: Mastery of identified missing skills is required for interview survival. Our AI will now bridge the gap in your signal, but terminal competency remains your responsibility.
                             </p>
                         </div>
                     </div>
@@ -451,16 +456,11 @@ function resumeCreator() {
         progressInterval: null,
         currentMemeIndex: 0,
         loadingMemes: [
-            { url: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/vfsAZnqDvoHzUpMPY4/giphy.gif', badge1: 'no cap 🧢', badge2: 'slay ✨' },
-            { url: 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/BmmfW45fSOUpy/giphy.gif', badge1: 'fr fr 💯', badge2: 'bet 🤝' },
-            { url: 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/13HgwGsXF0aiGY/giphy.gif', badge1: 'rizz lvl 99 📈', badge2: 'main character ✨' },
-            { url: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/yr7n0u3qzJC8mAkp7F/giphy.gif', badge1: 'shook 💀', badge2: 'delulu era 🧠' },
-            { url: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/99GwoXp4ZpOGs/giphy.gif', badge1: 'vibing 🎧', badge2: 'it’s a mood 💅' },
-            { url: 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/lKXEBR8m1jWso/giphy.gif', badge1: 'cooking 🍳', badge2: 'big brain 🧠' },
-            { url: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/sSGV_iSInYl0I/giphy.gif', badge1: 'manifesting ✨', badge2: 'rich era 💸' },
-            { url: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/7kn27lnWSAE9O/giphy.gif', badge1: 'hype 🚀', badge2: 'w move 📈' },
-            { url: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/nVXzt7FSQLXJaJDWiv/giphy.gif', badge1: 'slaying 💅', badge2: 'on fleek ✨' },
-            { url: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHlxYmZzZnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/pS9v6mZ858Jq0/giphy.gif', badge1: 'it’s giving 💅', badge2: 'hired era 💼' }
+            { url: 'https://i.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif', badge1: 'no cap 🧢', badge2: 'slay ✨' },
+            { url: 'https://i.giphy.com/media/l41lTfuxV5nS1V3K8/giphy.gif', badge1: 'fr fr 💯', badge2: 'bet 🤝' },
+            { url: 'https://i.giphy.com/media/13HgwGsXF0aiGY/giphy.gif', badge1: 'rizz lvl 99 📈', badge2: 'main character ✨' },
+            { url: 'https://i.giphy.com/media/yr7n0u3qzJC8mAkp7F/giphy.gif', badge1: 'shook 💀', badge2: 'delulu era 🧠' },
+            { url: 'https://i.giphy.com/media/lKXEBR8m1jWso/giphy.gif', badge1: 'cooking 🍳', badge2: 'big brain 🧠' }
         ],
         memeInterval: null,
 
@@ -492,8 +492,15 @@ function resumeCreator() {
 
             try {
                 const response = await fetch('/api/resume/', { method: 'POST', body: formData });
-                if (!response.ok) throw new Error('Upload failed');
                 const data = await response.json();
+                
+                if (!response.ok) {
+                    const errorMsg = data.detail || 'Upload failed';
+                    if (window.showNotification) window.showNotification(errorMsg, 'error');
+                    else alert(errorMsg);
+                    throw new Error(errorMsg);
+                }
+                
                 this.resumeId = data.id;
 
                 const maxAttempts = 30;
@@ -539,7 +546,14 @@ function resumeCreator() {
                     body: JSON.stringify({ job_description: this.jobDescription, job_title: this.jobTitle || undefined })
                 });
                 
-                if (!response.ok) throw new Error('Optimization failed');
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    const errorMsg = data.detail || 'Optimization failed';
+                    if (window.showNotification) window.showNotification(errorMsg, 'error');
+                    else alert(errorMsg);
+                    throw new Error(errorMsg);
+                }
                 
                 const result = await this.pollOptimizationStatus();
                 
