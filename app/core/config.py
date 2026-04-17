@@ -28,14 +28,14 @@ class Settings(BaseSettings):
     VERSION: str = "2.0.1"
 
     # Supabase Configuration
-    SUPABASE_URL: str = "https://placeholder.supabase.co"
-    SUPABASE_ANON_KEY: str = "sb_publishable_2MMUfh6MHkHhsITxqe3Q_w_t2zPFlCD"
+    SUPABASE_URL: str = ""
+    SUPABASE_ANON_KEY: str = ""
     SUPABASE_SERVICE_ROLE_KEY: Optional[str] = None
 
     # AI Service Configuration (Multi-Key Rotation for 1k+ Users)
     MODEL_NAME: str = "google/gemini-2.0-flash-lite-001"
     # Provide a comma-separated list of keys in your .env
-    API_KEYS: Union[str, list[str]] = ["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"]
+    API_KEYS: Union[str, list[str]] = []
     API_BASE: str = "https://openrouter.ai/api/v1"
     OPENROUTER_MANAGEMENT_KEY: Optional[str] = None
 
