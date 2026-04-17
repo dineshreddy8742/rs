@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     """
 
     PROJECT_NAME: str = "AuraRise"
-    VERSION: str = "2.0.0"
+    VERSION: str = "2.0.1"
 
     # Supabase Configuration
     SUPABASE_URL: str = "https://placeholder.supabase.co"
