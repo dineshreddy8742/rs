@@ -22,14 +22,6 @@ class BaseRepository:
         match = re.search(r"Could not find the '([^']+)' column", message)
         return match.group(1) if match else None
 
-    def _remove_unsupported_columns(
-        self, data: Dict[str, Any], missing_column: Optional[str]
-    ) -> Dict[str, Any]:
-        """Drop the reported unsupported column so older schemas still work."""
-        if not missing_column or missing_column not in data:
-            return data
-        return {key: value for key, value in data.items() if key != missing_column}
-
     async def insert_one(self, data: Dict[str, Any]) -> str:
         """Insert a single record into Supabase with recursive column fallback."""
         payload = dict(data)
@@ -39,12 +31,14 @@ class BaseRepository:
                 return str(result.data[0].get("id", ""))
             return ""
         except Exception as e:
+            error_msg = str(e)
+            print(f"❌ DATABASE INSERT ERROR [{self.table_name}]: {error_msg}")
+            
             missing_column = self._get_missing_column_name(e)
             if missing_column and missing_column in payload:
                 print(f"⚠️ Column '{missing_column}' missing in {self.table_name}, retrying...")
                 retry_payload = {k: v for k, v in payload.items() if k != missing_column}
                 return await self.insert_one(retry_payload)
-            print(f"Error inserting record into {self.table_name}: {e}")
             return ""
 
     async def find_one(self, query: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -88,12 +82,14 @@ class BaseRepository:
             result = table.execute()
             return len(result.data) > 0 if result.data else False
         except Exception as e:
+            error_msg = str(e)
+            print(f"❌ DATABASE UPDATE ERROR [{self.table_name}]: {error_msg}")
+            
             missing_column = self._get_missing_column_name(e)
             if missing_column and missing_column in payload:
                 print(f"⚠️ Column '{missing_column}' missing in {self.table_name}, retrying update...")
                 retry_payload = {k: v for k, v in payload.items() if k != missing_column}
                 return await self.update_one(query, retry_payload)
-            print(f"Error updating record in {self.table_name}: {e}")
             return False
 
     async def delete_one(self, query: Dict[str, Any]) -> bool:

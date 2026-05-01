@@ -13,14 +13,18 @@ class FeedbackRepository(BaseRepository):
 
     async def create_feedback(self, feedback: Feedback) -> str:
         feedback_dict = feedback.model_dump(by_alias=True)
-        # Resilient insert
+        # Resilient insert with local name override
+        current_table = self.table_name
         res = await self.insert_one(feedback_dict)
-        if not res and self.table_name == "feedback":
+
+        if not res and current_table == "feedback":
             # Fallback to "feedbacks" if singular fails
             print("⚠️ Singular 'feedback' table insert failed, retrying with plural 'feedbacks'...")
             self.table_name = "feedbacks"
             res = await self.insert_one(feedback_dict)
+
         return res
+
 
     async def get_feedback_by_id(self, feedback_id: str) -> Optional[Dict]:
         try:
@@ -38,15 +42,23 @@ class FeedbackRepository(BaseRepository):
     async def get_all_feedback(self) -> List[Dict]:
         try:
             items = await self.find_many({}, [("created_at", -1)])
-            if not items and self.table_name == "feedback":
-                # Try plural if singular returned nothing (could be missing table)
-                self.table_name = "feedbacks"
+            if not items:
+                # If nothing found, try the other variant
+                other_table = "feedbacks" if self.table_name == "feedback" else "feedback"
+                print(f"🔍 No feedback in '{self.table_name}', checking '{other_table}'...")
+                original_table = self.table_name
+                self.table_name = other_table
                 items = await self.find_many({}, [("created_at", -1)])
+                if not items:
+                    # Fallback without sort
+                    items = await self.find_many({})
+                    if not items:
+                        # If still nothing, revert to avoid side effects
+                        self.table_name = original_table
             return items
         except Exception:
             # Fallback without sort
             return await self.find_many({})
-
     async def update_feedback(self, feedback_id: str, update_data: Dict) -> bool:
         try:
             update_data["updated_at"] = datetime.now().isoformat()
