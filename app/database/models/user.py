@@ -17,6 +17,9 @@ class User(BaseModel):
     is_active: bool = True
     is_admin: bool = False
     resume_count: int = 0
+    daily_limit: int = 5
+    monthly_limit: int = 50
+    yearly_limit: int = 500
     last_login: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now().isoformat())
@@ -50,6 +53,9 @@ class UserResponse(BaseModel):
     is_active: bool
     is_admin: bool
     resume_count: int
+    daily_limit: int
+    monthly_limit: int
+    yearly_limit: int
     last_login: Optional[str] = None
     created_at: str
 

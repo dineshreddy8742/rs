@@ -195,20 +195,32 @@ async def get_resume_usage_stats(
 
         stats = await repo.get_usage_stats(target_user_id)
         
-        # Also get current limit
+        # Also get current limits
         from app.database.repositories.user_repository import UserRepository
         user_repo = UserRepository()
         user = await user_repo.get_user_by_id(target_user_id)
-        stats["limit"] = user.get("daily_limit", 5) if user else 5
+        if user:
+            stats["daily_limit"] = user.get("daily_limit", 5)
+            stats["monthly_limit"] = user.get("monthly_limit", 50)
+            stats["yearly_limit"] = user.get("yearly_limit", 500)
+        else:
+            stats["daily_limit"] = 5
+            stats["monthly_limit"] = 50
+            stats["yearly_limit"] = 500
         
         return stats
     except Exception as e:
         logger.error(f"Failed to get usage stats: {e}")
-        return {"today": 0, "yesterday": 0, "tomorrow": 0, "weekly": 0, "monthly": 0, "limit": 5}
+        return {
+            "today": 0, "yesterday": 0, "weekly": 0, "monthly": 0, "yearly": 0,
+            "daily_limit": 5, "monthly_limit": 50, "yearly_limit": 500
+        }
 
 class QuotaUpdate(BaseModel):
     user_id: str
     daily_limit: int
+    monthly_limit: Optional[int] = 50
+    yearly_limit: Optional[int] = 500
 
 @resume_router.post("/admin/limit")
 async def update_user_limit(
@@ -216,7 +228,7 @@ async def update_user_limit(
     current_user_id: str = Depends(get_current_user),
     repo: ResumeRepository = Depends(get_resume_repository)
 ):
-    """Update a user's daily resume creation limit (admin only)."""
+    """Update a user's resume creation limits (admin only)."""
     # Verify requester is admin
     from app.database.repositories.user_repository import UserRepository
     user_repo = UserRepository()
@@ -226,11 +238,16 @@ async def update_user_limit(
         raise HTTPException(status_code=403, detail="Admin access required")
     
     # Update directly in the user document/row
-    success = await user_repo.update_user(req.user_id, {"daily_limit": req.daily_limit})
+    update_data = {
+        "daily_limit": req.daily_limit,
+        "monthly_limit": req.monthly_limit,
+        "yearly_limit": req.yearly_limit
+    }
+    success = await user_repo.update_user(req.user_id, update_data)
     if not success:
-        raise HTTPException(status_code=500, detail="Failed to update limit")
+        raise HTTPException(status_code=500, detail="Failed to update limits")
     
-    return {"success": True, "message": f"Daily limit set to {req.daily_limit}"}
+    return {"success": True, "message": f"Limits updated successfully"}
 
 
 async def process_resume_upload(resume_id: str, temp_file_path: str, repo: ResumeRepository):

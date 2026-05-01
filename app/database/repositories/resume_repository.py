@@ -193,8 +193,9 @@ class ResumeRepository(BaseRepository):
             yesterday_date = today_date - timedelta(days=1)
             week_ago = now - timedelta(days=7)
             month_ago = now - timedelta(days=30)
+            year_ago = now - timedelta(days=365)
             
-            stats = {"today": 0, "yesterday": 0, "tomorrow": 0, "weekly": 0, "monthly": 0, "last_today": None}
+            stats = {"today": 0, "yesterday": 0, "tomorrow": 0, "weekly": 0, "monthly": 0, "yearly": 0, "last_today": None}
             
             for r in resumes:
                 raw_created_at = r.get("created_at")
@@ -228,21 +229,33 @@ class ResumeRepository(BaseRepository):
                         stats["weekly"] += 1
                     if created_at >= month_ago:
                         stats["monthly"] += 1
+                    if created_at >= year_ago:
+                        stats["yearly"] += 1
                         
                 except Exception as parse_err:
                     continue
             
             return stats
         except Exception as e:
-            return {"today": 0, "yesterday": 0, "tomorrow": 0, "weekly": 0, "monthly": 0, "last_today": None}
+            return {"today": 0, "yesterday": 0, "tomorrow": 0, "weekly": 0, "monthly": 0, "yearly": 0, "last_today": None}
 
     async def can_create_resume(self, user_id: str) -> bool:
-        """Check if user has reached their daily resume limit."""
+        """Check if user has reached their daily, monthly, or yearly resume limit."""
         from app.database.repositories.user_repository import UserRepository
         user_repo = UserRepository()
         user = await user_repo.get_user_by_id(user_id)
         if not user: return False
         
-        limit = user.get("daily_limit", 5)
+        # Enforce all tiers of limits
+        daily_limit = user.get("daily_limit", 5)
+        monthly_limit = user.get("monthly_limit", 50)
+        yearly_limit = user.get("yearly_limit", 500)
+        
         stats = await self.get_usage_stats(user_id)
-        return stats["today"] < limit
+        
+        # All conditions must be met
+        return (
+            stats["today"] < daily_limit and
+            stats["monthly"] < monthly_limit and
+            stats["yearly"] < yearly_limit
+        )

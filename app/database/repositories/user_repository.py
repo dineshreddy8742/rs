@@ -23,11 +23,12 @@ class UserRepository(BaseRepository):
             user_data["is_active"] = True
             user_data["is_admin"] = False
             user_data["resume_count"] = 0
-            user_data["daily_limit"] = 5  # New Feature: Daily Quota
-            result = self._get_table().insert(user_data).execute()
-            if result.data:
-                return str(result.data[0].get("id", ""))
-            return None
+            user_data["daily_limit"] = 5
+            user_data["monthly_limit"] = 50
+            user_data["yearly_limit"] = 500
+            
+            res = await self.insert_one(user_data)
+            return res if res else None
         except Exception as e:
             print(f"Error creating user: {e}")
             return None
@@ -72,14 +73,7 @@ class UserRepository(BaseRepository):
         """Update user data with resilient schema handling."""
         try:
             update_data["updated_at"] = datetime.now().isoformat()
-            # Use base_repo's resilient update if it exists, or handle manually
-            success = await self.update_one({"id": user_id}, update_data)
-            if not success and "daily_limit" in update_data:
-                # If first try failed (likely due to missing daily_limit), retry without it
-                print("⚠️ SCHEMA MISMATCH: daily_limit column missing. Retrying update without it...")
-                retry_data = {k: v for k, v in update_data.items() if k != "daily_limit"}
-                success = await self.update_one({"id": user_id}, retry_data)
-            return success
+            return await self.update_one({"id": user_id}, update_data)
         except Exception as e:
             print(f"🚨 DATABASE UPDATE CRASH: {e}")
             return False

@@ -30,7 +30,13 @@ async def create_new_feedback(
         content=feedback_in.content,
         image=feedback_in.image
     )
-    return await repo.create_feedback(feedback)
+    res = await repo.create_feedback(feedback)
+    if not res:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to submit feedback to the database. Please try again."
+        )
+    return res
 
 @router.get("/mine", response_model=List[Feedback])
 async def get_my_feedback(user_id: str = Depends(get_current_user)):

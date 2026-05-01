@@ -31,26 +31,19 @@ class BaseRepository:
         return {key: value for key, value in data.items() if key != missing_column}
 
     async def insert_one(self, data: Dict[str, Any]) -> str:
-        """Insert a single record into Supabase."""
+        """Insert a single record into Supabase with recursive column fallback."""
         payload = dict(data)
         try:
             result = self._get_table().insert(payload).execute()
             if result.data and len(result.data) > 0:
-                # Return the ID of the newly created record
                 return str(result.data[0].get("id", ""))
             return ""
         except Exception as e:
             missing_column = self._get_missing_column_name(e)
-            retry_payload = self._remove_unsupported_columns(payload, missing_column)
-            if retry_payload != payload:
-                try:
-                    result = self._get_table().insert(retry_payload).execute()
-                    if result.data and len(result.data) > 0:
-                        return str(result.data[0].get("id", ""))
-                    return ""
-                except Exception as retry_error:
-                    print(f"Error inserting record into {self.table_name}: {retry_error}")
-                    return ""
+            if missing_column and missing_column in payload:
+                print(f"⚠️ Column '{missing_column}' missing in {self.table_name}, retrying...")
+                retry_payload = {k: v for k, v in payload.items() if k != missing_column}
+                return await self.insert_one(retry_payload)
             print(f"Error inserting record into {self.table_name}: {e}")
             return ""
 
@@ -86,31 +79,20 @@ class BaseRepository:
             return []
 
     async def update_one(self, query: Dict[str, Any], data: Dict[str, Any]) -> bool:
-        """Update a single record in Supabase."""
+        """Update a single record in Supabase with recursive column fallback."""
         payload = dict(data)
         try:
-            # Build the update query properly
             table = self._get_table().update(payload)
-            
-            # Apply filters from query dict
             for key, value in query.items():
                 table = table.eq(key, value)
-
             result = table.execute()
             return len(result.data) > 0 if result.data else False
         except Exception as e:
             missing_column = self._get_missing_column_name(e)
-            retry_payload = self._remove_unsupported_columns(payload, missing_column)
-            if retry_payload != payload:
-                try:
-                    table = self._get_table().update(retry_payload)
-                    for key, value in query.items():
-                        table = table.eq(key, value)
-                    result = table.execute()
-                    return len(result.data) > 0 if result.data else False
-                except Exception as retry_error:
-                    print(f"Error updating record in {self.table_name}: {retry_error}")
-                    return False
+            if missing_column and missing_column in payload:
+                print(f"⚠️ Column '{missing_column}' missing in {self.table_name}, retrying update...")
+                retry_payload = {k: v for k, v in payload.items() if k != missing_column}
+                return await self.update_one(query, retry_payload)
             print(f"Error updating record in {self.table_name}: {e}")
             return False
 

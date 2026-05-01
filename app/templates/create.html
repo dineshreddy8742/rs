@@ -5,43 +5,107 @@
 {% block head %}
 <style>
 /* Mobile Responsiveness */
+@media (max-width: 1024px) {
+    .grid.lg\:grid-cols-2 { grid-template-columns: 1fr !important; }
+    .grid.lg\:grid-cols-3 { grid-template-columns: 1fr !important; }
+}
 @media (max-width: 768px) {
     .grid.md\:grid-cols-2 { grid-template-columns: 1fr !important; }
+    .text-9xl { font-size: 50px !important; }
+    .text-8xl { font-size: 42px !important; }
+    .text-7xl { font-size: 36px !important; }
+    .text-6xl { font-size: 32px !important; }
     .text-5xl { font-size: 28px !important; }
-    .text-lg { font-size: 14px !important; }
-    .p-8 { padding: 16px !important; }
-    .px-4 { padding-left: 12px !important; padding-right: 12px !important; }
-    .gap-6 { gap: 16px !important; }
-    .w-16.h-16 { width: 48px !important; height: 48px !important; }
-    .text-2xl { font-size: 18px !important; }
-    .text-sm { font-size: 12px !important; }
-    .w-80 { width: 100% !important; }
-    .h-24.w-24 { width: 64px !important; height: 64px !important; }
-    .text-3xl { font-size: 20px !important; }
     .text-4xl { font-size: 24px !important; }
+    .text-3xl { font-size: 20px !important; }
+    .text-2xl { font-size: 18px !important; }
     .text-xl { font-size: 16px !important; }
+    .text-lg { font-size: 14px !important; }
+    .text-sm { font-size: 12px !important; }
+    .text-\[10rem\] { font-size: 5rem !important; }
+    .text-\[12rem\] { font-size: 6rem !important; }
+    
+    .p-12 { padding: 24px !important; }
+    .p-10 { padding: 20px !important; }
+    .p-8 { padding: 16px !important; }
+    .px-24 { padding-left: 20px !important; padding-right: 20px !important; }
+    .px-20 { padding-left: 20px !important; padding-right: 20px !important; }
+    .px-12 { padding-left: 20px !important; padding-right: 20px !important; }
+    .px-4 { padding-left: 12px !important; padding-right: 12px !important; }
     .py-12 { padding-top: 32px !important; padding-bottom: 32px !important; }
+    .py-8 { padding-top: 16px !important; padding-bottom: 16px !important; }
+    .py-6 { padding-top: 16px !important; padding-bottom: 16px !important; }
     .py-4 { padding-top: 12px !important; padding-bottom: 12px !important; }
-    .px-12 { padding-left: 24px !important; padding-right: 24px !important; }
-    button.text-lg { font-size: 14px !important; }
+    
+    .gap-12 { gap: 24px !important; }
+    .gap-8 { gap: 16px !important; }
+    .gap-6 { gap: 16px !important; }
+    
+    .mb-20 { margin-bottom: 32px !important; }
+    .mb-16 { margin-bottom: 24px !important; }
+    .mb-12 { margin-bottom: 24px !important; }
+    
+    .w-32.h-32 { width: 80px !important; height: 80px !important; }
+    .w-24.h-24 { width: 64px !important; height: 64px !important; }
+    .w-16.h-16 { width: 48px !important; height: 48px !important; }
+    .w-72.h-72 { width: 120px !important; height: 120px !important; }
+    .w-80 { width: 100% !important; }
     .h-64 { height: 200px !important; }
     .h-3 { height: 8px !important; }
-    .w-72.h-72 { width: 120px !important; height: 120px !important; }
+    
+    .rounded-\[4rem\] { border-radius: 2rem !important; }
+    .rounded-\[3\.5rem\] { border-radius: 1.5rem !important; }
+    .rounded-\[3rem\] { border-radius: 1.5rem !important; }
+    
+    button.text-lg { font-size: 14px !important; }
+    
+    .-right-12 { right: -1rem !important; }
+    .-top-12 { top: -1rem !important; }
+    .-right-16 { right: -1rem !important; }
+    .-top-16 { top: -1rem !important; }
 }
 @media (max-width: 480px) {
+    .text-9xl { font-size: 40px !important; }
+    .text-8xl { font-size: 32px !important; }
+    .text-7xl { font-size: 28px !important; }
+    .text-6xl { font-size: 26px !important; }
     .text-5xl { font-size: 24px !important; }
+    .text-\[10rem\] { font-size: 4rem !important; }
+    .text-\[12rem\] { font-size: 4.5rem !important; }
+    
+    .p-12 { padding: 16px !important; }
+    .p-10 { padding: 16px !important; }
     .p-8 { padding: 12px !important; }
-    .rounded-3xl { border-radius: 12px !important; }
-    .rounded-2xl { border-radius: 8px !important; }
+    .px-24 { padding-left: 16px !important; padding-right: 16px !important; }
+    .px-20 { padding-left: 16px !important; padding-right: 16px !important; }
+    .px-12 { padding-left: 16px !important; padding-right: 16px !important; }
+    .px-4 { padding-left: 8px !important; padding-right: 8px !important; }
+    .py-8 { padding-top: 12px !important; padding-bottom: 12px !important; }
+    .py-6 { padding-top: 12px !important; padding-bottom: 12px !important; }
+    .py-3 { padding-top: 8px !important; padding-bottom: 8px !important; }
+    
+    .gap-12 { gap: 16px !important; }
+    .gap-8 { gap: 12px !important; }
+    
     .mb-10 { margin-bottom: 24px !important; }
     .mb-8 { margin-bottom: 16px !important; }
     .mb-6 { margin-bottom: 12px !important; }
     .mb-4 { margin-bottom: 8px !important; }
     .mb-3 { margin-bottom: 6px !important; }
-    .px-4 { padding-left: 8px !important; padding-right: 8px !important; }
-    .py-3 { padding-top: 8px !important; padding-bottom: 8px !important; }
+    
+    .w-32.h-32 { width: 64px !important; height: 64px !important; }
+    
+    .rounded-3xl { border-radius: 12px !important; }
+    .rounded-2xl { border-radius: 8px !important; }
+    .rounded-\[4rem\] { border-radius: 1.5rem !important; }
+    .rounded-\[3\.5rem\] { border-radius: 1rem !important; }
+    .rounded-\[3rem\] { border-radius: 1rem !important; }
+    
     textarea { font-size: 14px !important; }
     input { font-size: 14px !important; }
+    
+    .flex-col.md\:flex-row { flex-direction: column !important; }
+    .flex-col.sm\:flex-row { flex-direction: column !important; text-align: center; }
 }
 </style>
 {% endblock %}
@@ -717,36 +781,24 @@ function resumeCreator() {
         },
 
         optimizeResume() {
+            // The AI generation was already completed during startAnalysis in parallel.
+            // We just need to simulate a brief "deployment" phase for good UX
+            // and then transition to Step 4.
             this.currentStep = 2;
             this.isAnalyzing = true;
-            this.analysisProgress = 0;
-            this.analysisProgressMessage = 'Starting optimization...';
-            this.startProgressSimulation();
+            this.analysisProgress = 100;
+            this.estimatedTimeRemaining = 0;
+            this.analysisProgressMessage = 'Packaging Optimized Signal...';
+            this.currentMemeIndex = 4; // Use the 'cooking' meme or similar
             
-            this.pollOptimizationStatus().then(result => {
-                clearInterval(this.progressInterval);
-                if (result.status === 'completed') {
-                    this.analysisProgress = 100;
-                    this.analysisProgressMessage = 'Optimization complete!';
-                    this.originalScore = result.original_ats_score || 0;
-                    this.matchScore = result.ats_score || 0;
-                    this.matchedSkills = result.matching_skills || [];
-                    this.missingSkills = result.missing_skills || [];
-                    this.recommendation = result.recommendation || '';
-                    this.resumePreviewUrl = `/api/resume/${this.resumeId}/download?use_optimized=true`;
-                    this.resumePreviewLoaded = true;
+            // Brief 1.5s delay to make the transition feel substantial
+            setTimeout(() => {
+                this.analysisProgressMessage = 'Optimization Locked!';
+                setTimeout(() => {
+                    this.isAnalyzing = false;
                     this.currentStep = 4;
-                } else {
-                    window.alert('Optimization failed: ' + (result.recommendation || 'Unknown error'));
-                    this.currentStep = 3;
-                }
-            }).catch(error => {
-                clearInterval(this.progressInterval);
-                window.alert('Error: ' + error.message);
-                this.currentStep = 3;
-            }).finally(() => {
-                this.isAnalyzing = false;
-            });
+                }, 800);
+            }, 1500);
         },
 
         downloadOptimizedResume() {

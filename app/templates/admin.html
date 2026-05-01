@@ -307,7 +307,9 @@
                                 <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase">Identity</th>
                                 <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase">College</th>
                                 <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-center">Resumes</th>
-                                <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-center">Daily Limit</th>
+                                <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-center">Daily</th>
+                                <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-center">Monthly</th>
+                                <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-center">Yearly</th>
                                 <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-center">Status</th>
                                 <th class="px-6 py-4 text-xs font-bold text-blue-200 uppercase text-right">Actions</th>
                             </tr>
@@ -337,11 +339,19 @@
                                         <span class="text-sm font-bold text-cyan-300" x-text="user.resume_count || 0"></span>
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <div class="flex items-center justify-center gap-2">
-                                            <input type="number" :value="user.daily_limit || 5" 
-                                                   @change="user.daily_limit = $event.target.value; updateDailyLimit(user.id, $event.target.value)" 
-                                                   class="w-16 bg-white/5 border border-white/20 rounded-lg px-2 py-1 text-center text-white font-bold text-sm focus:outline-none focus:border-yellow-400">
-                                        </div>
+                                        <input type="number" :value="user.daily_limit || 5" 
+                                               @change="user.daily_limit = parseInt($event.target.value); syncUserQuotas(user)" 
+                                               class="w-16 bg-white/5 border border-white/20 rounded-lg px-2 py-1 text-center text-white font-bold text-sm focus:outline-none focus:border-yellow-400">
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <input type="number" :value="user.monthly_limit || 50" 
+                                               @change="user.monthly_limit = parseInt($event.target.value); syncUserQuotas(user)" 
+                                               class="w-16 bg-white/5 border border-white/20 rounded-lg px-2 py-1 text-center text-white font-bold text-sm focus:outline-none focus:border-cyan-400">
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <input type="number" :value="user.yearly_limit || 500" 
+                                               @change="user.yearly_limit = parseInt($event.target.value); syncUserQuotas(user)" 
+                                               class="w-16 bg-white/5 border border-white/20 rounded-lg px-2 py-1 text-center text-white font-bold text-sm focus:outline-none focus:border-pink-400">
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         <span :class="{
@@ -356,7 +366,7 @@
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             </button>
                                             
-                                            <button @click="showSetLimitModal(user.id, user.name, user.daily_limit || 5)" class="p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500 hover:text-indigo-950 transition-all font-bold" title="Set Daily Limit">
+                                            <button @click="showSetLimitModal(user.id, user.name, user.daily_limit, user.monthly_limit, user.yearly_limit)" class="p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500 hover:text-indigo-950 transition-all font-bold" title="Manage Quotas">
                                                 ⚡
                                             </button>
 
@@ -497,13 +507,21 @@
     <!-- Set Daily Limit Modal -->
     <div x-show="showLimitModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div class="bg-indigo-950 border border-white/20 rounded-3xl p-8 max-w-sm w-full shadow-2xl shadow-yellow-500/10">
-            <h3 class="text-xl font-black text-white mb-2">⚡ Set Daily Limit</h3>
+            <h3 class="text-xl font-black text-white mb-2">⚡ Manage Quotas</h3>
             <p class="text-xs text-blue-300 mb-6">Manifesting capacity for <span class="text-white font-bold" x-text="targetUserName"></span></p>
             
-            <form @submit.prevent="submitLimitUpdate" class="space-y-4">
+            <form @submit.prevent="submitLimitUpdate" class="space-y-6">
                 <div>
-                    <label class="block text-[10px] font-bold text-blue-300 mb-1 uppercase">Allowed Resumes Per Day</label>
-                    <input x-model="tempLimit" type="number" required min="1" max="100" class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white text-center text-2xl font-black focus:outline-none focus:border-yellow-400">
+                    <label class="block text-[10px] font-bold text-blue-300 mb-1 uppercase">Daily Limit</label>
+                    <input x-model="tempLimit" type="number" required min="1" max="100" class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white text-center text-xl font-black focus:outline-none focus:border-yellow-400">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-blue-300 mb-1 uppercase">Monthly Limit</label>
+                    <input x-model="tempMonthlyLimit" type="number" required min="1" max="1000" class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white text-center text-xl font-black focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-blue-300 mb-1 uppercase">Yearly Limit</label>
+                    <input x-model="tempYearlyLimit" type="number" required min="1" max="10000" class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white text-center text-xl font-black focus:outline-none focus:border-pink-400">
                 </div>
                 <div class="flex gap-3 pt-4">
                     <button type="button" @click="showLimitModal = false" class="flex-1 px-6 py-3 rounded-xl text-white font-bold bg-white/10 hover:bg-white/20 transition-all">Cancel</button>
@@ -533,6 +551,8 @@ function adminDashboard() {
         feedback: [],
         feedbackFilter: 'all',
         tempLimit: 5,
+        tempMonthlyLimit: 50,
+        tempYearlyLimit: 500,
         newCollege: { name: '', email: '' },
         showEditModal: false,
         editingCollege: { id: '', name: '', email: '' },
@@ -544,38 +564,38 @@ function adminDashboard() {
         csvPreview: [],
         loading: false,
 
-        showSetLimitModal(id, name, limit) {
+        showSetLimitModal(id, name, daily, monthly, yearly) {
             this.targetUserId = id;
             this.targetUserName = name;
-            this.tempLimit = limit;
+            this.tempLimit = daily || 5;
+            this.tempMonthlyLimit = monthly || 50;
+            this.tempYearlyLimit = yearly || 500;
             this.showLimitModal = true;
         },
 
         async submitLimitUpdate() {
-            console.log("Limit Update Triggered", { 
-                userId: this.targetUserId, 
-                limit: this.tempLimit,
-                numericLimit: parseInt(this.tempLimit)
-            });
             this.loading = true;
             try {
                 const res = await fetch('/api/resume/admin/limit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: this.targetUserId, daily_limit: parseInt(this.tempLimit) })
+                    body: JSON.stringify({ 
+                        user_id: this.targetUserId, 
+                        daily_limit: parseInt(this.tempLimit),
+                        monthly_limit: parseInt(this.tempMonthlyLimit),
+                        yearly_limit: parseInt(this.tempYearlyLimit)
+                    })
                 });
                 const data = await res.json();
-                console.log("Server Response (Limit):", { status: res.status, data });
 
                 if (res.ok) {
                     this.showLimitModal = false;
                     await this.refreshData();
-                    window.showNotification?.(`✅ Manifest quota updated for ${this.targetUserName}`, 'success');
+                    window.showNotification?.(`✅ Quotas updated for ${this.targetUserName}`, 'success');
                 } else {
-                    alert("⚠️ Command Execution Failed: " + (data.detail || "Update failed"));
+                    alert("⚠️ Update failed: " + (data.detail || "Error"));
                 }
             } catch (e) { 
-                console.error("Limit Sync Critical Error:", e);
                 alert("❌ Action failed: " + e.message); 
             }
             finally { this.loading = false; }
@@ -598,7 +618,8 @@ function adminDashboard() {
                 this.users = await usersRes.json();
                 this.colleges = await collegesRes.json();
                 this.recentActivity = await activityRes.json();
-                this.feedback = await feedbackRes.json();
+                const feedbackData = await feedbackRes.json();
+                this.feedback = Array.isArray(feedbackData) ? feedbackData : [];
 
                 console.log("Admin Dashboard Context Refreshed:", {
                     total_users: this.users.length,
@@ -609,8 +630,9 @@ function adminDashboard() {
         },
 
         get filteredFeedback() {
-            if (this.feedbackFilter === 'all') return this.feedback;
-            return this.feedback.filter(f => f.status === this.feedbackFilter);
+            const list = Array.isArray(this.feedback) ? this.feedback : [];
+            if (this.feedbackFilter === 'all') return list;
+            return list.filter(f => f.status === this.feedbackFilter);
         },
 
         async resolveFeedback(id) {
@@ -797,17 +819,23 @@ function adminDashboard() {
             finally { this.loading = false; }
         },
 
-        async updateDailyLimit(userId, limit) {
+        async syncUserQuotas(user) {
             try {
                 const res = await fetch('/api/resume/admin/limit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, daily_limit: parseInt(limit) })
+                    body: JSON.stringify({ 
+                        user_id: user.id, 
+                        daily_limit: user.daily_limit,
+                        monthly_limit: user.monthly_limit,
+                        yearly_limit: user.yearly_limit
+                    })
                 });
                 if (res.ok) {
-                    window.showNotification?.('✅ Daily limit updated', 'success');
+                    window.showNotification?.(`✅ Quotas synced for ${user.name}`, 'success');
                 } else {
-                    alert("Failed to update limit");
+                    const data = await res.json();
+                    alert("⚠️ Sync failed: " + (data.detail || "Error"));
                 }
             } catch (e) { console.error(e); }
         },
