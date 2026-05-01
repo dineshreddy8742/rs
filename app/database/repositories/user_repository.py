@@ -27,8 +27,8 @@ class UserRepository(BaseRepository):
             user_data["monthly_limit"] = 50
             user_data["yearly_limit"] = 500
             
-            res = await self.insert_one(user_data)
-            return res if res else None
+            res_id, error = await self.insert_one(user_data)
+            return res_id if res_id else None
         except Exception as e:
             print(f"Error creating user: {e}")
             return None

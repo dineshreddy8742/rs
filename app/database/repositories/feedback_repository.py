@@ -11,19 +11,19 @@ class FeedbackRepository(BaseRepository):
         # and checking both plural/singular if needed could be done in methods
         super().__init__(table_name)
 
-    async def create_feedback(self, feedback: Feedback) -> str:
+    async def create_feedback(self, feedback: Feedback) -> tuple[str, Optional[str]]:
         feedback_dict = feedback.model_dump(by_alias=True)
         # Resilient insert with local name override
         current_table = self.table_name
-        res = await self.insert_one(feedback_dict)
+        res_id, error = await self.insert_one(feedback_dict)
 
-        if not res and current_table == "feedback":
+        if not res_id and current_table == "feedback":
             # Fallback to "feedbacks" if singular fails
             print("⚠️ Singular 'feedback' table insert failed, retrying with plural 'feedbacks'...")
             self.table_name = "feedbacks"
-            res = await self.insert_one(feedback_dict)
+            res_id, error = await self.insert_one(feedback_dict)
 
-        return res
+        return res_id, error
 
 
     async def get_feedback_by_id(self, feedback_id: str) -> Optional[Dict]:

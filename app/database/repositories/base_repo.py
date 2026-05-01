@@ -22,14 +22,14 @@ class BaseRepository:
         match = re.search(r"Could not find the '([^']+)' column", message)
         return match.group(1) if match else None
 
-    async def insert_one(self, data: Dict[str, Any]) -> str:
-        """Insert a single record into Supabase with recursive column fallback."""
-        payload = dict(data)
+    async def insert_one(self, data: Dict[str, Any]) -> tuple[str, Optional[str]]:
+        """Insert a single record into Supabase with recursive column fallback. Returns (id, error_msg)."""
+        payload = {k: v for k, v in data.items() if v is not None}
         try:
             result = self._get_table().insert(payload).execute()
             if result.data and len(result.data) > 0:
-                return str(result.data[0].get("id", ""))
-            return ""
+                return str(result.data[0].get("id", "")), None
+            return "", "Insert succeeded but no data was returned. Check RLS policies."
         except Exception as e:
             error_msg = str(e)
             print(f"❌ DATABASE INSERT ERROR [{self.table_name}]: {error_msg}")
@@ -39,7 +39,7 @@ class BaseRepository:
                 print(f"⚠️ Column '{missing_column}' missing in {self.table_name}, retrying...")
                 retry_payload = {k: v for k, v in payload.items() if k != missing_column}
                 return await self.insert_one(retry_payload)
-            return ""
+            return "", error_msg
 
     async def find_one(self, query: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Find a single record in Supabase."""
